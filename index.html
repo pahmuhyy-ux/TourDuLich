@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelVivu - Khám phá thế giới</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font chữ cơ bản từ Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header & Navbar -->
+    <header>
+        <div class="container navbar">
+            <div class="logo">
+                <h2>Travel<span>Vivu</span></h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Trang chủ</a></li>
+                    <li><a href="#">Danh sách Tour</a></li>
+                    <li><a href="#">Điểm đến</a></li>
+                    <li><a href="#">Liên hệ</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <button class="btn btn-outline">Đăng nhập</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner & Thanh tìm kiếm (Hero Section) -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Khám phá hành trình mơ ước của bạn</h1>
+            <p>Hàng ngàn điểm đến tuyệt vời đang chờ đón bạn</p>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Bạn muốn đi đâu? (VD: Đà Lạt, Phú Quốc...)">
+                <input type="date" id="dateInput">
+                <button id="searchBtn" class="btn btn-primary">Tìm kiếm ngay</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Tour Nổi Bật (Dữ liệu được render từ JavaScript) -->
+    <section class="featured-tours container">
+        <h2 class="section-title">Tour Du Lịch Nổi Bật</h2>
+        <div id="tour-container" class="tour-grid">
+            <!-- JavaScript sẽ chèn các card tour vào đây -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-col">
+                <h3>TravelVivu</h3>
+                <p>Đồng hành cùng bạn trên mọi nẻo đường.</p>
+            </div>
+            <div class="footer-col">
+                <h3>Liên kết</h3>
+                <ul>
+                    <li><a href="#">Về chúng tôi</a></li>
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Liên hệ</h3>
+                <p>Email: contact@travelvivu.com</p>
+                <p>Hotline: 1900 xxxx</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TravelVivu. Đồ án môn học Web.</p>
+        </div>
+    </footer>
+
+    <!-- Gọi file JavaScript -->
+    <script src="main.js"></script>
+</body>
+</html>
