@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Liên hệ</title>
+    <style>
+      :root {
+        --bg: #f3f7ff;
+        --card: rgba(255, 255, 255, 0.9);
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --text: #111827;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --success: #dcfce7;
+        --success-text: #166534;
+        --error: #dc2626;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: Arial, Helvetica, sans-serif;
+        background: radial-gradient(circle at top, #f9fbff 0%, var(--bg) 42%, #e8f0ff 100%);
+        color: var(--text);
+      }
+
+      .container {
+        width: min(980px, 92vw);
+      }
+
+      .contact {
+        display: grid;
+        grid-template-columns: 0.95fr 1.25fr;
+        background: var(--card);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 22px 50px rgba(15, 23, 42, 0.12);
+      }
+
+      .info {
+        padding: 38px 30px;
+        background: linear-gradient(135deg, #0f172a, var(--primary));
+        color: #fff;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        letter-spacing: 0.04em;
+      }
+
+      .info h2 {
+        margin: 18px 0 14px;
+        font-size: clamp(2rem, 2vw + 1rem, 2.5rem);
+      }
+
+      .info p {
+        margin: 0 0 24px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .info-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .info-item {
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        line-height: 1.8;
+      }
+
+      .form-wrap {
+        padding: 34px 30px 30px;
+      }
+
+      .form-wrap h3 {
+        margin: 0 0 20px;
+        font-size: clamp(1.6rem, 1vw + 1rem, 2rem);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      form {
+        display: grid;
+        gap: 16px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+
+      input, textarea, button {
+        width: 100%;
+        font: inherit;
+      }
+
+      input, textarea {
+        border: 1px solid var(--line);
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 12px 14px;
+        transition: 0.2s ease;
+      }
+
+      input:focus, textarea:focus {
+        outline: none;
+        border-color: #60a5fa;
+        box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.16);
+      }
+
+      textarea {
+        min-height: 140px;
+        resize: vertical;
+      }
+
+      .field-error {
+        display: block;
+        min-height: 18px;
+        margin-top: 6px;
+        color: var(--error);
+        font-size: 0.8rem;
+      }
+
+      .success {
+        display: none;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: var(--success);
+        color: var(--success-text);
+        border: 1px solid #86efac;
+        font-weight: 700;
+      }
+
+      .success.show {
+        display: block;
+      }
+
+      button {
+        border: none;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        cursor: pointer;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        opacity: 0.96;
+      }
+
+      @media (max-width: 760px) {
+        .contact {
+          grid-template-columns: 1fr;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="contact">
+        <aside class="info">
+          <div class="badge">TRAVEL SUPPORT</div>
+          <img
+            src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80"
+            alt="Tràng An"
+            style="width: 100%; height: 180px; object-fit: cover; border-radius: 16px; margin: 18px 0; border: 1px solid rgba(255,255,255,0.25);"
+          />
+          <h2>Liên hệ với chúng tôi</h2>
+          <p>
+            Hãy để lại thông tin, chúng tôi sẽ tư vấn và hỗ trợ bạn nhanh nhất về
+            tour, đặt phòng, hoặc các yêu cầu đặc biệt.
+          </p>
+
+          <div class="info-list">
+            <div class="info-item"><strong>📍 Địa chỉ:</strong><br />123 Đường ABC, Quận 1, TP.HCM</div>
+            <div class="info-item"><strong>📞 Điện thoại:</strong><br />0901 234 567</div>
+            <div class="info-item"><strong>✉️ Email:</strong><br />contact@javanaangcao.vn</div>
+          </div>
+        </aside>
+
+        <div class="form-wrap">
+          <h3>Gửi tin nhắn</h3>
+          <form id="contactForm" novalidate>
+            <div class="grid">
+              <div>
+                <label for="name">Họ và tên</label>
+                <input id="name" type="text" placeholder="Nhập họ tên" />
+                <span class="field-error" data-error-for="name"></span>
+              </div>
+              <div>
+                <label for="phone">Số điện thoại</label>
+                <input id="phone" type="tel" placeholder="Nhập số điện thoại" />
+                <span class="field-error" data-error-for="phone"></span>
+              </div>
+            </div>
+
+            <div>
+              <label for="email">Email</label>
+              <input id="email" type="email" placeholder="Nhập email" />
+              <span class="field-error" data-error-for="email"></span>
+            </div>
+
+            <div>
+              <label for="subject">Chủ đề</label>
+              <input id="subject" type="text" placeholder="Nhập chủ đề" />
+              <span class="field-error" data-error-for="subject"></span>
+            </div>
+
+            <div>
+              <label for="message">Nội dung</label>
+              <textarea id="message" placeholder="Viết tin nhắn của bạn..."></textarea>
+              <span class="field-error" data-error-for="message"></span>
+            </div>
+
+            <div id="formMessage" class="success" aria-live="polite">
+              Gửi tin nhắn thành công. Chúng tôi sẽ phản hồi sớm nhất.
+            </div>
+
+            <button type="submit">Gửi liên hệ</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById('contactForm');
+      const formMessage = document.getElementById('formMessage');
+      const rules = {
+        name: v => v.trim().length >= 2,
+        phone: v => /^0\d{9,10}$/.test(v.trim()),
+        email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
+        subject: v => v.trim().length >= 5,
+        message: v => v.trim().length >= 10,
+      };
+
+      const messages = {
+        name: 'Vui lòng nhập họ tên ít nhất 2 ký tự.',
+        phone: 'Số điện thoại không hợp lệ.',
+        email: 'Email không hợp lệ.',
+        subject: 'Chủ đề tối thiểu 5 ký tự.',
+        message: 'Nội dung tối thiểu 10 ký tự.'
+      };
+
+      function setError(id, text) {
+        const field = document.getElementById(id);
+        const node = document.querySelector(`[data-error-for="${id}"]`);
+        if (field) field.setAttribute('aria-invalid', text ? 'true' : 'false');
+        if (node) node.textContent = text;
+      }
+
+      function validate() {
+        let ok = true;
+        Object.keys(rules).forEach(id => {
+          const value = document.getElementById(id).value;
+          const valid = rules[id](value);
+          setError(id, valid ? '' : messages[id]);
+          if (!valid) ok = false;
+        });
+        return ok;
+      }
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        formMessage.classList.remove('show');
+        if (!validate()) return;
+        form.reset();
+        formMessage.classList.add('show');
+      });
+    </script>
+  </body>
+</html>
