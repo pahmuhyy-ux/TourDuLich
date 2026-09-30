@@ -1,5 +1,10 @@
 import './style.css'
 
+// Nạp file chức năng vào (sử dụng dynamic import để đảm bảo HTML render xong mới chạy logic)
+setTimeout(() => {
+  import('./chucnang.js');
+}, 100);
+
 const img = (id) => `https://picsum.photos/seed/${id}/1200/800`
 
 document.querySelector('#app').innerHTML = `
@@ -117,64 +122,33 @@ document.querySelector('#app').innerHTML = `
       <h2 class="section-title">Tour du lịch được yêu thích nhất</h2>
       <p class="section-desc">Lựa chọn hoàn hảo cho kỳ nghỉ của bạn.</p>
     </div>
-    <div class="grid tours">
-      <div class="card tour-card">
-        <div class="tour-media">
-          <img src="${img('tour-malaysia')}" alt="Tour Malaysia - Singapore" />
-          <span class="badge">Giảm 20%</span>
-          <span class="days">5N4Đ</span>
-        </div>
-        <div class="tour-body">
-          <p class="tour-rating">★★★★★ <span>4.9 (238 đánh giá)</span></p>
-          <h3>Tour Malaysia – Singapore</h3>
-          <p class="tour-meta">🇸🇬 Singapore • 🇲🇾 Malaysia</p>
-          <div class="tour-foot">
-            <div>
-              <span class="price-old">12.500.000đ</span>
-              <span class="price">10.000.000đ</span>
-            </div>
-            <button class="btn btn-primary btn-sm">Đặt ngay</button>
-          </div>
-        </div>
-      </div>
-      <div class="card tour-card">
-        <div class="tour-media">
-          <img src="${img('tour-japan')}" alt="Tour Nhật Bản" />
-          <span class="badge badge-hot">Hot</span>
-          <span class="days">6N5Đ</span>
-        </div>
-        <div class="tour-body">
-          <p class="tour-rating">★★★★★ <span>4.8 (312 đánh giá)</span></p>
-          <h3>Tour Nhật Bản – Tokyo, Osaka</h3>
-          <p class="tour-meta">🇯🇵 Nhật Bản • Hoa anh đào</p>
-          <div class="tour-foot">
-            <div>
-              <span class="price-old">28.900.000đ</span>
-              <span class="price">25.400.000đ</span>
-            </div>
-            <button class="btn btn-primary btn-sm">Đặt ngay</button>
-          </div>
-        </div>
-      </div>
-      <div class="card tour-card">
-        <div class="tour-media">
-          <img src="${img('tour-europe')}" alt="Tour Châu Âu" />
-          <span class="badge">Giảm 15%</span>
-          <span class="days">9N8Đ</span>
-        </div>
-        <div class="tour-body">
-          <p class="tour-rating">★★★★★ <span>4.9 (178 đánh giá)</span></p>
-          <h3>Tour Châu Âu – Pháp, Ý, Thụy Sĩ</h3>
-          <p class="tour-meta">🇫🇷 Pháp • 🇮🇹 Ý • 🇨🇭 Thụy Sĩ</p>
-          <div class="tour-foot">
-            <div>
-              <span class="price-old">78.000.000đ</span>
-              <span class="price">66.300.000đ</span>
-            </div>
-            <button class="btn btn-primary btn-sm">Đặt ngay</button>
-          </div>
-        </div>
-      </div>
+
+    <!-- BỔ SUNG: BỘ LỌC TOUR -->
+    <div class="filter-section" style="display: flex; gap: 15px; margin-bottom: 30px; justify-content: center;">
+        <select id="filterPrice" onchange="window.applyFilters()" style="padding: 10px; border-radius: 5px; border: 1px solid #ccc; outline: none; cursor: pointer;">
+            <option value="all">Tất cả mức giá</option>
+            <option value="under2">Dưới 2.000.000đ</option>
+            <option value="2to5">Từ 2 - 5.000.000đ</option>
+            <option value="over5">Trên 5.000.000đ</option>
+        </select>
+
+        <select id="filterDays" onchange="window.applyFilters()" style="padding: 10px; border-radius: 5px; border: 1px solid #ccc; outline: none; cursor: pointer;">
+            <option value="all">Tất cả số ngày</option>
+            <option value="short">Ngắn ngày (1 - 2 ngày)</option>
+            <option value="medium">Vừa (3 - 4 ngày)</option>
+            <option value="long">Dài ngày (5 ngày trở lên)</option>
+        </select>
+
+        <select id="sortPrice" onchange="window.applyFilters()" style="padding: 10px; border-radius: 5px; border: 1px solid #ccc; outline: none; cursor: pointer;">
+            <option value="default">Sắp xếp mặc định</option>
+            <option value="asc">Giá: Thấp đến Cao</option>
+            <option value="desc">Giá: Cao đến Thấp</option>
+        </select>
+    </div>
+
+    <!-- BỔ SUNG: THÊM ID tourList ĐỂ JAVASCRIPT GẮN DỮ LIỆU -->
+    <div id="tourList" class="grid tours">
+      <!-- File chucnang.js sẽ tự động điền các tour vào đây -->
     </div>
   </div>
 </section>
@@ -233,50 +207,6 @@ document.querySelector('#app').innerHTML = `
   </div>
 </section>
 
-<section class="section">
-  <div class="container">
-    <div class="section-head">
-      <p class="section-label">ĐÁNH GIÁ KHÁCH HÀNG</p>
-      <h2 class="section-title">Khách hàng nói gì về chúng tôi</h2>
-    </div>
-    <div class="grid testimonials">
-      <div class="card testimonial-card">
-        <div class="stars">★★★★★</div>
-        <p>"Tour được tổ chức rất chuyên nghiệp, HDV nhiệt tình, lịch trình hợp lý. Gia đình mình rất hài lòng!"</p>
-        <div class="testimonial-author">
-          <div class="avatar">MT</div>
-          <div>
-            <strong>Minh Thư</strong>
-            <span>Tour Nhật Bản</span>
-          </div>
-        </div>
-      </div>
-      <div class="card testimonial-card">
-        <div class="stars">★★★★★</div>
-        <p>"Giá cả hợp lý, không phát sinh chi phí. Khách sạn sạch sẽ, view đẹp. Sẽ tiếp tục sử dụng dịch vụ."</p>
-        <div class="testimonial-author">
-          <div class="avatar">HD</div>
-          <div>
-            <strong>Hoàng Đức</strong>
-            <span>Tour Hà Nội</span>
-          </div>
-        </div>
-      </div>
-      <div class="card testimonial-card">
-        <div class="stars">★★★★★</div>
-        <p>"Từ khâu tư vấn đến lúc hoàn thành tour đều rất chu đáo. Đáng tin cậy, 10 điểm không có nhưng!"</p>
-        <div class="testimonial-author">
-          <div class="avatar">NT</div>
-          <div>
-            <strong>Ngọc Trâm</strong>
-            <span>Tour Singapore</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <footer class="footer">
   <div class="container footer-grid">
     <div class="footer-brand">
@@ -320,4 +250,49 @@ document.querySelector('#app').innerHTML = `
     </div>
   </div>
 </footer>
+
+<!-- BỔ SUNG: MODAL ĐẶT TOUR ẨN BÊN DƯỚI -->
+<div id="bookingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 500px; position: relative;">
+        <span onclick="window.closeModal()" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; font-weight: bold; color: #333;">&times;</span>
+        <h2 style="margin-top:0; color: #3b82f6;">Xác nhận đặt tour</h2>
+        
+        <h3 id="modalTourName" style="color: #1e293b; margin: 10px 0;"></h3>
+        <p style="margin:0 0 15px 0;">Giá vé: <span id="modalTourPrice" style="color: #f97316; font-weight: bold; font-size: 18px;"></span> / người</p>
+        
+        <div style="margin-top: 15px;">
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Họ và Tên:</label>
+                <input type="text" id="cusName" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Nhập họ tên đầy đủ...">
+                <span id="errName" style="color: red; font-size: 13px; display: block;"></span>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Số điện thoại:</label>
+                <input type="text" id="cusPhone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Ví dụ: 0912345678">
+                <span id="errPhone" style="color: red; font-size: 13px; display: block;"></span>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Email:</label>
+                <input type="email" id="cusEmail" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="abc@gmail.com">
+                <span id="errEmail" style="color: red; font-size: 13px; display: block;"></span>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Ngày khởi hành:</label>
+                <input type="date" id="cusDate" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <span id="errDate" style="color: red; font-size: 13px; display: block;"></span>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Số lượng người:</label>
+                <input type="number" id="cusQty" oninput="window.calcTotal()" value="1" min="1" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <span id="errQty" style="color: red; font-size: 13px; display: block;"></span>
+            </div>
+        </div>
+
+        <div style="text-align: right; margin: 15px 0; font-size: 18px;">
+            Tổng tiền: <span id="totalPrice" style="color: #f97316; font-weight: bold; font-size: 22px;">0đ</span>
+        </div>
+
+        <button onclick="window.submitBooking()" style="width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px;">Xác nhận đặt ngay</button>
+    </div>
+</div>
 `
