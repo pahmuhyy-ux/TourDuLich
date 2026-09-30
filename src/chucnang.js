@@ -526,5 +526,121 @@ window.openModal = (id) => {
     if (currentUser) {
         document.getElementById('cusName').value = currentUser.name;
         document.getElementById('cusEmail').value = currentUser.email;
+        
     }
 };
+// ==========================================
+// 9. FIX SLIDER ĐỔI ẢNH CHUẨN XÁC NHẤT
+// ==========================================
+setTimeout(() => {
+    const heroSection = document.querySelector('.hero');
+    if (heroSection && !document.querySelector('.hero-btn-left')) { 
+        const bannerImages = [
+            'url("https://picsum.photos/seed/banner1/1920/1080")',
+            'url("https://picsum.photos/seed/banner2/1920/1080")',
+            'url("https://picsum.photos/seed/banner3/1920/1080")'
+        ];
+        let currentIdx = 0;
+
+        heroSection.style.position = 'relative';
+        heroSection.style.transition = 'background-image 0.5s ease-in-out';
+        heroSection.style.backgroundImage = bannerImages[0];
+
+        // Tạo nút Trái
+        const btnLeft = document.createElement('button');
+        btnLeft.className = 'hero-btn-left'; // Đánh dấu để không tạo trùng
+        btnLeft.innerHTML = '&#10094;';
+        Object.assign(btnLeft.style, {
+            position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)',
+            background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none',
+            fontSize: '24px', padding: '12px 18px', cursor: 'pointer', zIndex: '100', borderRadius: '50%'
+        });
+
+        // Tạo nút Phải
+        const btnRight = document.createElement('button');
+        btnRight.innerHTML = '&#10095;';
+        Object.assign(btnRight.style, {
+            position: 'absolute', top: '50%', right: '20px', transform: 'translateY(-50%)',
+            background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none',
+            fontSize: '24px', padding: '12px 18px', cursor: 'pointer', zIndex: '100', borderRadius: '50%'
+        });
+
+        heroSection.appendChild(btnLeft);
+        heroSection.appendChild(btnRight);
+
+        const changeBanner = (dir) => {
+            currentIdx = dir === 'next' ? (currentIdx + 1) % bannerImages.length : (currentIdx - 1 + bannerImages.length) % bannerImages.length;
+            heroSection.style.backgroundImage = bannerImages[currentIdx];
+        };
+
+        btnLeft.onclick = () => changeBanner('prev');
+        btnRight.onclick = () => changeBanner('next');
+        setInterval(() => changeBanner('next'), 3000);
+    }
+}, 500); // Delay nửa giây để đảm bảo HTML đã có sẵn
+
+
+// ==========================================
+// 10. FIX TRANG CHI TIẾT (LẬT NGƯỢC GIAO DIỆN TRANG CHỦ)
+// ==========================================
+const urlParams = new URLSearchParams(window.location.search);
+const tourId = parseInt(urlParams.get('id'));
+
+if (tourId) {
+    // Đợi HTML trang chủ load xong thì ta xóa đi và thay bằng UI Chi tiết
+    setTimeout(() => {
+        const tour = tours.find(t => t.id === tourId);
+        if (tour) {
+            const appDiv = document.querySelector('#app');
+            if (appDiv) {
+                // XÓA TRẮNG GIAO DIỆN CŨ VÀ RENDER GIAO DIỆN MỚI
+                appDiv.innerHTML = `
+                    <header class="header" style="background: #0f172a; padding: 15px 0;">
+                        <div class="container header-inner" style="display:flex; justify-content:space-between; align-items:center;">
+                            <a href="/" class="logo" style="color:white; text-decoration:none; font-size:24px;"><span style="color:#0ea5e9;">✈</span> Tour<strong>DuLich</strong></a>
+                            <a href="/" style="color:white; text-decoration:none; font-weight:bold;">Về Trang chủ</a>
+                        </div>
+                    </header>
+                    
+                    <div style="max-width: 1000px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
+                        <h1 style="color: #2563eb; font-size: 32px; margin-bottom: 10px;">${tour.name}</h1>
+                        <img src="https://picsum.photos/seed/${tour.img}/1200/800" style="width:100%; height:450px; object-fit:cover; border-radius:12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        
+                        <div style="display:flex; justify-content: space-between; background:#f8fafc; padding:30px; border-radius:12px; border: 1px solid #e2e8f0; margin-top: 20px;">
+                            <div style="font-size: 16px; line-height: 2;">
+                                <div><strong>📍 Điểm đến:</strong> ${tour.location}</div>
+                                <div><strong>🛫 Khởi hành:</strong> ${tour.depart}</div>
+                                <div><strong>⏱ Thời gian:</strong> ${tour.days} ngày</div>
+                                <div><strong>🚌 Phương tiện:</strong> ${tour.vehicle}</div>
+                            </div>
+                            <div style="text-align: right; display:flex; flex-direction:column; justify-content:center;">
+                                <div style="color: #f97316; font-size: 32px; font-weight: bold; margin-bottom: 15px;">${tour.price.toLocaleString('vi-VN')} đ</div>
+                                <button onclick="window.openModal(${tour.id})" style="padding:15px 40px; background:#f97316; color:white; border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer;">ĐẶT TOUR NGAY</button>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 30px; margin-top: 30px;">
+                            <div style="flex:1; background: #f0fdf4; padding: 25px; border-radius: 12px;">
+                                <h3 style="color:#16a34a; margin-top:0;">✅ Dịch vụ bao gồm</h3>
+                                <ul style="line-height: 1.8; margin-bottom:0;">${tour.inc.map(i => `<li>${i}</li>`).join('')}</ul>
+                            </div>
+                            <div style="flex:1; background: #fef2f2; padding: 25px; border-radius: 12px;">
+                                <h3 style="color:#dc2626; margin-top:0;">❌ Không bao gồm</h3>
+                                <ul style="line-height: 1.8; margin-bottom:0;">${tour.exc.map(i => `<li>${i}</li>`).join('')}</ul>
+                            </div>
+                        </div>
+
+                        <h3 style="margin-top: 40px; border-bottom: 2px solid #e2e8f0; padding-bottom:10px; font-size: 24px;">Lịch trình chi tiết</h3>
+                        <div>
+                            ${tour.schedule.map(s => `
+                                <div style="margin-top: 20px; background: #fff; padding: 20px; border-left: 5px solid #3b82f6; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-radius: 0 8px 8px 0;">
+                                    <strong style="color: #3b82f6; font-size: 18px;">Ngày ${s.day}:</strong> <span style="font-size: 16px; line-height: 1.6; color:#333;">${s.desc}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    }, 200); // Đợi 200ms để đảm bảo đè thành công lên giao diện index.html
+}
