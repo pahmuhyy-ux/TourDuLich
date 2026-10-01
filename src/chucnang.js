@@ -2,6 +2,7 @@
 // 1. DỮ LIỆU MẪU (MOCK DATA) & BIẾN TOÀN CỤC
 // ==========================================
 const tours = [
+    
     {
         id: 1, name: "Khám phá Vịnh Hạ Long", location: "Hạ Long", days: 2, price: 1800000, img: "halong1", featured: true,
         depart: "Hà Nội", vehicle: "Ô tô, Du thuyền 5 sao",
@@ -56,10 +57,45 @@ const tours = [
 
 let currentTour = null; // Lưu tour đang được chọn để đặt
 window.searchParams = { date: '', guests: 2 }; // Biến toàn cục lưu trữ tùy chọn tìm kiếm tạm thời từ banner
+// ==========================================
+// TỰ ĐỘNG GENERATE THÊM 120 TOUR (20 tour / địa điểm)
+// ==========================================
+const locationList = ["Hạ Long", "Đà Nẵng", "Đà Lạt", "Hà Nội", "Phú Quốc", "Nha Trang"];
+const adjectives = ["Khám phá", "Trải nghiệm", "Kỳ nghỉ dưỡng", "Hành trình vi vu", "Tour VIP", "Check-in"];
 
+let autoId = 10; // Bắt đầu ID từ 10 để không trùng với các tour cũ
+locationList.forEach(loc => {
+    for (let i = 1; i <= 20; i++) {
+        // Random từ 2 - 5 ngày
+        const randomDays = Math.floor(Math.random() * 4) + 2; 
+        // Random giá từ 1.500.000đ - 6.500.000đ
+        const randomPrice = (Math.floor(Math.random() * 50) + 15) * 100000; 
+
+        tours.push({
+            id: autoId++,
+            name: `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${loc} - Tuyến ${i}`,
+            location: loc,
+            days: randomDays,
+            price: randomPrice,
+            img: `tour${loc.replace(/\s/g, '').toLowerCase()}${i}`, // Random seed ảnh theo tên địa điểm
+            featured: i <= 2, // Lấy 2 tour đầu tiên của mỗi địa điểm làm "Tour nổi bật"
+            depart: "TP.HCM / Hà Nội", 
+            vehicle: "Máy bay, Ô tô cao cấp",
+            inc: ["Xe đưa đón tận nơi", "Khách sạn tiêu chuẩn", "Ăn các bữa theo lịch trình", "Hướng dẫn viên nhiệt tình"], 
+            exc: ["Chi phí mua sắm cá nhân", "Tiền Tip cho HDV", "VAT"],
+            schedule: [
+                { day: 1, desc: `Sáng: Khởi hành đến ${loc}. Chiều: Tự do khám phá, nhận phòng khách sạn. Tối: Ăn đặc sản địa phương.` },
+                { day: 2, desc: `Trải nghiệm các danh lam thắng cảnh nổi bật nhất tại ${loc}. Tham gia các hoạt động vui chơi giải trí.` }
+            ]
+        });
+    }
+});
 
 // ==========================================
 // 2. RENDER DANH SÁCH TOUR
+// ==========================================
+// ==========================================
+// RENDER DANH SÁCH TOUR (ĐÃ FIX MÀU CHỮ DỄ ĐỌC)
 // ==========================================
 function renderTours(data) {
     const tourList = document.getElementById('tourList');
@@ -71,15 +107,20 @@ function renderTours(data) {
     }
 
     tourList.innerHTML = data.map(tour => `
-        <div class="card dest-card" style="display:flex; flex-direction:column; overflow:hidden; background:#fff; border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
-            <img src="https://picsum.photos/seed/${tour.img}/1200/800" alt="${tour.name}" style="width:100%; height:200px; object-fit:cover;" />
-            <div class="dest-info" style="padding: 15px; display:flex; flex-direction:column; flex:1;">
-                <h3 style="font-size: 18px; margin-bottom: 8px; color:#1e293b;">${tour.name}</h3>
-                <p style="color: #64748b; font-size: 14px; margin-bottom: 5px;">📍 ${tour.location} | ⏱ ${tour.days} ngày</p>
-                <p style="color: #f97316; font-weight: bold; font-size: 18px; margin: 10px 0 auto;">${tour.price.toLocaleString('vi-VN')} đ</p>
+        <div class="card dest-card" style="display:flex; flex-direction:column; overflow:hidden; background:#1e293b; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.2); position:relative;">
+            <img src="https://picsum.photos/seed/${tour.img}/1200/800" alt="${tour.name}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:0;" />
+            
+            <!-- Phủ một lớp gradient đen mờ để chữ đè lên không bao giờ bị chìm -->
+            <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 100%); z-index:1;"></div>
+
+            <div class="dest-info" style="padding: 15px; display:flex; flex-direction:column; flex:1; position:relative; z-index:2; justify-content: flex-end; min-height: 220px;">
+                <!-- CHỮ MÀU TRẮNG VÀ CÓ BÓNG ĐỔ -->
+                <h3 style="font-size: 19px; margin-bottom: 5px; color:#ffffff; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">${tour.name}</h3>
+                <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">📍 ${tour.location} | ⏱ ${tour.days} ngày</p>
+                <p style="color: #fbbf24; font-weight: bold; font-size: 20px; margin: 10px 0 15px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${tour.price.toLocaleString('vi-VN')} đ</p>
                 
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button onclick="window.viewTourDetail(${tour.id})" style="flex:1; padding:10px; cursor:pointer; background:#f1f5f9; color:#3b82f6; border:none; border-radius:4px; font-weight:bold;">Chi tiết</button>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="window.viewTourDetail(${tour.id})" style="flex:1; padding:10px; cursor:pointer; background:rgba(255,255,255,0.9); color:#0284c7; border:none; border-radius:4px; font-weight:bold;">Chi tiết</button>
                     <button onclick="window.openModal(${tour.id})" style="flex:1; padding:10px; cursor:pointer; background:#3b82f6; color:white; border:none; border-radius:4px; font-weight:bold;">Đặt ngay</button>
                 </div>
             </div>
@@ -581,66 +622,81 @@ setTimeout(() => {
 
 
 // ==========================================
-// 10. FIX TRANG CHI TIẾT (LẬT NGƯỢC GIAO DIỆN TRANG CHỦ)
+// 10 & 11. XỬ LÝ TRANG CHI TIẾT & DANH MỤC (GIỮ NGUYÊN CSS GỐC)
 // ==========================================
 const urlParams = new URLSearchParams(window.location.search);
 const tourId = parseInt(urlParams.get('id'));
+const locParam = urlParams.get('loc');
 
-if (tourId) {
-    // Đợi HTML trang chủ load xong thì ta xóa đi và thay bằng UI Chi tiết
-    setTimeout(() => {
-        const tour = tours.find(t => t.id === tourId);
-        if (tour) {
-            const appDiv = document.querySelector('#app');
-            if (appDiv) {
-                // XÓA TRẮNG GIAO DIỆN CŨ VÀ RENDER GIAO DIỆN MỚI
-                appDiv.innerHTML = `
-                    <header class="header" style="background: #0f172a; padding: 15px 0;">
-                        <div class="container header-inner" style="display:flex; justify-content:space-between; align-items:center;">
-                            <a href="/" class="logo" style="color:white; text-decoration:none; font-size:24px;"><span style="color:#0ea5e9;">✈</span> Tour<strong>DuLich</strong></a>
-                            <a href="/" style="color:white; text-decoration:none; font-weight:bold;">Về Trang chủ</a>
-                        </div>
-                    </header>
-                    
-                    <div style="max-width: 1000px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
-                        <h1 style="color: #2563eb; font-size: 32px; margin-bottom: 10px;">${tour.name}</h1>
-                        <img src="https://picsum.photos/seed/${tour.img}/1200/800" style="width:100%; height:450px; object-fit:cover; border-radius:12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                        
-                        <div style="display:flex; justify-content: space-between; background:#f8fafc; padding:30px; border-radius:12px; border: 1px solid #e2e8f0; margin-top: 20px;">
-                            <div style="font-size: 16px; line-height: 2;">
-                                <div><strong>📍 Điểm đến:</strong> ${tour.location}</div>
-                                <div><strong>🛫 Khởi hành:</strong> ${tour.depart}</div>
-                                <div><strong>⏱ Thời gian:</strong> ${tour.days} ngày</div>
-                                <div><strong>🚌 Phương tiện:</strong> ${tour.vehicle}</div>
-                            </div>
-                            <div style="text-align: right; display:flex; flex-direction:column; justify-content:center;">
-                                <div style="color: #f97316; font-size: 32px; font-weight: bold; margin-bottom: 15px;">${tour.price.toLocaleString('vi-VN')} đ</div>
-                                <button onclick="window.openModal(${tour.id})" style="padding:15px 40px; background:#f97316; color:white; border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer;">ĐẶT TOUR NGAY</button>
-                            </div>
-                        </div>
+setTimeout(() => {
+    // 1. Gắn sự kiện click cho các thẻ địa điểm ở trang chủ
+    const destCards = document.querySelectorAll('.destinations .dest-card');
+    destCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            const h3 = card.querySelector('h3');
+            if (h3) {
+                // Chuyển hướng sang URL có tham số loc
+                window.location.href = `?loc=${encodeURIComponent(h3.innerText.trim())}`;
+            }
+        });
+    });
 
-                        <div style="display: flex; gap: 30px; margin-top: 30px;">
-                            <div style="flex:1; background: #f0fdf4; padding: 25px; border-radius: 12px;">
-                                <h3 style="color:#16a34a; margin-top:0;">✅ Dịch vụ bao gồm</h3>
-                                <ul style="line-height: 1.8; margin-bottom:0;">${tour.inc.map(i => `<li>${i}</li>`).join('')}</ul>
-                            </div>
-                            <div style="flex:1; background: #fef2f2; padding: 25px; border-radius: 12px;">
-                                <h3 style="color:#dc2626; margin-top:0;">❌ Không bao gồm</h3>
-                                <ul style="line-height: 1.8; margin-bottom:0;">${tour.exc.map(i => `<li>${i}</li>`).join('')}</ul>
-                            </div>
-                        </div>
+    // 2. NẾU ĐANG Ở TRANG DANH MỤC ĐỊA ĐIỂM (?loc=...)
+    if (locParam) {
+        // Ẩn tất cả các thẻ <section> KHÔNG CHỨA danh sách tour (#tourList)
+        document.querySelectorAll('section').forEach(sec => {
+            if (!sec.querySelector('#tourList')) {
+                sec.style.display = 'none';
+            }
+        });
 
-                        <h3 style="margin-top: 40px; border-bottom: 2px solid #e2e8f0; padding-bottom:10px; font-size: 24px;">Lịch trình chi tiết</h3>
-                        <div>
-                            ${tour.schedule.map(s => `
-                                <div style="margin-top: 20px; background: #fff; padding: 20px; border-left: 5px solid #3b82f6; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-radius: 0 8px 8px 0;">
-                                    <strong style="color: #3b82f6; font-size: 18px;">Ngày ${s.day}:</strong> <span style="font-size: 16px; line-height: 1.6; color:#333;">${s.desc}</span>
-                                </div>
-                            `).join('')}
+        // Đổi tiêu đề của khu vực tour thành tên địa điểm
+        const sectionHead = document.querySelector('.section-alt .section-head');
+        if (sectionHead) {
+            sectionHead.innerHTML = `
+                <p class="section-label">ĐIỂM ĐẾN</p>
+                <h2 class="section-title">Các tour du lịch tại ${locParam}</h2>
+                <p class="section-desc" style="margin-top: 15px;">
+                    <a href="/" style="color: #3b82f6; text-decoration: none; font-weight: bold; padding: 8px 15px; background: #e0f2fe; border-radius: 5px;">← Quay lại Trang chủ</a>
+                </p>
+            `;
+        }
+
+        // Lọc data và dùng lại hàm renderTours gốc (giữ nguyên CSS card)
+        const searchLoc = locParam.toLowerCase().replace('vịnh ', '').trim();
+        const filteredTours = tours.filter(t => t.location.toLowerCase().includes(searchLoc));
+        renderTours(filteredTours);
+    }
+
+    // 3. NẾU ĐANG Ở TRANG CHI TIẾT TOUR (?id=...)
+    if (tourId) {
+        // Ẩn toàn bộ nội dung trang chủ
+        document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
+        const hero = document.querySelector('.hero');
+        if(hero) hero.style.display = 'none';
+
+        // Gọi hàm hiển thị chi tiết tour
+        if (typeof window.viewTourDetail === 'function') {
+            window.viewTourDetail(tourId);
+            
+            // Ép khung chi tiết tour trượt vào luồng trang web bình thường (không bị nổi lềnh bềnh)
+            const modal = document.getElementById('tourDetailModal');
+            if (modal) {
+                modal.style.position = 'relative'; // Bỏ thuộc tính fixed
+                modal.style.zIndex = '1';
+                modal.style.padding = '40px 0';
+                
+                // Thay nút X tắt popup thành nút Quay lại trang chủ
+                const closeBtn = modal.querySelector('span');
+                if (closeBtn) {
+                    closeBtn.outerHTML = `
+                        <div style="margin-bottom: 20px;">
+                            <a href="/" style="color: #3b82f6; text-decoration: none; font-weight: bold; font-size: 16px;">← Quay lại danh sách</a>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             }
         }
-    }, 200); // Đợi 200ms để đảm bảo đè thành công lên giao diện index.html
-}
+    }
+}, 300);
