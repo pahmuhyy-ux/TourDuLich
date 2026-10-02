@@ -1,7 +1,9 @@
 import './style.css'
 
-const STORAGE_KEY = 'javanaangcao_tours'
+// 1. Đồng bộ key với trang Admin
+const STORAGE_KEY = 'tourdulich_tours'
 const img = (id) => `https://picsum.photos/seed/${id}/1200/800`
+
 const defaultTours = [
   { id: 1, code: 'TO-1023', name: 'Hạ Long 3N2Đ', type: 'Biển đảo', date: '2026-10-12', price: 4490000, status: 'open' },
   { id: 2, code: 'TO-1129', name: 'Đà Nẵng - Hội An', type: 'Miền Trung', date: '2026-10-18', price: 5890000, status: 'pending' },
@@ -11,12 +13,17 @@ const defaultTours = [
   { id: 6, code: 'TO-1282', name: 'Cần Thơ - Châu Đốc', type: 'Miền Nam', date: '2026-12-03', price: 4590000, status: 'pending' }
 ]
 
+// 2. Hàm loadTours ưu tiên đọc trực tiếp từ Admin (LocalStorage)
 const loadTours = () => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (!saved) return [...defaultTours]
-    const parsed = JSON.parse(saved)
-    return Array.isArray(parsed) && parsed.length ? parsed : [...defaultTours]
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed // Lấy danh sách mới nhất từ Admin thêm vào
+      }
+    }
+    return [...defaultTours]
   } catch {
     return [...defaultTours]
   }
@@ -26,32 +33,46 @@ const statusLabel = { open: 'Đang mở', pending: 'Chờ duyệt', closed: 'Đ�
 const tours = loadTours()
 const formatCurrency = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value)
 
-const renderTourCards = () => {
+// 3. Hàm render tương thích hoàn toàn với cả tour cũ và tour Admin
+const renderTourCards = (dataToRender = tours) => {
   const container = document.querySelector('#featuredTours')
   if (!container) return
 
-  container.innerHTML = tours
-    .map((tour) => `
+  if (dataToRender.length === 0) {
+      container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 20px;">Không tìm thấy tour phù hợp.</p>`
+      return
+  }
+
+  container.innerHTML = dataToRender
+    .map((tour) => {
+      const tourCode = tour.code || `TO-${String(tour.id).slice(-4).toUpperCase()}`
+      const tourType = tour.type || tour.category || 'Chưa phân loại'
+      const tourDays = tour.date ? new Date(tour.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : (tour.duration || 'Liên hệ')
+      const tourImg = tour.image || img(tourCode || tour.name)
+      const oldPrice = tour.oldPrice || Math.round(tour.price * 1.12)
+
+      return `
       <article class="card tour-card is-clickable" data-id="${tour.id}" tabindex="0" role="button" aria-label="Xem chi tiết ${tour.name}">
         <div class="tour-media">
-          <img src="${img(tour.code || tour.name)}" alt="${tour.name}" />
-          <span class="badge">${tour.type}</span>
-          <span class="days">${new Date(tour.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}</span>
+          <img src="${tourImg}" alt="${tour.name}" />
+          <span class="badge">${tourType}</span>
+          <span class="days">${tourDays}</span>
         </div>
         <div class="tour-body">
           <p class="tour-rating">★★★★★ <span>${statusLabel[tour.status] || 'Tour mới'}</span></p>
           <h3>${tour.name}</h3>
-          <p class="tour-meta">${tour.code} • ${tour.type}</p>
+          <p class="tour-meta">${tourCode} • ${tourType}</p>
           <div class="tour-foot">
             <div>
-              <span class="price-old">${formatCurrency(Math.round(tour.price * 1.12))}</span>
+              <span class="price-old">${formatCurrency(oldPrice)}</span>
               <span class="price">${formatCurrency(tour.price)}</span>
             </div>
             <button class="btn btn-primary btn-sm" type="button">Xem chi tiết</button>
           </div>
         </div>
       </article>
-    `)
+      `
+    })
     .join('')
 }
 
@@ -68,14 +89,20 @@ const openTourDetail = (tour) => {
   const detailStatus = document.querySelector('#tourDetailStatus')
   const detailImage = document.querySelector('#tourDetailImage')
 
-  detailType.textContent = tour.type
+  const tourCode = tour.code || `TO-${String(tour.id).slice(-4).toUpperCase()}`
+  const tourType = tour.type || tour.category || 'Chưa phân loại'
+  const tourDays = tour.date ? new Date(tour.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : (tour.duration || 'Liên hệ')
+  const tourImg = tour.image || img(tourCode || tour.name)
+  const oldPrice = tour.oldPrice || Math.round(tour.price * 1.12)
+
+  detailType.textContent = tourType
   detailName.textContent = tour.name
-  detailMeta.textContent = `${tour.code} • ${tour.type}`
-  detailDate.textContent = new Date(tour.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  detailMeta.textContent = `${tourCode} • ${tourType}`
+  detailDate.textContent = tourDays
   detailPrice.textContent = formatCurrency(tour.price)
-  detailOldPrice.textContent = formatCurrency(Math.round(tour.price * 1.12))
+  detailOldPrice.textContent = formatCurrency(oldPrice)
   detailStatus.textContent = statusLabel[tour.status] || 'Tour mới'
-  detailImage.src = img(tour.code || tour.name)
+  detailImage.src = tourImg
   detailImage.alt = tour.name
 
   modal.classList.add('show')
@@ -89,22 +116,22 @@ const closeTourDetail = () => {
   modal.setAttribute('aria-hidden', 'true')
 }
 
+// 4. Giao diện trang chủ
 document.querySelector('#app').innerHTML = `
 <header class="header">
   <div class="container header-inner">
-    <a href="#" class="logo">
+    <a href="/" class="logo">
       <span class="logo-icon">✈</span>
       <span>Tour<strong>DuLich</strong></span>
     </a>
     <nav class="nav">
-      <a href="#" class="nav-link active">Trang chủ</a>
-      <a href="#" class="nav-link">Địa điểm</a>
-      <a href="#" class="nav-link">Tour</a>
-      <a href="#" class="nav-link">Blog</a>
-      <a href="#" class="nav-link">Liên hệ</a>
+      <a href="/" class="nav-link active">Trang chủ</a>
+      <a href="#featuredTours" class="nav-link">Tour</a>
+      <a href="tranglienhe.html" onclick="window.location.href='tranglienhe.html'; return false;" class="nav-link">Liên hệ</a>
     </nav>
     <div class="header-actions">
-      <button class="btn btn-primary">Đăng nhập</button>
+      <a href="admin.html" onclick="window.location.href='admin.html'; return false;" style="margin-right: 15px; font-weight: bold; color: #f97316; text-decoration: none;">Admin</a>
+      <button class="btn btn-primary" id="btnLogin">Đăng nhập</button>
     </div>
   </div>
 </header>
@@ -153,45 +180,27 @@ document.querySelector('#app').innerHTML = `
     <div class="grid destinations">
       <a href="#" class="card dest-card dest-lg">
         <img src="${img('halong')}" alt="Vịnh Hạ Long" />
-        <div class="dest-info">
-          <h3>Vịnh Hạ Long</h3>
-          <p>Quảng Ninh • 120+ tour</p>
-        </div>
+        <div class="dest-info"><h3>Vịnh Hạ Long</h3><p>Quảng Ninh • 120+ tour</p></div>
       </a>
       <a href="#" class="card dest-card">
         <img src="${img('danang')}" alt="Đà Nẵng" />
-        <div class="dest-info">
-          <h3>Đà Nẵng</h3>
-          <p>Miền Trung • 85 tour</p>
-        </div>
+        <div class="dest-info"><h3>Đà Nẵng</h3><p>Miền Trung • 85 tour</p></div>
       </a>
       <a href="#" class="card dest-card">
         <img src="${img('dalat')}" alt="Đà Lạt" />
-        <div class="dest-info">
-          <h3>Đà Lạt</h3>
-          <p>Lâm Đồng • 60 tour</p>
-        </div>
+        <div class="dest-info"><h3>Đà Lạt</h3><p>Lâm Đồng • 60 tour</p></div>
       </a>
       <a href="#" class="card dest-card">
         <img src="${img('hanoi')}" alt="Hà Nội" />
-        <div class="dest-info">
-          <h3>Hà Nội</h3>
-          <p>Thủ đô • 95 tour</p>
-        </div>
+        <div class="dest-info"><h3>Hà Nội</h3><p>Thủ đô • 95 tour</p></div>
       </a>
       <a href="#" class="card dest-card">
         <img src="${img('phuquoc')}" alt="Phú Quốc" />
-        <div class="dest-info">
-          <h3>Phú Quốc</h3>
-          <p>Kiên Giang • 50 tour</p>
-        </div>
+        <div class="dest-info"><h3>Phú Quốc</h3><p>Kiên Giang • 50 tour</p></div>
       </a>
       <a href="#" class="card dest-card">
         <img src="${img('nhatrang')}" alt="Nha Trang" />
-        <div class="dest-info">
-          <h3>Nha Trang</h3>
-          <p>Khánh Hòa • 72 tour</p>
-        </div>
+        <div class="dest-info"><h3>Nha Trang</h3><p>Khánh Hòa • 72 tour</p></div>
       </a>
     </div>
   </div>
@@ -219,21 +228,12 @@ document.querySelector('#app').innerHTML = `
       <h3 id="tourDetailName">Tên tour</h3>
       <p id="tourDetailMeta">Mã tour • Loại</p>
       <div class="tour-detail-grid">
-        <div>
-          <span>Ngày khởi hành</span>
-          <strong id="tourDetailDate">--</strong>
-        </div>
-        <div>
-          <span>Trạng thái</span>
-          <strong id="tourDetailStatus">--</strong>
-        </div>
+        <div><span>Ngày khởi hành</span><strong id="tourDetailDate">--</strong></div>
+        <div><span>Trạng thái</span><strong id="tourDetailStatus">--</strong></div>
       </div>
       <div class="tour-detail-footer">
-        <div>
-          <span class="price-old" id="tourDetailOldPrice">0đ</span>
-          <span class="price" id="tourDetailPrice">0đ</span>
-        </div>
-        <button class="btn btn-primary" type="button">Đặt tour</button>
+        <div><span class="price-old" id="tourDetailOldPrice">0đ</span><span class="price" id="tourDetailPrice">0đ</span></div>
+        <button class="btn btn-primary" id="btnBookTour" type="button">Đặt tour</button>
       </div>
     </div>
   </div>
@@ -246,36 +246,12 @@ document.querySelector('#app').innerHTML = `
       <h2 class="section-title">Trải nghiệm dịch vụ hoàn hảo</h2>
     </div>
     <div class="grid features">
-      <div class="card feature-card">
-        <div class="feature-icon">💼</div>
-        <h3>Giá tốt nhất</h3>
-        <p>Cam kết giá cạnh tranh, không phát sinh chi phí ẩn trong suốt hành trình.</p>
-      </div>
-      <div class="card feature-card">
-        <div class="feature-icon">🛡️</div>
-        <h3>An toàn tuyệt đối</h3>
-        <p>Bảo hiểm du lịch lên đến 100 triệu đồng cho mọi khách hàng.</p>
-      </div>
-      <div class="card feature-card">
-        <div class="feature-icon">🧑‍✈️</div>
-        <h3>Hướng dẫn viên chuyên nghiệp</h3>
-        <p>Đội ngũ HDV giàu kinh nghiệm, thân thiện và am hiểu văn hóa bản địa.</p>
-      </div>
-      <div class="card feature-card">
-        <div class="feature-icon">📞</div>
-        <h3>Hỗ trợ 24/7</h3>
-        <p>Đội ngũ chăm sóc khách hàng luôn sẵn sàng hỗ trợ bạn mọi lúc mọi nơi.</p>
-      </div>
-      <div class="card feature-card">
-        <div class="feature-icon">🗓️</div>
-        <h3>Linh hoạt lịch trình</h3>
-        <p>Dễ dàng tùy chỉnh lịch trình theo nhu cầu và sở thích của bạn.</p>
-      </div>
-      <div class="card feature-card">
-        <div class="feature-icon">🗺️</div>
-        <h3>Điểm đến đa dạng</h3>
-        <p>Hơn 120 điểm đến trong nước và quốc tế cho mọi ngân sách.</p>
-      </div>
+      <div class="card feature-card"><div class="feature-icon">💼</div><h3>Giá tốt nhất</h3><p>Cam kết giá cạnh tranh, không phát sinh chi phí ẩn.</p></div>
+      <div class="card feature-card"><div class="feature-icon">🛡️</div><h3>An toàn tuyệt đối</h3><p>Bảo hiểm du lịch lên đến 100 triệu đồng.</p></div>
+      <div class="card feature-card"><div class="feature-icon">🧑‍✈️</div><h3>HDV chuyên nghiệp</h3><p>Đội ngũ giàu kinh nghiệm, thân thiện.</p></div>
+      <div class="card feature-card"><div class="feature-icon">📞</div><h3>Hỗ trợ 24/7</h3><p>Chăm sóc khách hàng luôn sẵn sàng hỗ trợ.</p></div>
+      <div class="card feature-card"><div class="feature-icon">🗓️</div><h3>Linh hoạt lịch trình</h3><p>Dễ dàng tùy chỉnh theo nhu cầu.</p></div>
+      <div class="card feature-card"><div class="feature-icon">🗺️</div><h3>Điểm đến đa dạng</h3><p>Hơn 120 điểm đến trong và ngoài nước.</p></div>
     </div>
   </div>
 </section>
@@ -293,118 +269,93 @@ document.querySelector('#app').innerHTML = `
   </div>
 </section>
 
-<section class="section">
-  <div class="container">
-    <div class="section-head">
-      <p class="section-label">ĐÁNH GIÁ KHÁCH HÀNG</p>
-      <h2 class="section-title">Khách hàng nói gì về chúng tôi</h2>
-    </div>
-    <div class="grid testimonials">
-      <div class="card testimonial-card">
-        <div class="stars">★★★★★</div>
-        <p>"Tour được tổ chức rất chuyên nghiệp, HDV nhiệt tình, lịch trình hợp lý. Gia đình mình rất hài lòng!"</p>
-        <div class="testimonial-author">
-          <div class="avatar">MT</div>
-          <div>
-            <strong>Minh Thư</strong>
-            <span>Tour Nhật Bản</span>
-          </div>
-        </div>
-      </div>
-      <div class="card testimonial-card">
-        <div class="stars">★★★★★</div>
-        <p>"Giá cả hợp lý, không phát sinh chi phí. Khách sạn sạch sẽ, view đẹp. Sẽ tiếp tục sử dụng dịch vụ."</p>
-        <div class="testimonial-author">
-          <div class="avatar">HD</div>
-          <div>
-            <strong>Hoàng Đức</strong>
-            <span>Tour Hà Nội</span>
-          </div>
-        </div>
-      </div>
-      <div class="card testimonial-card">
-        <div class="stars">★★★★★</div>
-        <p>"Từ khâu tư vấn đến lúc hoàn thành tour đều rất chu đáo. Đáng tin cậy, 10 điểm không có nhưng!"</p>
-        <div class="testimonial-author">
-          <div class="avatar">NT</div>
-          <div>
-            <strong>Ngọc Trâm</strong>
-            <span>Tour Singapore</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <footer class="footer">
   <div class="container footer-grid">
     <div class="footer-brand">
-      <a href="#" class="logo logo-light">
+      <a href="/" class="logo logo-light">
         <span class="logo-icon">✈</span>
         <span>Tour<strong>DuLich</strong></span>
       </a>
-      <p>Công ty du lịch hàng đầu Việt Nam với hơn 15 năm kinh nghiệm tổ chức tour trong nước và quốc tế.</p>
-      <div class="socials">
-        <a href="#" title="Facebook">f</a>
-        <a href="#" title="Instagram">◎</a>
-        <a href="#" title="YouTube">▶</a>
-      </div>
-    </div>
-    <div class="footer-col">
-      <h4>Tour phổ biến</h4>
-      <a href="#">Tour châu Âu</a>
-      <a href="#">Tour Nhật Bản</a>
-      <a href="#">Tour Thái Lan</a>
-      <a href="#">Tour Phú Quốc</a>
-      <a href="#">Tour Hội An</a>
+      <p>Công ty du lịch hàng đầu Việt Nam.</p>
     </div>
     <div class="footer-col">
       <h4>Về chúng tôi</h4>
-      <a href="#">Giới thiệu</a>
-      <a href="#">Tuyển dụng</a>
-      <a href="#">Tin tức</a>
-      <a href="#">Chính sách bảo mật</a>
-      <a href="#">Liên hệ</a>
-    </div>
-    <div class="footer-col footer-contact">
-      <h4>Liên hệ</h4>
-      <p>📍 123 Nguyễn Huệ, Q.1, TP.HCM</p>
-      <p>📞 1900 1234</p>
-      <p>✉️ info@tourdulich.vn</p>
+      <a href="tranglienhe.html" onclick="window.location.href='tranglienhe.html'; return false;">Liên hệ</a>
     </div>
   </div>
   <div class="footer-bottom">
-    <div class="container">
-      <p>© 2026 TourDuLich. Bảo lưu mọi quyền.</p>
-    </div>
+    <div class="container"><p>© 2026 TourDuLich. Bảo lưu mọi quyền.</p></div>
   </div>
 </footer>
 `
 
-renderTourCards()
+// ==========================================
+// 5. KHỞI TẠO SỰ KIỆN TƯƠNG TÁC
+// ==========================================
 
-const featuredTours = document.querySelector('#featuredTours')
+renderTourCards();
+
+const featuredTours = document.querySelector('#featuredTours');
+
 featuredTours?.addEventListener('click', (event) => {
-  const card = event.target.closest('.tour-card')
-  if (!card) return
+  const card = event.target.closest('.tour-card');
+  if (!card) return;
 
-  const selectedTour = tours.find((tour) => Number(tour.id) === Number(card.dataset.id))
-  if (selectedTour) openTourDetail(selectedTour)
-})
+  const currentTours = loadTours();
+  const selectedTour = currentTours.find((tour) => String(tour.id) === String(card.dataset.id));
+  if (selectedTour) openTourDetail(selectedTour);
+});
 
-const closeButton = document.querySelector('#closeTourDetail')
-closeButton?.addEventListener('click', closeTourDetail)
+const btnBookTour = document.querySelector('#btnBookTour');
+btnBookTour?.addEventListener('click', () => {
+    const tourName = document.querySelector('#tourDetailName').textContent;
+    const guestName = prompt(`Bạn đang đặt: ${tourName}\nVui lòng nhập Họ và Tên:`);
+    if (!guestName) return;
+    
+    const phone = prompt("Vui lòng nhập Số điện thoại liên hệ:");
+    if (!phone) return;
+
+    const BOOKING_KEY = 'tourdulich_bookings'; 
+    const bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
+    
+    bookings.push({
+        id: 'bk-' + Date.now(),
+        guestName: guestName.trim(),
+        phone: phone.trim(),
+        tourName: tourName,
+        travelDate: new Date().toLocaleDateString('vi-VN'),
+        status: 'pending' 
+    });
+    
+    localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings));
+    alert(`🎉 Đặt tour thành công!\nCảm ơn ${guestName}, chúng tôi sẽ liên hệ sớm nhất.`);
+    closeTourDetail();
+});
+
+const closeButton = document.querySelector('#closeTourDetail');
+closeButton?.addEventListener('click', closeTourDetail);
 
 document.querySelector('#tourDetailModal')?.addEventListener('click', (event) => {
-  if (event.target === event.currentTarget) closeTourDetail()
-})
+  if (event.target === event.currentTarget) closeTourDetail();
+});
 
-featuredTours?.addEventListener('keydown', (event) => {
-  if (event.key !== 'Enter' && event.key !== ' ') return
-  const card = event.target.closest('.tour-card')
-  if (!card) return
-  event.preventDefault()
-  const selectedTour = tours.find((tour) => Number(tour.id) === Number(card.dataset.id))
-  if (selectedTour) openTourDetail(selectedTour)
-})
+const btnSearch = document.querySelector('.btn-search');
+btnSearch?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const currentTours = loadTours();
+    const keyword = document.querySelector('#dest').value.toLowerCase().trim();
+    
+    const filtered = currentTours.filter(t => 
+        t.name.toLowerCase().includes(keyword) || 
+        (t.type && t.type.toLowerCase().includes(keyword)) ||
+        (t.category && t.category.toLowerCase().includes(keyword))
+    );
+    
+    renderTourCards(filtered);
+    featuredTours.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+const btnLogin = document.querySelector('#btnLogin');
+btnLogin?.addEventListener('click', () => {
+    alert("Tính năng đăng nhập đang được phát triển!");
+});
