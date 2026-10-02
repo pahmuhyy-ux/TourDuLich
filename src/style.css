@@ -403,6 +403,15 @@ button {
   border: 1px solid var(--border);
 }
 
+.is-clickable {
+  cursor: pointer;
+}
+
+.is-clickable:focus-visible {
+  outline: 3px solid rgba(13, 122, 95, 0.28);
+  outline-offset: 3px;
+}
+
 .tour-media {
   position: relative;
   height: 220px;
@@ -703,6 +712,116 @@ button {
   opacity: 0.7;
 }
 
+.tour-detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.62);
+  padding: 20px;
+}
+
+.tour-detail-modal.show {
+  display: flex;
+}
+
+.tour-detail-panel {
+  position: relative;
+  width: min(860px, 100%);
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+}
+
+.tour-detail-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tour-detail-media {
+  min-height: 100%;
+}
+
+.tour-detail-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tour-detail-body {
+  padding: 30px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tour-detail-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-weight: 700;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.tour-detail-body h3 {
+  font-size: clamp(24px, 3vw, 34px);
+  margin-bottom: 8px;
+}
+
+#tourDetailMeta {
+  color: var(--text);
+  opacity: 0.8;
+  margin-bottom: 18px;
+}
+
+.tour-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 18px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+
+.tour-detail-grid span {
+  display: block;
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.tour-detail-grid strong {
+  font-size: 15px;
+  color: var(--text-h);
+}
+
+.tour-detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .destinations,
@@ -763,6 +882,14 @@ button {
 
   .newsletter input {
     min-width: 100%;
+  }
+
+  .tour-detail-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .tour-detail-media {
+    min-height: 220px;
   }
 
   .footer-grid {

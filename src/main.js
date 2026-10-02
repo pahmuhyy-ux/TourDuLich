@@ -1,6 +1,93 @@
 import './style.css'
 
+const STORAGE_KEY = 'javanaangcao_tours'
 const img = (id) => `https://picsum.photos/seed/${id}/1200/800`
+const defaultTours = [
+  { id: 1, code: 'TO-1023', name: 'Hạ Long 3N2Đ', type: 'Biển đảo', date: '2026-10-12', price: 4490000, status: 'open' },
+  { id: 2, code: 'TO-1129', name: 'Đà Nẵng - Hội An', type: 'Miền Trung', date: '2026-10-18', price: 5890000, status: 'pending' },
+  { id: 3, code: 'TO-1155', name: 'Phú Quốc 4N3Đ', type: 'Biển đảo', date: '2026-11-02', price: 6790000, status: 'open' },
+  { id: 4, code: 'TO-1194', name: 'Sapa - Fansipan', type: 'Núi rừng', date: '2026-11-15', price: 5290000, status: 'closed' },
+  { id: 5, code: 'TO-1218', name: 'Ninh Bình - Tràng An', type: 'Miền Bắc', date: '2026-10-26', price: 3890000, status: 'open' },
+  { id: 6, code: 'TO-1282', name: 'Cần Thơ - Châu Đốc', type: 'Miền Nam', date: '2026-12-03', price: 4590000, status: 'pending' }
+]
+
+const loadTours = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (!saved) return [...defaultTours]
+    const parsed = JSON.parse(saved)
+    return Array.isArray(parsed) && parsed.length ? parsed : [...defaultTours]
+  } catch {
+    return [...defaultTours]
+  }
+}
+
+const statusLabel = { open: 'Đang mở', pending: 'Chờ duyệt', closed: 'Đã đóng' }
+const tours = loadTours()
+const formatCurrency = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value)
+
+const renderTourCards = () => {
+  const container = document.querySelector('#featuredTours')
+  if (!container) return
+
+  container.innerHTML = tours
+    .map((tour) => `
+      <article class="card tour-card is-clickable" data-id="${tour.id}" tabindex="0" role="button" aria-label="Xem chi tiết ${tour.name}">
+        <div class="tour-media">
+          <img src="${img(tour.code || tour.name)}" alt="${tour.name}" />
+          <span class="badge">${tour.type}</span>
+          <span class="days">${new Date(tour.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}</span>
+        </div>
+        <div class="tour-body">
+          <p class="tour-rating">★★★★★ <span>${statusLabel[tour.status] || 'Tour mới'}</span></p>
+          <h3>${tour.name}</h3>
+          <p class="tour-meta">${tour.code} • ${tour.type}</p>
+          <div class="tour-foot">
+            <div>
+              <span class="price-old">${formatCurrency(Math.round(tour.price * 1.12))}</span>
+              <span class="price">${formatCurrency(tour.price)}</span>
+            </div>
+            <button class="btn btn-primary btn-sm" type="button">Xem chi tiết</button>
+          </div>
+        </div>
+      </article>
+    `)
+    .join('')
+}
+
+const openTourDetail = (tour) => {
+  const modal = document.querySelector('#tourDetailModal')
+  if (!modal) return
+
+  const detailType = document.querySelector('#tourDetailType')
+  const detailName = document.querySelector('#tourDetailName')
+  const detailMeta = document.querySelector('#tourDetailMeta')
+  const detailDate = document.querySelector('#tourDetailDate')
+  const detailPrice = document.querySelector('#tourDetailPrice')
+  const detailOldPrice = document.querySelector('#tourDetailOldPrice')
+  const detailStatus = document.querySelector('#tourDetailStatus')
+  const detailImage = document.querySelector('#tourDetailImage')
+
+  detailType.textContent = tour.type
+  detailName.textContent = tour.name
+  detailMeta.textContent = `${tour.code} • ${tour.type}`
+  detailDate.textContent = new Date(tour.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  detailPrice.textContent = formatCurrency(tour.price)
+  detailOldPrice.textContent = formatCurrency(Math.round(tour.price * 1.12))
+  detailStatus.textContent = statusLabel[tour.status] || 'Tour mới'
+  detailImage.src = img(tour.code || tour.name)
+  detailImage.alt = tour.name
+
+  modal.classList.add('show')
+  modal.setAttribute('aria-hidden', 'false')
+}
+
+const closeTourDetail = () => {
+  const modal = document.querySelector('#tourDetailModal')
+  if (!modal) return
+  modal.classList.remove('show')
+  modal.setAttribute('aria-hidden', 'true')
+}
 
 document.querySelector('#app').innerHTML = `
 <header class="header">
@@ -117,67 +204,40 @@ document.querySelector('#app').innerHTML = `
       <h2 class="section-title">Tour du lịch được yêu thích nhất</h2>
       <p class="section-desc">Lựa chọn hoàn hảo cho kỳ nghỉ của bạn.</p>
     </div>
-    <div class="grid tours">
-      <div class="card tour-card">
-        <div class="tour-media">
-          <img src="${img('tour-malaysia')}" alt="Tour Malaysia - Singapore" />
-          <span class="badge">Giảm 20%</span>
-          <span class="days">5N4Đ</span>
+    <div id="featuredTours" class="grid tours"></div>
+  </div>
+</section>
+
+<div class="tour-detail-modal" id="tourDetailModal" aria-hidden="true">
+  <div class="tour-detail-panel">
+    <button class="tour-detail-close" id="closeTourDetail" type="button" aria-label="Đóng">×</button>
+    <div class="tour-detail-media">
+      <img id="tourDetailImage" src="" alt="" />
+    </div>
+    <div class="tour-detail-body">
+      <span class="tour-detail-badge" id="tourDetailType">Tour</span>
+      <h3 id="tourDetailName">Tên tour</h3>
+      <p id="tourDetailMeta">Mã tour • Loại</p>
+      <div class="tour-detail-grid">
+        <div>
+          <span>Ngày khởi hành</span>
+          <strong id="tourDetailDate">--</strong>
         </div>
-        <div class="tour-body">
-          <p class="tour-rating">★★★★★ <span>4.9 (238 đánh giá)</span></p>
-          <h3>Tour Malaysia – Singapore</h3>
-          <p class="tour-meta">🇸🇬 Singapore • 🇲🇾 Malaysia</p>
-          <div class="tour-foot">
-            <div>
-              <span class="price-old">12.500.000đ</span>
-              <span class="price">10.000.000đ</span>
-            </div>
-            <button class="btn btn-primary btn-sm">Đặt ngay</button>
-          </div>
-        </div>
-      </div>
-      <div class="card tour-card">
-        <div class="tour-media">
-          <img src="${img('tour-japan')}" alt="Tour Nhật Bản" />
-          <span class="badge badge-hot">Hot</span>
-          <span class="days">6N5Đ</span>
-        </div>
-        <div class="tour-body">
-          <p class="tour-rating">★★★★★ <span>4.8 (312 đánh giá)</span></p>
-          <h3>Tour Nhật Bản – Tokyo, Osaka</h3>
-          <p class="tour-meta">🇯🇵 Nhật Bản • Hoa anh đào</p>
-          <div class="tour-foot">
-            <div>
-              <span class="price-old">28.900.000đ</span>
-              <span class="price">25.400.000đ</span>
-            </div>
-            <button class="btn btn-primary btn-sm">Đặt ngay</button>
-          </div>
+        <div>
+          <span>Trạng thái</span>
+          <strong id="tourDetailStatus">--</strong>
         </div>
       </div>
-      <div class="card tour-card">
-        <div class="tour-media">
-          <img src="${img('tour-europe')}" alt="Tour Châu Âu" />
-          <span class="badge">Giảm 15%</span>
-          <span class="days">9N8Đ</span>
+      <div class="tour-detail-footer">
+        <div>
+          <span class="price-old" id="tourDetailOldPrice">0đ</span>
+          <span class="price" id="tourDetailPrice">0đ</span>
         </div>
-        <div class="tour-body">
-          <p class="tour-rating">★★★★★ <span>4.9 (178 đánh giá)</span></p>
-          <h3>Tour Châu Âu – Pháp, Ý, Thụy Sĩ</h3>
-          <p class="tour-meta">🇫🇷 Pháp • 🇮🇹 Ý • 🇨🇭 Thụy Sĩ</p>
-          <div class="tour-foot">
-            <div>
-              <span class="price-old">78.000.000đ</span>
-              <span class="price">66.300.000đ</span>
-            </div>
-            <button class="btn btn-primary btn-sm">Đặt ngay</button>
-          </div>
-        </div>
+        <button class="btn btn-primary" type="button">Đặt tour</button>
       </div>
     </div>
   </div>
-</section>
+</div>
 
 <section class="section">
   <div class="container">
@@ -321,3 +381,30 @@ document.querySelector('#app').innerHTML = `
   </div>
 </footer>
 `
+
+renderTourCards()
+
+const featuredTours = document.querySelector('#featuredTours')
+featuredTours?.addEventListener('click', (event) => {
+  const card = event.target.closest('.tour-card')
+  if (!card) return
+
+  const selectedTour = tours.find((tour) => Number(tour.id) === Number(card.dataset.id))
+  if (selectedTour) openTourDetail(selectedTour)
+})
+
+const closeButton = document.querySelector('#closeTourDetail')
+closeButton?.addEventListener('click', closeTourDetail)
+
+document.querySelector('#tourDetailModal')?.addEventListener('click', (event) => {
+  if (event.target === event.currentTarget) closeTourDetail()
+})
+
+featuredTours?.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter' && event.key !== ' ') return
+  const card = event.target.closest('.tour-card')
+  if (!card) return
+  event.preventDefault()
+  const selectedTour = tours.find((tour) => Number(tour.id) === Number(card.dataset.id))
+  if (selectedTour) openTourDetail(selectedTour)
+})
