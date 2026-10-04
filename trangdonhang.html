@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách Đơn Đặt Tour</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="padding: 50px; background: #f8fafc;">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Đơn Đặt Tour Của Bạn</h2>
+            <a href="/" class="btn btn-primary">Về Trang chủ</a>
+        </div>
+        
+        <table style="width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <thead>
+                <tr style="background: #e2e8f0; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Mã Đơn</th>
+                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Tên Tour</th>
+                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Ngày đi</th>
+                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Tổng tiền</th>
+                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="orderList">
+                <!-- Dữ liệu render bằng JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const formatMoney = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+        const BOOKING_KEY = 'tourdulich_bookings';
+
+        const renderOrders = () => {
+            const bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
+            const tbody = document.getElementById('orderList');
+            
+            if (bookings.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="padding: 20px; text-align: center;">Bạn chưa có đơn đặt tour nào.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = bookings.map(b => `
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 12px;">${b.id}</td>
+                    <td style="padding: 12px; font-weight: bold;">${b.tourName}</td>
+                    <td style="padding: 12px;">${b.travelDate}</td>
+                    <td style="padding: 12px; color: #f97316; font-weight: bold;">${formatMoney(b.totalPrice)}</td>
+                    <td style="padding: 12px;">
+                        <button onclick="cancelOrder('${b.id}')" style="background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Hủy đơn</button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        window.cancelOrder = (id) => {
+            if(confirm("Bạn có chắc chắn muốn hủy đơn này không?")) {
+                let bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
+                bookings = bookings.filter(b => b.id !== id);
+                localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings));
+                renderOrders(); // Load lại bảng
+                alert("Đã hủy đơn thành công!");
+            }
+        };
+
+        renderOrders();
+    </script>
+</body>
+</html>

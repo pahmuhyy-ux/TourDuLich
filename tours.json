@@ -1,0 +1,8 @@
+[
+  { "id": 1, "code": "TO-1023", "name": "Hạ Long 3N2Đ", "type": "Biển đảo", "date": "2026-10-12", "price": 4490000, "status": "open", "image": "https://picsum.photos/seed/halong/1200/800" },
+  { "id": 2, "code": "TO-1129", "name": "Đà Nẵng - Hội An", "type": "Miền Trung", "date": "2026-10-18", "price": 5890000, "status": "pending", "image": "https://picsum.photos/seed/danang/1200/800" },
+  { "id": 3, "code": "TO-1155", "name": "Phú Quốc 4N3Đ", "type": "Biển đảo", "date": "2026-11-02", "price": 6790000, "status": "open", "image": "https://picsum.photos/seed/phuquoc/1200/800" },
+  { "id": 4, "code": "TO-1194", "name": "Sapa - Fansipan", "type": "Núi rừng", "date": "2026-11-15", "price": 5290000, "status": "closed", "image": "https://picsum.photos/seed/sapa/1200/800" },
+  { "id": 5, "code": "TO-1218", "name": "Ninh Bình - Tràng An", "type": "Miền Bắc", "date": "2026-10-26", "price": 3890000, "status": "open", "image": "https://picsum.photos/seed/ninhbinh/1200/800" },
+  { "id": 6, "code": "TO-1282", "name": "Cần Thơ - Châu Đốc", "type": "Miền Nam", "date": "2026-12-03", "price": 4590000, "status": "pending", "image": "https://picsum.photos/seed/cantho/1200/800" }
+]
