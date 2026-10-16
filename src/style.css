@@ -887,3 +887,171 @@ button {
 }
 .btn-fav:hover { transform: scale(1.1); }
 .btn-fav.active { color: #ef4444; } /* Màu đỏ khi đã thả tim */
+/* =========================================
+   PROMO SECTION (MÃ GIẢM GIÁ) - FULL CSS
+========================================= */
+
+/* 1. Khung bao bọc bên ngoài */
+.promo-section {
+  background: #ffffff;
+  padding: 40px 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* 2. Menu Tabs (Ngân hàng, Khách sạn...) */
+.promo-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.promo-tab {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  padding: 10px 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.promo-tab.active {
+  color: #0284c7; 
+}
+
+.promo-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #0ea5e9;
+  border-radius: 3px 3px 0 0;
+}
+
+/* 3. Vùng cuộn ngang chứa các thẻ giảm giá */
+.promo-slider {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 20px 5px;
+  scroll-snap-type: x mandatory;
+}
+
+.promo-slider::-webkit-scrollbar {
+  height: 6px;
+}
+.promo-slider::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* 4. Style chi tiết cho từng Thẻ (Card) - Kích thước LỚN */
+.promo-card {
+  flex: 0 0 auto;
+  width: 380px; 
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  scroll-snap-align: start;
+}
+
+.promo-card-inner {
+  display: flex;
+  gap: 20px; 
+  padding: 20px; 
+  height: 100%;
+}
+
+/* 5. Nhãn "Sắp hết mã" */
+.promo-badge {
+  position: absolute;
+  top: -14px;
+  left: -5px;
+  background: #fecdd3;
+  color: #be123c;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.promo-badge::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  border-width: 4px 4px 0 0;
+  border-style: solid;
+  border-color: #9f1239 transparent transparent transparent;
+}
+
+/* 6. Logo ngân hàng */
+.promo-logo img {
+  width: 80px; 
+  height: 80px;
+  object-fit: cover;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+}
+
+/* 7. Nội dung chữ bên trong thẻ */
+.promo-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.promo-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px; 
+  color: #1e293b;
+  line-height: 1.3;
+}
+
+.promo-content p {
+  margin: 0 0 15px 0;
+  font-size: 14px; 
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* 8. Phần Footer chứa loại thẻ và nút bấm */
+.promo-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto; /* Đẩy footer xuống đáy */
+}
+
+.promo-tag {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-claim {
+  background: #0ea5e9;
+  color: white;
+  border: none;
+  padding: 8px 16px; 
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-claim:hover {
+  background: #0284c7;
+}

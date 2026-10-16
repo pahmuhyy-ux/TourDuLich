@@ -29,16 +29,11 @@ const fetchTours = async () => {
     fetchedData = [...defaultTours];
   }
 
-  // Lấy danh sách tour do Admin tạo từ LocalStorage
   const adminTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
-  
-  // Gộp dữ liệu: Ưu tiên hiển thị tour của Admin lên trước
   toursList = [...adminTours, ...fetchedData];
-  
   renderTourCards(toursList);
 }
 
-// Hàm lấy danh sách tour yêu thích từ LocalStorage
 const getFavorites = () => JSON.parse(localStorage.getItem('tourdulich_favorites') || '[]');
 
 // 3. Hàm render Tour
@@ -133,7 +128,7 @@ const closeTourDetail = () => {
   modal.setAttribute('aria-hidden', 'true')
 }
 
-// 4. Giao diện trang chủ (Bao gồm Modal Đăng nhập/Đăng ký)
+// 4. Giao diện trang chủ
 document.querySelector('#app').innerHTML = `
 <header class="header">
   <div class="container header-inner">
@@ -231,6 +226,91 @@ document.querySelector('#app').innerHTML = `
   </div>
 </section>
 
+<!-- BỔ SUNG: KHỐI HTML MÃ GIẢM GIÁ (PROMO SECTION) -->
+<section class="section promo-section">
+  <div class="container">
+    <div class="section-head text-center" style="text-align: center;">
+      <h2 class="section-title" style="color: #0c4a6e; font-size: 28px;">Mã Giảm Giá Có Hạn</h2>
+    </div>
+
+    <div class="promo-tabs">
+      <button class="promo-tab active">Ngân hàng</button>
+      <button class="promo-tab">Vé máy bay</button>
+      <button class="promo-tab">Khách sạn</button>
+      <button class="promo-tab">Vé vui chơi</button>
+      <button class="promo-tab">Du thuyền</button>
+    </div>
+
+    <div class="promo-slider">
+      <div class="promo-card">
+        <span class="promo-badge">Sắp hết mã</span>
+        <div class="promo-card-inner">
+          <div class="promo-logo">
+            <img src="https://picsum.photos/seed/hdbank/80/80" alt="HDBank">
+          </div>
+          <div class="promo-content">
+            <h4>Giảm 400K VND cho Vé ...</h4>
+            <p>Tối thiểu giao dịch 3.4 triệu đ...</p>
+            <div class="promo-footer">
+              <span class="promo-tag">Credit Card</span>
+              <button class="btn btn-claim" data-code="HDBANK400" data-discount="400000">Nhận Ngay</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="promo-card">
+        <span class="promo-badge">Sắp hết mã</span>
+        <div class="promo-card-inner">
+          <div class="promo-logo">
+            <img src="https://picsum.photos/seed/techcombank/80/80" alt="Techcombank">
+          </div>
+          <div class="promo-content">
+            <h4>Giảm giá 400k VND</h4>
+            <p>Tối thiểu giao dịch 8 triệu đồn...</p>
+            <div class="promo-footer">
+              <span class="promo-tag">Credit Card</span>
+              <button class="btn btn-claim" data-code="TECHCOM400" data-discount="400000">Nhận Ngay</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="promo-card">
+        <div class="promo-card-inner">
+          <div class="promo-logo">
+            <img src="https://picsum.photos/seed/jcb/80/80" alt="JCB">
+          </div>
+          <div class="promo-content">
+            <h4>Giảm giá 400,000 VND</h4>
+            <p>Tối thiểu giao dịch 6 triệu đồng</p>
+            <div class="promo-footer">
+              <span class="promo-tag">Credit Card</span>
+              <button class="btn btn-claim" data-code="JCB400" data-discount="400000">Nhận Ngay</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="promo-card">
+        <div class="promo-card-inner">
+          <div class="promo-logo">
+            <img src="https://picsum.photos/seed/namabank/80/80" alt="Nam A Bank">
+          </div>
+          <div class="promo-content">
+            <h4>Giảm giá 200K VND</h4>
+            <p>Cho khách hàng Nam A Bank</p>
+            <div class="promo-footer">
+              <span class="promo-tag">Credit Card</span>
+              <button class="btn btn-claim" data-code="NAMABANK200" data-discount="200000">Nhận Ngay</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section section-alt">
   <div class="container">
     <div class="section-head">
@@ -265,7 +345,7 @@ document.querySelector('#app').innerHTML = `
   </div>
 </div>
 
-<!-- Modal 2: Form Đặt Tour -->
+<!-- Modal 2: Form Đặt Tour (Đã fix vị trí thẻ SELECT vào đúng chỗ) -->
 <div class="tour-detail-modal" id="bookingModal" aria-hidden="true">
   <div class="tour-detail-panel" style="max-width: 500px; text-align: left;">
     <button class="tour-detail-close" id="closeBookingModal" type="button" aria-label="Đóng">×</button>
@@ -303,6 +383,14 @@ document.querySelector('#app').innerHTML = `
           <input type="date" id="departureDate" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" />
           <span id="errDate" style="color: #ef4444; font-size: 12px; display: none; margin-top: 4px;">Vui lòng chọn ngày hợp lệ.</span>
         </div>
+      </div>
+
+      <!-- Thêm phần chọn mã giảm giá vào Form (Vị trí chuẩn) -->
+      <div style="margin-bottom: 15px;">
+        <label for="promoCode" style="display: block; margin-bottom: 5px; font-weight: 500;">Mã giảm giá (Ví Voucher)</label>
+        <select id="promoCode" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+          <option value="0">Không dùng mã</option>
+        </select>
       </div>
 
       <div style="margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 6px; text-align: right;">
@@ -448,9 +536,42 @@ btnSearch?.addEventListener('click', (e) => {
     featuredTours.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
+
 // ==========================================
-// 6. LOGIC XỬ LÝ ĐẶT TOUR
+// 6. LOGIC MÃ GIẢM GIÁ VÀ ĐẶT TOUR
 // ==========================================
+
+// 6.1 Xử lý Nhận Mã Khuyến Mãi
+const promoSection = document.querySelector('.promo-section');
+promoSection?.addEventListener('click', (e) => {
+  if (e.target.classList.contains('btn-claim')) {
+    const btn = e.target;
+    const code = btn.dataset.code;
+    const discount = parseInt(btn.dataset.discount);
+    
+    // Lưu mã vào LocalStorage
+    let vouchers = JSON.parse(localStorage.getItem('tourdulich_vouchers') || '[]');
+    const isExist = vouchers.find(v => v.code === code);
+    
+    if (!isExist) {
+        vouchers.push({ code, discount });
+        localStorage.setItem('tourdulich_vouchers', JSON.stringify(vouchers));
+    }
+
+    btn.textContent = "Đã lưu";
+    btn.style.background = "#10b981"; 
+    btn.style.pointerEvents = "none";
+    
+    alert(`Lưu mã ${code} (giảm ${formatCurrency(discount)}) thành công! Bạn có thể chọn mã này ở bước thanh toán.`);
+  }
+  
+  if (e.target.classList.contains('promo-tab')) {
+    document.querySelectorAll('.promo-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+});
+
+// 6.2 Logic Đặt Tour kèm Mã Khuyến Mãi
 const btnBookTour = document.querySelector('#btnBookTour');
 const bookingModal = document.querySelector('#bookingModal');
 const closeBookingBtn = document.querySelector('#closeBookingModal');
@@ -459,8 +580,30 @@ const bookingTourNameEl = document.querySelector('#bookingTourName');
 const guestCountInput = document.querySelector('#guestCount');
 const dateInput = document.querySelector('#departureDate');
 const totalPriceDisplay = document.querySelector('#totalPriceDisplay');
+const promoCodeSelect = document.querySelector('#promoCode');
 
 let currentTourPrice = 0;
+
+const loadVouchersToForm = () => {
+    if(!promoCodeSelect) return;
+    let vouchers = JSON.parse(localStorage.getItem('tourdulich_vouchers') || '[]');
+    promoCodeSelect.innerHTML = '<option value="0">Không dùng mã</option>' + 
+        vouchers.map(v => `<option value="${v.discount}">Mã ${v.code} - Giảm ${formatCurrency(v.discount)}</option>`).join('');
+};
+
+const updateTotalPrice = () => {
+    let count = parseInt(guestCountInput.value);
+    if (isNaN(count) || count < 1) count = 0;
+    
+    let subTotal = currentTourPrice * count; 
+    let discountAmount = promoCodeSelect ? parseInt(promoCodeSelect.value) : 0; 
+    let total = subTotal - discountAmount;
+    
+    if(total < 0) total = 0; 
+
+    let discountUI = discountAmount > 0 ? `<div style="font-size: 14px; color: #10b981; margin-bottom: 5px;">Trừ khuyến mãi: - ${formatCurrency(discountAmount)}</div>` : '';
+    totalPriceDisplay.innerHTML = `${discountUI}<strong style="font-size: 20px; color: #f97316;">${formatCurrency(total)}</strong>`;
+};
 
 btnBookTour?.addEventListener('click', () => {
     const tourName = document.querySelector('#tourDetailName').textContent;
@@ -473,6 +616,8 @@ btnBookTour?.addEventListener('click', () => {
     dateInput.setAttribute('min', today);
     dateInput.value = today;
     guestCountInput.value = 1; 
+    
+    loadVouchersToForm();
     updateTotalPrice(); 
     
     closeTourDetail();
@@ -480,13 +625,8 @@ btnBookTour?.addEventListener('click', () => {
     bookingModal.setAttribute('aria-hidden', 'false');
 });
 
-const updateTotalPrice = () => {
-    let count = parseInt(guestCountInput.value);
-    if (isNaN(count) || count < 1) count = 0;
-    const total = currentTourPrice * count;
-    totalPriceDisplay.textContent = formatCurrency(total);
-};
 guestCountInput?.addEventListener('input', updateTotalPrice);
+promoCodeSelect?.addEventListener('change', updateTotalPrice);
 
 const closeBookingModal = () => {
     bookingModal.classList.remove('show');
@@ -539,13 +679,16 @@ bookingForm?.addEventListener('submit', (e) => {
 
     if (!isValid) return;
 
-    const finalTotal = currentTourPrice * count;
-    
+    let discountAmount = promoCodeSelect ? parseInt(promoCodeSelect.value) : 0;
+    let finalTotal = Math.max(0, (currentTourPrice * count) - discountAmount);
+    let appliedCode = promoCodeSelect && promoCodeSelect.selectedIndex > 0 ? promoCodeSelect.options[promoCodeSelect.selectedIndex].text : 'Không có';
+
     const confirmMessage = `XÁC NHẬN THÔNG TIN ĐẶT TOUR:
 - Tên tour: ${bookingTourNameEl.textContent}
 - Khách hàng: ${name}
 - Số lượng: ${count} người
-- Tổng thanh toán: ${formatCurrency(finalTotal)}
+- Mã áp dụng: ${appliedCode}
+- TỔNG THANH TOÁN: ${formatCurrency(finalTotal)}
 
 Bạn có chắc chắn muốn tiến hành đặt tour này không?`;
     
@@ -563,6 +706,7 @@ Bạn có chắc chắn muốn tiến hành đặt tour này không?`;
         tourName: bookingTourNameEl.textContent,
         travelDate: date,
         totalPrice: finalTotal,
+        promoInfo: appliedCode,
         status: 'pending' 
     });
     
@@ -584,7 +728,7 @@ const btnAuthSubmit = document.querySelector('#btnAuthSubmit');
 const authSwitchText = document.querySelector('#authSwitchText');
 const authSwitchLink = document.querySelector('#authSwitchLink');
 
-let isLoginMode = true; // Biến cờ: true = Đăng nhập, false = Đăng ký
+let isLoginMode = true; 
 
 const checkLoginStatus = () => {
     const activeUser = JSON.parse(localStorage.getItem('tourdulich_active_user'));
@@ -625,7 +769,6 @@ authModal?.addEventListener('click', (event) => {
     if (event.target === authModal) closeAuthModal();
 });
 
-// Xử lý chuyển đổi giữa Đăng ký và Đăng nhập
 authSwitchLink?.addEventListener('click', (e) => {
     e.preventDefault();
     isLoginMode = !isLoginMode;
@@ -645,7 +788,6 @@ authSwitchLink?.addEventListener('click', (e) => {
     }
 });
 
-// Xử lý Submit Form Authentication
 authForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.querySelector('#authName').value.trim();
@@ -661,7 +803,6 @@ authForm?.addEventListener('submit', (e) => {
     let users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
 
     if (isLoginMode) {
-        // Xử lý Đăng nhập
         const matchedUser = users.find(u => u.email === email && u.password === password);
         if (matchedUser) {
             localStorage.setItem('tourdulich_active_user', JSON.stringify(matchedUser));
@@ -672,7 +813,6 @@ authForm?.addEventListener('submit', (e) => {
             alert("Sai thông tin đăng nhập hoặc tài khoản không tồn tại!");
         }
     } else {
-        // Xử lý Đăng ký
         const userExists = users.some(u => u.email === email);
         if (userExists) {
             alert("Email này đã được đăng ký, vui lòng sử dụng email khác hoặc Đăng nhập!");
@@ -684,7 +824,6 @@ authForm?.addEventListener('submit', (e) => {
         localStorage.setItem(USERS_KEY, JSON.stringify(users));
         
         alert("✅ Đăng ký thành công! Bạn có thể tiến hành đăng nhập ngay.");
-        // Tự động chuyển về giao diện đăng nhập
         authSwitchLink.click();
     }
 });
