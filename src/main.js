@@ -465,22 +465,96 @@ document.querySelector('#app').innerHTML = `
   </div>
 </section>
 
-<footer class="footer">
-  <div class="container footer-grid">
-    <div class="footer-brand">
-      <a href="/" class="logo logo-light">
+<footer class="footer-new">
+  <div class="container footer-grid-multi">
+    <!-- Cột 1: Logo và Đối tác -->
+    <div class="footer-col">
+      <a href="/" class="logo logo-light" style="margin-bottom: 20px; display: inline-flex;">
         <span class="logo-icon">✈</span>
         <span>Tour<strong>DuLich</strong></span>
       </a>
-      <p>Công ty du lịch hàng đầu Việt Nam.</p>
+      <div style="margin-bottom: 30px;">
+        <button class="btn-cooperate">Hợp tác với chúng tôi</button>
+      </div>
+      
+      <h4 class="footer-heading">Đối tác thanh toán</h4>
+      <div class="payment-grid">
+        <div class="pay-box" style="color: #eb001b;">Mastercard</div>
+        <div class="pay-box" style="color: #1a1f71;">VISA</div>
+        <div class="pay-box" style="color: #0f863b;">JCB</div>
+        <div class="pay-box" style="color: #2671b8;">AMEX</div>
+        <div class="pay-box" style="color: #a82236;">VietQR</div>
+        <div class="pay-box" style="color: #ae2070;">MoMo</div>
+        <div class="pay-box" style="color: #e31837;">Techcombank</div>
+        <div class="pay-box" style="color: #00704a;">VPBank</div>
+        <div class="pay-box" style="color: #005a9e;">VNPAY</div>
+        <div class="pay-box" style="color: #0067b8;">Vietcombank</div>
+        <div class="pay-box" style="color: #00266b;">MB</div>
+        <div class="pay-box" style="color: #db0011;">HSBC</div>
+      </div>
     </div>
+
+    <!-- Cột 2: Về chúng tôi & Mạng xã hội -->
     <div class="footer-col">
-      <h4>Về chúng tôi</h4>
-      <a href="tranglienhe.html" onclick="window.location.href='tranglienhe.html'; return false;">Liên hệ</a>
+      <h4 class="footer-heading">Về TourDuLich</h4>
+      <ul class="footer-links">
+        <li><a href="#">Cách đặt chỗ</a></li>
+        <li><a href="#">Liên hệ chúng tôi</a></li>
+        <li><a href="#">Trợ giúp</a></li>
+        <li><a href="#">Tuyển dụng</a></li>
+        <li><a href="#">Về chúng tôi</a></li>
+      </ul>
+
+      <h4 class="footer-heading" style="margin-top: 30px;">Theo dõi chúng tôi trên</h4>
+      <ul class="footer-links">
+        <li><a href="#">📘 Facebook</a></li>
+        <li><a href="#">📸 Instagram</a></li>
+        <li><a href="#">🎵 TikTok</a></li>
+        <li><a href="#">▶️ Youtube</a></li>
+      </ul>
+    </div>
+
+    <!-- Cột 3: Sản phẩm -->
+    <div class="footer-col">
+      <h4 class="footer-heading">Sản phẩm</h4>
+      <ul class="footer-links">
+        <li><a href="#">Khách sạn</a></li>
+        <li><a href="#">Vé máy bay</a></li>
+        <li><a href="#">Vé xe khách</a></li>
+        <li><a href="#">Đưa đón sân bay</a></li>
+        <li><a href="#">Cho thuê xe</a></li>
+        <li><a href="#">Hoạt động & Vui chơi</a></li>
+        <li><a href="#">Du thuyền</a></li>
+        <li><a href="#">Biệt thự</a></li>
+        <li><a href="#">Căn hộ</a></li>
+      </ul>
+    </div>
+
+    <!-- Cột 4: Khác & Tải app -->
+    <div class="footer-col">
+      <h4 class="footer-heading">Khác</h4>
+      <ul class="footer-links">
+        <li><a href="#">Affiliate</a></li>
+        <li><a href="#">Blog Du lịch</a></li>
+        <li><a href="#">Chính sách Quyền riêng tư</a></li>
+        <li><a href="#">Điều khoản & Điều kiện</a></li>
+        <li><a href="#">Đăng ký nơi nghỉ của bạn</a></li>
+        <li><a href="#">Đăng ký doanh nghiệp</a></li>
+        <li><a href="#">Khu vực báo chí</a></li>
+      </ul>
+
+      <h4 class="footer-heading" style="margin-top: 30px;">Tải ứng dụng</h4>
+      <div class="app-badges">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="App Store">
+      </div>
     </div>
   </div>
-  <div class="footer-bottom">
-    <div class="container"><p>© 2026 TourDuLich. Bảo lưu mọi quyền.</p></div>
+  
+  <div class="footer-bottom-new">
+    <div class="container">
+      <p>© 2026 TourDuLich. Bảo lưu mọi quyền.</p>
+    </div>
   </div>
 </footer>
 `
