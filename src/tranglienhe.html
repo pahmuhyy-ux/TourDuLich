@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Liên hệ</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #f3f8ff, #e8f7f2);
+        color: #1f2937;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 60px auto;
+        background: #ffffff;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .hero-image {
+        width: 100%;
+        height: 260px;
+        overflow: hidden;
+        border-radius: 14px;
+        margin-bottom: 28px;
+      }
+
+      .hero-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 24px;
+        color: #0f172a;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      input,
+      textarea,
+      select,
+      button {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 16px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+
+      textarea {
+        min-height: 140px;
+        resize: vertical;
+      }
+
+      .error {
+        display: block;
+        min-height: 20px;
+        margin-top: 6px;
+        font-size: 14px;
+        color: #dc2626;
+      }
+
+      .success-message {
+        margin-top: 20px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: #dcfce7;
+        color: #166534;
+        font-weight: 600;
+      }
+
+      button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: 700;
+        transition: background 0.3s ease;
+      }
+
+      button:hover {
+        background: #1d4ed8;
+      }
+
+      .invalid {
+        border-color: #dc2626;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="hero-image">
+        <img
+          src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80"
+          alt="Cảnh Tràng An đẹp"
+        />
+      </div>
+
+      <h1>Liên hệ với chúng tôi</h1>
+
+      <form id="contactForm" novalidate>
+        <div class="form-group">
+          <label for="fullName">Họ và tên</label>
+          <input type="text" id="fullName" name="fullName" placeholder="Nhập họ và tên" />
+          <span class="error" data-error-for="fullName"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="example@gmail.com" />
+          <span class="error" data-error-for="email"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Số điện thoại</label>
+          <input type="tel" id="phone" name="phone" placeholder="0901234567" />
+          <span class="error" data-error-for="phone"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="subject">Chủ đề</label>
+          <select id="subject" name="subject">
+            <option value="">-- Chọn chủ đề --</option>
+            <option value="tour">Đặt tour</option>
+            <option value="support">Hỗ trợ khách hàng</option>
+            <option value="feedback">Góp ý</option>
+            <option value="other">Khác</option>
+          </select>
+          <span class="error" data-error-for="subject"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="message">Nội dung</label>
+          <textarea id="message" name="message" placeholder="Nhập nội dung bạn muốn gửi..."></textarea>
+          <span class="error" data-error-for="message"></span>
+        </div>
+
+        <button type="submit">Gửi liên hệ</button>
+      </form>
+
+      <div id="successMessage" class="success-message" hidden>
+        Gửi liên hệ thành công! Chúng tôi sẽ phản hồi sớm nhất.
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById('contactForm');
+      const successMessage = document.getElementById('successMessage');
+
+      function setError(fieldId, message) {
+        const input = document.getElementById(fieldId);
+        const errorElement = document.querySelector(`[data-error-for="${fieldId}"]`);
+
+        input.classList.add('invalid');
+        errorElement.textContent = message;
+      }
+
+      function clearError(fieldId) {
+        const input = document.getElementById(fieldId);
+        const errorElement = document.querySelector(`[data-error-for="${fieldId}"]`);
+
+        input.classList.remove('invalid');
+        errorElement.textContent = '';
+      }
+
+      function validateFullName() {
+        const value = document.getElementById('fullName').value.trim();
+        if (!value) {
+          setError('fullName', 'Vui lòng nhập họ và tên.');
+          return false;
+        }
+        if (value.length < 2) {
+          setError('fullName', 'Họ tên phải có ít nhất 2 ký tự.');
+          return false;
+        }
+        clearError('fullName');
+        return true;
+      }
+
+      function validateEmail() {
+        const value = document.getElementById('email').value.trim();
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!value) {
+          setError('email', 'Vui lòng nhập email.');
+          return false;
+        }
+        if (!emailPattern.test(value)) {
+          setError('email', 'Email không đúng định dạng.');
+          return false;
+        }
+        clearError('email');
+        return true;
+      }
+
+      function validatePhone() {
+        const value = document.getElementById('phone').value.trim();
+        const phonePattern = /(84|0[3|5|7|8|9])+([0-9]{8,9})\b/;
+
+        if (!value) {
+          setError('phone', 'Vui lòng nhập số điện thoại.');
+          return false;
+        }
+        if (!phonePattern.test(value)) {
+          setError('phone', 'Số điện thoại không hợp lệ.');
+          return false;
+        }
+        clearError('phone');
+        return true;
+      }
+
+      function validateSubject() {
+        const value = document.getElementById('subject').value;
+        if (!value) {
+          setError('subject', 'Vui lòng chọn chủ đề.');
+          return false;
+        }
+        clearError('subject');
+        return true;
+      }
+
+      function validateMessage() {
+        const value = document.getElementById('message').value.trim();
+        if (!value) {
+          setError('message', 'Vui lòng nhập nội dung.');
+          return false;
+        }
+        if (value.length < 10) {
+          setError('message', 'Nội dung phải có ít nhất 10 ký tự.');
+          return false;
+        }
+        clearError('message');
+        return true;
+      }
+
+      document.getElementById('fullName').addEventListener('blur', validateFullName);
+      document.getElementById('email').addEventListener('blur', validateEmail);
+      document.getElementById('phone').addEventListener('blur', validatePhone);
+      document.getElementById('subject').addEventListener('change', validateSubject);
+      document.getElementById('message').addEventListener('blur', validateMessage);
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const isFullNameValid = validateFullName();
+        const isEmailValid = validateEmail();
+        const isPhoneValid = validatePhone();
+        const isSubjectValid = validateSubject();
+        const isMessageValid = validateMessage();
+
+        if (
+          isFullNameValid &&
+          isEmailValid &&
+          isPhoneValid &&
+          isSubjectValid &&
+          isMessageValid
+        ) {
+          successMessage.hidden = false;
+          form.reset();
+          ['fullName', 'email', 'phone', 'subject', 'message'].forEach(clearError);
+        } else {
+          successMessage.hidden = true;
+        }
+      });
+    </script>
+  </body>
+</html>
