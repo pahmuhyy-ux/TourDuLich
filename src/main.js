@@ -30,7 +30,12 @@ const fetchTours = async () => {
   }
 
   const adminTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
-  toursList = [...adminTours, ...fetchedData];
+  if (adminTours.length > 0) {
+    toursList = adminTours;
+  } else {
+    toursList = fetchedData;
+    localStorage.setItem('tourdulich_tours', JSON.stringify(fetchedData));
+  }
   renderTourCards(toursList);
 }
 
@@ -117,6 +122,8 @@ const openTourDetail = (tour) => {
   detailImage.src = tourImg
   detailImage.alt = tour.name
 
+  const fullLink = document.querySelector('#tourDetailFullPageLink');
+  if (fullLink) fullLink.href = 'tourdetail.html?id=' + encodeURIComponent(tour.id);
   modal.classList.add('show')
   modal.setAttribute('aria-hidden', 'false')
 }
@@ -198,27 +205,27 @@ document.querySelector('#app').innerHTML = `
       <p class="section-desc">Những địa danh được yêu thích nhất dành cho chuyến đi của bạn.</p>
     </div>
     <div class="grid destinations">
-      <a href="#" class="card dest-card dest-lg">
+      <a href="trangtour.html?dest=Hạ+Long" class="card dest-card dest-lg">
         <img src="${img('halong')}" alt="Vịnh Hạ Long" />
         <div class="dest-info"><h3>Vịnh Hạ Long</h3><p>Quảng Ninh • 120+ tour</p></div>
       </a>
-      <a href="#" class="card dest-card">
+      <a href="trangtour.html" class="card dest-card">
         <img src="${img('danang')}" alt="Đà Nẵng" />
         <div class="dest-info"><h3>Đà Nẵng</h3><p>Miền Trung • 85 tour</p></div>
       </a>
-      <a href="#" class="card dest-card">
+      <a href="trangtour.html" class="card dest-card">
         <img src="${img('dalat')}" alt="Đà Lạt" />
         <div class="dest-info"><h3>Đà Lạt</h3><p>Lâm Đồng • 60 tour</p></div>
       </a>
-      <a href="#" class="card dest-card">
+      <a href="trangtour.html" class="card dest-card">
         <img src="${img('hanoi')}" alt="Hà Nội" />
         <div class="dest-info"><h3>Hà Nội</h3><p>Thủ đô • 95 tour</p></div>
       </a>
-      <a href="#" class="card dest-card">
+      <a href="trangtour.html" class="card dest-card">
         <img src="${img('phuquoc')}" alt="Phú Quốc" />
         <div class="dest-info"><h3>Phú Quốc</h3><p>Kiên Giang • 50 tour</p></div>
       </a>
-      <a href="#" class="card dest-card">
+      <a href="trangtour.html" class="card dest-card">
         <img src="${img('nhatrang')}" alt="Nha Trang" />
         <div class="dest-info"><h3>Nha Trang</h3><p>Khánh Hòa • 72 tour</p></div>
       </a>
@@ -339,7 +346,10 @@ document.querySelector('#app').innerHTML = `
       </div>
       <div class="tour-detail-footer">
         <div><span class="price-old" id="tourDetailOldPrice">0đ</span><span class="price" id="tourDetailPrice">0đ</span></div>
-        <button class="btn btn-primary" id="btnBookTour" type="button">Đặt tour</button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <a id="tourDetailFullPageLink" href="tourdetail.html" class="btn btn-sm" style="text-decoration: none; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700; color: #0284c7; background: #f0f9ff;">Xem lịch trình chi tiết →</a>
+          <button class="btn btn-primary" id="btnBookTour" type="button">Đặt tour</button>
+        </div>
       </div>
     </div>
   </div>

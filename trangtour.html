@@ -3,91 +3,231 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Danh sách Tour Nổi Bật - TourDuLich</title>
+  <title>Danh Sách Tour Du Lịch - TourDuLich</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="src/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f4f8f7;
-      color: #1f2937;
-    }
-    .header-nav {
-      background: white;
-      padding: 15px 30px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo { text-decoration: none; color: #1f2937; font-size: 24px; font-weight: bold; }
-    .logo-icon { color: #0ea5e9; }
-    .back-btn {
-      text-decoration: none; color: #0d7a5f; font-weight: 600;
-      padding: 8px 16px; background: #e7faf4; border-radius: 8px; transition: 0.3s;
-    }
-    .back-btn:hover { background: #d2f5eb; }
+    body { margin: 0; font-family: 'Nunito', sans-serif; background: #f8fafc; color: #1f2937; min-height: 100vh; display: flex; flex-direction: column; }
+    .header { background: #0f172a; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-inner { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; max-width: 1200px; margin: 0 auto; }
+    .logo { font-size: 22px; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .logo-icon { color: #0ea5e9; font-size: 24px; }
+    .logo strong { color: #34d399; }
+    .nav { display: flex; align-items: center; gap: 20px; }
+    .nav-link { color: #cbd5e1; text-decoration: none; font-weight: 600; font-size: 15px; transition: 0.2s; }
+    .nav-link:hover, .nav-link.active { color: white; }
+    .nav-admin { color: #f97316 !important; font-weight: 800; }
 
-    .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-    .section-head { text-align: center; margin-bottom: 40px; }
-    .section-label { color: #0d7a5f; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.1em; }
-    .section-title { font-size: 2.2rem; margin: 10px 0; color: #0f172a; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; flex: 1; }
     
-    /* Grid layout cho danh sách tour */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px; }
+    .section-head { text-align: center; margin-bottom: 30px; }
+    .section-label { color: #0d7a5f; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.12em; margin-bottom: 8px; }
+    .section-title { font-size: 2.2rem; margin: 0 0 10px 0; color: #0f172a; font-weight: 800; }
+    .section-sub { color: #64748b; font-size: 15px; margin: 0; }
+
+    /* Filter Toolbar */
+    .filter-toolbar { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+    .search-input-wrap { flex: 1; min-width: 260px; position: relative; }
+    .search-input-wrap input { width: 100%; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; font-family: inherit; box-sizing: border-box; }
+    .search-input-wrap input:focus { outline: none; border-color: #0d7a5f; }
+
+    .category-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 24px; }
+    .cat-pill { padding: 8px 18px; border-radius: 999px; border: 1px solid #cbd5e1; background: white; font-weight: 700; font-size: 14px; color: #475569; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .cat-pill:hover { background: #f1f5f9; color: #0f172a; }
+    .cat-pill.active { background: #0d7a5f; color: white; border-color: #0d7a5f; }
+
+    /* Tour Cards Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 28px; }
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
     .card {
       background: white; border-radius: 16px; overflow: hidden;
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06); border: 1px solid #dfe7ea;
-      display: flex; flex-direction: column; transition: transform 0.2s;
+      box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05); border: 1px solid #e2e8f0;
+      display: flex; flex-direction: column; transition: transform 0.25s, box-shadow 0.25s;
     }
-    .card:hover { transform: translateY(-4px); }
-    .tour-media { position: relative; height: 220px; }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1); }
+    .tour-media { position: relative; height: 230px; }
     .tour-media img { width: 100%; height: 100%; object-fit: cover; }
-    .badge {
-      position: absolute; top: 12px; left: 12px; background: rgba(13, 122, 95, 0.9);
-      color: white; padding: 6px 12px; font-size: 0.75rem; font-weight: 700; border-radius: 99px;
+    
+    .badge-cat {
+      position: absolute; top: 14px; left: 14px; background: rgba(13, 122, 95, 0.92);
+      backdrop-filter: blur(4px); color: white; padding: 6px 12px; font-size: 12px; font-weight: 800; border-radius: 999px;
     }
-    .days {
-      position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6);
-      color: white; padding: 6px 10px; font-size: 0.75rem; border-radius: 99px;
+    .days-badge {
+      position: absolute; top: 14px; right: 14px; background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(4px); color: white; padding: 6px 10px; font-size: 12px; font-weight: 700; border-radius: 999px;
     }
-    .tour-body { padding: 20px; display: flex; flex-direction: column; flex: 1; }
-    .tour-rating { color: #f59e0b; font-size: 0.85rem; margin-bottom: 8px; }
-    .tour-body h3 { margin: 0 0 8px 0; font-size: 1.25rem; color: #0f172a; }
-    .tour-meta { color: #64748b; font-size: 0.9rem; margin-bottom: 16px; }
+
+    .tour-body { padding: 22px; display: flex; flex-direction: column; flex: 1; }
+    .tour-rating { color: #f59e0b; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .tour-body h3 { margin: 0 0 8px 0; font-size: 1.25rem; color: #0f172a; font-weight: 800; line-height: 1.35; }
+    .tour-meta { color: #64748b; font-size: 13px; margin-bottom: 20px; }
+
     .tour-foot {
-      margin-top: auto; display: flex; justify-content: space-between; align-items: center;
-      border-top: 1px solid #edf2f7; padding-top: 14px;
+      margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end;
+      border-top: 1px solid #f1f5f9; padding-top: 16px;
     }
-    .price { font-size: 1.2rem; font-weight: bold; color: #0d7a5f; }
-    .price-old { text-decoration: line-through; color: #94a3b8; font-size: 0.9rem; display: block; }
-    .btn { background: #0d7a5f; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-    .btn:hover { background: #0a5f49; }
+    .price-main { font-size: 1.3rem; font-weight: 800; color: #0d7a5f; }
+    .price-old { text-decoration: line-through; color: #94a3b8; font-size: 12px; display: block; }
+
+    .card-actions { display: flex; gap: 8px; }
+    .btn-detail { background: #e0f2fe; color: #0369a1; border: none; padding: 9px 14px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; text-decoration: none; }
+    .btn-book { background: #0d7a5f; color: white; border: none; padding: 9px 14px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; text-decoration: none; }
+    .btn-book:hover { background: #0a5f49; }
+
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #64748b; }
+    
+    .footer { background: #0f172a; color: #94a3b8; padding: 30px 0; margin-top: auto; text-align: center; font-size: 14px; }
   </style>
 </head>
 <body>
-  <div class="header-nav">
-    <a href="/" class="logo"><span class="logo-icon">✈</span> Tour<strong>DuLich</strong></a>
-    <a href="/" class="back-btn">← Về trang chủ</a>
-  </div>
+
+  <!-- Header Navigation -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <span class="logo-icon">✈</span>
+        <span>Tour<strong>DuLich</strong></span>
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-link">Trang chủ</a>
+        <a href="trangtour.html" class="nav-link active">Tour</a>
+        <a href="tranggioithieu.html" class="nav-link">Giới thiệu</a>
+        <a href="trangdonhang.html" class="nav-link">Đơn hàng</a>
+        <a href="tranglienhe.html" class="nav-link">Liên hệ</a>
+        <a href="admin.html" class="nav-link nav-admin">Admin</a>
+      </nav>
+    </div>
+  </header>
 
   <div class="container">
     <div class="section-head">
-      <p class="section-label">TOUR NỔI BẬT</p>
-      <h2 class="section-title">Danh sách tour du lịch hấp dẫn</h2>
-      <p>Lựa chọn hoàn hảo cho kỳ nghỉ và những chuyến đi đáng nhớ của bạn.</p>
+      <p class="section-label">CHUYẾN ĐI TUYỆT VỜI</p>
+      <h1 class="section-title">Danh Sách Tour Du Lịch Hấp Dẫn</h1>
+      <p class="section-sub">Trọn vẹn mọi miền đất nước và quốc tế với dịch vụ chuyên nghiệp, an toàn, giá tốt nhất.</p>
     </div>
 
-    <!-- Nơi render danh sách tour -->
+    <!-- Toolbar: Search & Sort -->
+    <div class="filter-toolbar">
+      <div class="search-input-wrap">
+        <input type="text" id="tourKeywordInput" placeholder="Tìm theo tên tour, điểm đến (Hạ Long, Đà Nẵng, Phú Quốc...)..." />
+      </div>
+      <select id="tourSortSelect" style="padding: 11px 16px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; font-family: inherit;">
+        <option value="default">Mới nhất</option>
+        <option value="price-asc">Giá: Thấp đến Cao</option>
+        <option value="price-desc">Giá: Cao đến Thấp</option>
+        <option value="name">Tên A-Z</option>
+      </select>
+    </div>
+
+    <!-- Category Filter Pills -->
+    <div class="category-pills" id="categoryPills">
+      <button class="cat-pill active" data-cat="all">Tất cả</button>
+      <button class="cat-pill" data-cat="Trong nước">Trong nước</button>
+      <button class="cat-pill" data-cat="Nước ngoài">Nước ngoài</button>
+      <button class="cat-pill" data-cat="Biển đảo">Biển đảo</button>
+      <button class="cat-pill" data-cat="Miền Bắc">Miền Bắc</button>
+      <button class="cat-pill" data-cat="Miền Trung">Miền Trung</button>
+      <button class="cat-pill" data-cat="Miền Nam">Miền Nam</button>
+      <button class="cat-pill" data-cat="Núi rừng">Núi rừng</button>
+    </div>
+
+    <!-- Grid danh sách tour -->
     <div id="allToursGrid" class="grid"></div>
   </div>
 
+  <footer class="footer">
+    <div class="container">
+      © 2026 TourDuLich - Khám phá Việt Nam & Thế giới.
+    </div>
+  </footer>
+
   <script>
     const STORAGE_KEY = 'tourdulich_tours';
+    const formatCurrency = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value || 0);
+
     const defaultTours = [
-      { id: 1, code: 'TO-1023', name: 'Hạ Long 3N2Đ', type: 'Biển đảo', date: '2026-10-12', price: 4490000, status: 'open' },
-      { id: 2, code: 'TO-1129', name: 'Đà Nẵng - Hội An', type: 'Miền Trung', date: '2026-10-18', price: 5890000, status: 'pending' },
-      { id: 3, code: 'TO-1155', name: 'Phú Quốc 4N3Đ', type: 'Biển đảo', date: '2026-11-02', price: 6790000, status: 'open' }
+      {
+        id: 'tour-halong',
+        code: 'TO-1023',
+        name: 'Hạ Long 3N2Đ – Du Thuyền 5 Sao',
+        destination: 'Vịnh Hạ Long',
+        category: 'Biển đảo',
+        type: 'Biển đảo',
+        duration: '3N2Đ',
+        price: 4490000,
+        oldPrice: 5200000,
+        image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
+        badge: 'Giảm 15%'
+      },
+      {
+        id: 'tour-danang',
+        code: 'TO-1129',
+        name: 'Đà Nẵng – Bà Nà Hills – Phố Cổ Hội An',
+        destination: 'Đà Nẵng & Hội An',
+        category: 'Miền Trung',
+        type: 'Miền Trung',
+        duration: '4N3Đ',
+        price: 5890000,
+        oldPrice: 6500000,
+        image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
+        badge: 'Hot Nhất'
+      },
+      {
+        id: 'tour-phuquoc',
+        code: 'TO-1155',
+        name: 'Phú Quốc – Thiên Đường Nghỉ Dưỡng Grand World',
+        destination: 'Đảo Ngọc Phú Quốc',
+        category: 'Biển đảo',
+        type: 'Biển đảo',
+        duration: '3N2Đ',
+        price: 6790000,
+        oldPrice: 7900000,
+        image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80',
+        badge: 'Mới'
+      },
+      {
+        id: 'tour-sapa',
+        code: 'TO-1194',
+        name: 'Sapa – Chinh Phục Đỉnh Fansipan – Bản Cát Cát',
+        destination: 'Sapa, Lào Cai',
+        category: 'Núi rừng',
+        type: 'Núi rừng',
+        duration: '3N2Đ',
+        price: 3890000,
+        oldPrice: 4500000,
+        image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+        badge: 'Săn mây'
+      },
+      {
+        id: 'tour-malaysia-singapore',
+        code: 'TO-1301',
+        name: 'Tour Liên Tuyến Malaysia – Singapore Cao Cấp',
+        destination: 'Singapore & Malaysia',
+        category: 'Nước ngoài',
+        type: 'Nước ngoài',
+        duration: '5N4Đ',
+        price: 10990000,
+        oldPrice: 12900000,
+        image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=80',
+        badge: 'Quốc Tế'
+      },
+      {
+        id: 'tour-thailand',
+        code: 'TO-1388',
+        name: 'Thái Lan Thiên Đường Du Lịch: Bangkok – Pattaya',
+        destination: 'Bangkok - Pattaya',
+        category: 'Nước ngoài',
+        type: 'Nước ngoài',
+        duration: '5N4Đ',
+        price: 6890000,
+        oldPrice: 7990000,
+        image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=1200&q=80',
+        badge: 'Giá Tốt'
+      }
     ];
 
     function loadTours() {
@@ -97,40 +237,74 @@
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
-        return defaultTours;
-      } catch { return defaultTours; }
+      } catch(e) {}
+      return defaultTours;
     }
 
-    const formatCurrency = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+    let currentCategory = 'all';
 
-    function renderAllTours() {
+    // Parse URL params for pre-filter (e.g. ?dest=halong or ?category=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const destParam = urlParams.get('dest');
+    if (destParam) {
+      document.getElementById('tourKeywordInput').value = destParam;
+    }
+
+    function renderTours() {
       const container = document.getElementById('allToursGrid');
       const tours = loadTours();
+      const keyword = document.getElementById('tourKeywordInput').value.trim().toLowerCase();
+      const sort = document.getElementById('tourSortSelect').value;
 
-      container.innerHTML = tours.map(tour => {
-        const tourCode = tour.code || `TO-${String(tour.id).slice(-4).toUpperCase()}`;
-        const tourType = tour.type || tour.category || 'Chưa phân loại';
-        const tourDays = tour.date ? new Date(tour.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : (tour.duration || 'Liên hệ');
-        const tourImg = tour.image || `https://picsum.photos/seed/${tourCode}/1200/800`;
-        const oldPrice = tour.oldPrice || Math.round(tour.price * 1.12);
+      let filtered = tours.filter(t => {
+        const text = `${t.name} ${t.destination || ''} ${t.location || ''} ${t.code || ''}`.toLowerCase();
+        const matchesKeyword = !keyword || text.includes(keyword);
+        const matchesCat = currentCategory === 'all' || t.category === currentCategory || t.type === currentCategory;
+        return matchesKeyword && matchesCat;
+      });
+
+      // Sort
+      if (sort === 'price-asc') filtered.sort((a,b) => (a.price || 0) - (b.price || 0));
+      else if (sort === 'price-desc') filtered.sort((a,b) => (b.price || 0) - (a.price || 0));
+      else if (sort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3 style="font-size: 1.3rem; margin-bottom: 8px;">Không tìm thấy tour phù hợp</h3>
+            <p>Hãy thử tìm với từ khóa khác hoặc bấm chọn lại phân loại "Tất cả".</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(t => {
+        const tourCode = t.code || `TO-${t.id}`;
+        const catName = t.category || t.type || 'Trong nước';
+        const days = t.duration || (t.days ? t.days + ' Ngày' : '3N2Đ');
+        const oldPriceVal = t.oldPrice || Math.round(t.price * 1.15);
+        const imgUrl = t.image || t.img || `https://picsum.photos/seed/${t.id}/1200/800`;
 
         return `
           <div class="card">
             <div class="tour-media">
-              <img src="${tourImg}" alt="${tour.name}" />
-              <span class="badge">${tourType}</span>
-              <span class="days">${tourDays}</span>
+              <img src="${imgUrl}" alt="${t.name}" onerror="this.src='https://picsum.photos/seed/tour/1200/800'" />
+              <span class="badge-cat">${t.badge || catName}</span>
+              <span class="days-badge">⏱ ${days}</span>
             </div>
             <div class="tour-body">
-              <p class="tour-rating">★★★★★</p>
-              <h3>${tour.name}</h3>
-              <p class="tour-meta">${tourCode} • ${tourType}</p>
+              <div class="tour-rating">★★★★★ <span style="color: #64748b; font-size: 12px; font-weight: normal;">(Tuyệt vời)</span></div>
+              <h3>${t.name}</h3>
+              <div class="tour-meta">📍 ${t.destination || t.location || 'Việt Nam'} • Mã: ${tourCode}</div>
               <div class="tour-foot">
                 <div>
-                  <span class="price-old">${formatCurrency(oldPrice)}</span>
-                  <span class="price">${formatCurrency(tour.price)}</span>
+                  <span class="price-old">${formatCurrency(oldPriceVal)}</span>
+                  <span class="price-main">${formatCurrency(t.price)}</span>
                 </div>
-                <button class="btn" onclick="alert('Bạn đang xem chi tiết tour: ${tour.name}')">Chi tiết</button>
+                <div class="card-actions">
+                  <a href="tourdetail.html?id=${t.id}" class="btn-detail">Chi tiết</a>
+                  <a href="tourdetail.html?id=${t.id}#book" class="btn-book">Đặt ngay</a>
+                </div>
               </div>
             </div>
           </div>
@@ -138,7 +312,20 @@
       }).join('');
     }
 
-    renderAllTours();
+    // Category pills filter
+    document.querySelectorAll('#categoryPills .cat-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('#categoryPills .cat-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        currentCategory = pill.dataset.cat;
+        renderTours();
+      });
+    });
+
+    document.getElementById('tourKeywordInput').addEventListener('input', renderTours);
+    document.getElementById('tourSortSelect').addEventListener('change', renderTours);
+
+    renderTours();
   </script>
 </body>
 </html>

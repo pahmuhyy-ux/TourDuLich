@@ -2,69 +2,250 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Danh sách Đơn Đặt Tour</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn Đặt Tour Của Bạn - TourDuLich</title>
     <link rel="stylesheet" href="style.css">
-</head>
-<body style="padding: 50px; background: #f8fafc;">
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Đơn Đặt Tour Của Bạn</h2>
-            <a href="/" class="btn btn-primary">Về Trang chủ</a>
-        </div>
+    <link rel="stylesheet" href="src/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { background: #f8fafc; font-family: 'Nunito', sans-serif; color: #1e293b; margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: #0f172a; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-inner { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; max-width: 1200px; margin: 0 auto; }
+        .logo { font-size: 22px; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .logo-icon { color: #0ea5e9; font-size: 24px; }
+        .logo strong { color: #34d399; }
+        .nav { display: flex; align-items: center; gap: 20px; }
+        .nav-link { color: #cbd5e1; text-decoration: none; font-weight: 600; font-size: 15px; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { color: white; }
+        .nav-admin { color: #f97316 !important; font-weight: 800; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; flex: 1; }
         
-        <table style="width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            <thead>
-                <tr style="background: #e2e8f0; text-align: left;">
-                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Mã Đơn</th>
-                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Tên Tour</th>
-                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Ngày đi</th>
-                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Tổng tiền</th>
-                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Hành động</th>
-                </tr>
-            </thead>
-            <tbody id="orderList">
-                <!-- Dữ liệu render bằng JS -->
-            </tbody>
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .page-title h1 { font-size: 1.85rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; }
+        .page-title p { color: #64748b; margin: 0; font-size: 14px; }
+
+        .tab-pills { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+        .tab-pill { padding: 8px 16px; border-radius: 999px; border: 1px solid #cbd5e1; background: white; font-weight: 700; font-size: 14px; cursor: pointer; color: #475569; transition: 0.2s; white-space: nowrap; }
+        .tab-pill.active { background: #0d7a5f; color: white; border-color: #0d7a5f; }
+
+        .search-box { display: flex; gap: 12px; margin-bottom: 20px; }
+        .search-input { flex: 1; padding: 11px 16px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; font-family: inherit; }
+        .search-input:focus { outline: none; border-color: #0d7a5f; }
+
+        .table-wrap { background: white; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; min-width: 800px; }
+        th { background: #f8fafc; padding: 14px 18px; font-weight: 800; color: #475569; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 16px 18px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        tr:hover { background: #fafbfc; }
+
+        .badge-code { background: #f1f5f9; color: #334155; font-family: monospace; font-weight: 700; font-size: 12px; padding: 3px 8px; border-radius: 4px; border: 1px solid #e2e8f0; }
+        .status-badge { display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+        .status-pending { background: #fef3c7; color: #b45309; }
+        .status-confirmed, .status-paid { background: #ecfdf5; color: #065f46; }
+        .status-completed { background: #eff6ff; color: #1e40af; }
+        .status-cancelled { background: #fef2f2; color: #991b1b; }
+
+        .btn-sm { padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 13px; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-view { background: #e0f2fe; color: #0369a1; }
+        .btn-cancel { background: #fee2e2; color: #b91c1c; margin-left: 6px; }
+
+        .empty-box { padding: 60px 20px; text-align: center; color: #64748b; }
+        .empty-box h3 { color: #1e293b; margin-bottom: 8px; }
+
+        .footer { background: #0f172a; color: #94a3b8; padding: 30px 0; margin-top: auto; text-align: center; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="header">
+      <div class="header-inner">
+        <a href="/" class="logo">
+          <span class="logo-icon">✈</span>
+          <span>Tour<strong>DuLich</strong></span>
+        </a>
+        <nav class="nav">
+          <a href="/" class="nav-link">Trang chủ</a>
+          <a href="trangtour.html" class="nav-link">Tour</a>
+          <a href="tranggioithieu.html" class="nav-link">Giới thiệu</a>
+          <a href="trangdonhang.html" class="nav-link active">Đơn hàng</a>
+          <a href="tranglienhe.html" class="nav-link">Liên hệ</a>
+          <a href="admin.html" class="nav-link nav-admin">Admin</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="page-header">
+        <div class="page-title">
+          <h1>Danh Sách Đơn Đặt Tour</h1>
+          <p>Xem lại lịch sử các chuyến đi và trạng thái thanh toán của bạn</p>
+        </div>
+        <a href="trangtour.html" class="btn-sm" style="background: #0d7a5f; color: white; padding: 10px 18px; border-radius: 8px; font-size: 14px;">+ Đặt thêm tour mới</a>
+      </div>
+
+      <div class="tab-pills" id="orderStatusTabs">
+        <button class="tab-pill active" data-status="all">Tất cả đơn (<span id="countAll">0</span>)</button>
+        <button class="tab-pill" data-status="pending">Chờ xác nhận (<span id="countPending">0</span>)</button>
+        <button class="tab-pill" data-status="confirmed">Đã xác nhận (<span id="countConfirmed">0</span>)</button>
+        <button class="tab-pill" data-status="completed">Hoàn thành (<span id="countCompleted">0</span>)</button>
+        <button class="tab-pill" data-status="cancelled">Đã hủy (<span id="countCancelled">0</span>)</button>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="orderSearchInput" class="search-input" placeholder="Tìm theo mã đơn (#BK-...), họ tên, số điện thoại, tên tour..." />
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Mã Đơn</th>
+              <th>Khách Hàng</th>
+              <th>Chương Trình Tour</th>
+              <th>Khởi Hành</th>
+              <th>Số Lượng</th>
+              <th>Tổng Thanh Toán</th>
+              <th>Trạng Thái</th>
+              <th style="text-align: right;">Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="orderListBody">
+            <!-- Rendered by JS -->
+          </tbody>
         </table>
+      </div>
     </div>
 
+    <footer class="footer">
+      <div class="container">
+        © 2026 TourDuLich - Hệ thống lữ hành & đặt tour trực tuyến hàng đầu Việt Nam.
+      </div>
+    </footer>
+
     <script>
-        const formatMoney = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
-        const BOOKING_KEY = 'tourdulich_bookings';
+      const BOOKING_KEY = 'tourdulich_bookings';
+      const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0);
 
-        const renderOrders = () => {
-            const bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
-            const tbody = document.getElementById('orderList');
-            
-            if (bookings.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="padding: 20px; text-align: center;">Bạn chưa có đơn đặt tour nào.</td></tr>`;
-                return;
-            }
+      let currentStatusFilter = 'all';
 
-            tbody.innerHTML = bookings.map(b => `
-                <tr style="border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px;">${b.id}</td>
-                    <td style="padding: 12px; font-weight: bold;">${b.tourName}</td>
-                    <td style="padding: 12px;">${b.travelDate}</td>
-                    <td style="padding: 12px; color: #f97316; font-weight: bold;">${formatMoney(b.totalPrice)}</td>
-                    <td style="padding: 12px;">
-                        <button onclick="cancelOrder('${b.id}')" style="background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Hủy đơn</button>
-                    </td>
-                </tr>
-            `).join('');
-        };
+      function getBookings() {
+        try {
+          const raw = localStorage.getItem(BOOKING_KEY);
+          if (raw) return JSON.parse(raw);
+        } catch(e) {}
+        return [];
+      }
 
-        window.cancelOrder = (id) => {
-            if(confirm("Bạn có chắc chắn muốn hủy đơn này không?")) {
-                let bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
-                bookings = bookings.filter(b => b.id !== id);
-                localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings));
-                renderOrders(); // Load lại bảng
-                alert("Đã hủy đơn thành công!");
-            }
-        };
+      function saveBookings(data) {
+        localStorage.setItem(BOOKING_KEY, JSON.stringify(data));
+      }
 
-        renderOrders();
+      function renderOrders() {
+        const bookings = getBookings();
+        const searchKey = document.getElementById('orderSearchInput').value.trim().toLowerCase();
+
+        // Update counters
+        document.getElementById('countAll').textContent = bookings.length;
+        document.getElementById('countPending').textContent = bookings.filter(b => b.status === 'pending').length;
+        document.getElementById('countConfirmed').textContent = bookings.filter(b => b.status === 'confirmed' || b.status === 'paid').length;
+        document.getElementById('countCompleted').textContent = bookings.filter(b => b.status === 'completed').length;
+        document.getElementById('countCancelled').textContent = bookings.filter(b => b.status === 'cancelled').length;
+
+        const filtered = bookings.filter(b => {
+          const text = `${b.id} ${b.guestName} ${b.phone} ${b.tourName}`.toLowerCase();
+          const matchesSearch = !searchKey || text.includes(searchKey);
+          let matchesStatus = true;
+          if (currentStatusFilter === 'confirmed') {
+            matchesStatus = b.status === 'confirmed' || b.status === 'paid';
+          } else if (currentStatusFilter !== 'all') {
+            matchesStatus = b.status === currentStatusFilter;
+          }
+          return matchesSearch && matchesStatus;
+        });
+
+        const tbody = document.getElementById('orderListBody');
+        if (filtered.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8">
+                <div class="empty-box">
+                  <h3>Không tìm thấy đơn đặt tour nào</h3>
+                  <p>Bạn chưa có đơn đặt tour nào hoặc không có đơn nào phù hợp với bộ lọc.</p>
+                  <a href="trangtour.html" class="btn-sm" style="background: #0d7a5f; color: white; padding: 10px 20px; margin-top: 10px;">Khám Phá Các Tour Ngay</a>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(b => {
+          let statusText = 'Chờ xác nhận';
+          let statusClass = 'status-pending';
+          if (b.status === 'confirmed') { statusText = 'Đã xác nhận'; statusClass = 'status-confirmed'; }
+          else if (b.status === 'paid') { statusText = 'Đã thanh toán'; statusClass = 'status-paid'; }
+          else if (b.status === 'completed') { statusText = 'Đã hoàn thành'; statusClass = 'status-completed'; }
+          else if (b.status === 'cancelled') { statusText = 'Đã hủy đơn'; statusClass = 'status-cancelled'; }
+
+          return `
+            <tr>
+              <td><span class="badge-code">#${b.id}</span></td>
+              <td>
+                <strong>${b.guestName}</strong><br>
+                <small style="color: #64748b;">${b.phone}</small>
+              </td>
+              <td>
+                <strong style="color: #0f172a;">${b.tourName}</strong>
+              </td>
+              <td>${b.travelDate || '---'}</td>
+              <td><strong>${b.guestCount || 1}</strong> người</td>
+              <td><strong style="color: #0d7a5f; font-size: 15px;">${formatCurrency(b.totalPrice)}</strong></td>
+              <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+              <td style="text-align: right;">
+                <button class="btn-sm btn-view" onclick="viewOrderAlert('${b.id}')">Xem vé</button>
+                ${b.status !== 'cancelled' ? `<button class="btn-sm btn-cancel" onclick="cancelOrder('${b.id}')">Hủy đơn</button>` : ''}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      window.viewOrderAlert = (id) => {
+        const b = getBookings().find(x => x.id === id);
+        if (!b) return;
+        alert(`THÔNG TIN VÉ TOUR DU LỊCH\n\nMã đơn: #${b.id}\nTour: ${b.tourName}\nKhách hàng: ${b.guestName}\nSố điện thoại: ${b.phone}\nNgày đi: ${b.travelDate}\nSố khách: ${b.guestCount || 1} người\nTổng thanh toán: ${formatCurrency(b.totalPrice)}\nTrạng thái: ${b.status === 'confirmed' ? 'Đã xác nhận' : b.status === 'paid' ? 'Đã thanh toán' : b.status === 'cancelled' ? 'Đã hủy' : 'Chờ duyệt'}\n\nChúc bạn có một chuyến đi tuyệt vời!`);
+      };
+
+      window.cancelOrder = (id) => {
+        if (confirm(`Bạn có chắc chắn muốn hủy đơn #${id} không?`)) {
+          const bookings = getBookings();
+          const match = bookings.find(b => b.id === id);
+          if (match) {
+            match.status = 'cancelled';
+            saveBookings(bookings);
+            alert(`Đã hủy đơn #${id} thành công!`);
+            renderOrders();
+          }
+        }
+      };
+
+      // Filter tabs click
+      document.querySelectorAll('#orderStatusTabs .tab-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#orderStatusTabs .tab-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentStatusFilter = btn.dataset.status;
+          renderOrders();
+        });
+      });
+
+      document.getElementById('orderSearchInput').addEventListener('input', renderOrders);
+
+      renderOrders();
     </script>
 </body>
 </html>

@@ -2,36 +2,131 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Giới thiệu - TourDuLich</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giới Thiệu Về Chúng Tôi - TourDuLich</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="src/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { background: #f8fafc; font-family: 'Nunito', sans-serif; color: #1e293b; margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: #0f172a; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-inner { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; max-width: 1200px; margin: 0 auto; }
+        .logo { font-size: 22px; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .logo-icon { color: #0ea5e9; font-size: 24px; }
+        .logo strong { color: #34d399; }
+        .nav { display: flex; align-items: center; gap: 20px; }
+        .nav-link { color: #cbd5e1; text-decoration: none; font-weight: 600; font-size: 15px; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { color: white; }
+        .nav-admin { color: #f97316 !important; font-weight: 800; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; flex: 1; }
+        
+        .hero-about { text-align: center; margin-bottom: 50px; }
+        .hero-about h1 { font-size: 2.6rem; color: #0f172a; font-weight: 800; margin: 0 0 16px 0; }
+        .hero-about p { font-size: 18px; color: #64748b; line-height: 1.6; max-width: 750px; margin: 0 auto; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 40px 0; }
+        .stat-box { background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .stat-number { font-size: 2.4rem; font-weight: 800; color: #0d7a5f; margin-bottom: 4px; }
+        .stat-desc { color: #64748b; font-weight: 600; font-size: 14px; }
+
+        .card-content { background: white; border-radius: 16px; padding: 36px; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 30px; line-height: 1.8; font-size: 16px; }
+        .card-content h3 { font-size: 1.4rem; color: #0d7a5f; margin-top: 24px; margin-bottom: 12px; }
+
+        .values-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 20px; }
+        .value-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
+        .value-card h4 { margin: 0 0 8px 0; font-size: 17px; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+
+        .cta-box { text-align: center; padding: 50px 20px; background: linear-gradient(135deg, #0d7a5f, #094b3a); border-radius: 20px; color: white; margin-top: 40px; }
+        .cta-box h2 { font-size: 2rem; margin: 0 0 12px 0; }
+        .cta-box p { font-size: 16px; margin: 0 0 24px 0; opacity: 0.9; }
+        .btn-cta { display: inline-block; padding: 14px 28px; background: #f59e0b; color: #0f172a; font-weight: 800; font-size: 16px; border-radius: 10px; text-decoration: none; transition: 0.2s; }
+        .btn-cta:hover { background: #d97706; transform: translateY(-2px); }
+
+        .footer { background: #0f172a; color: #94a3b8; padding: 30px 0; margin-top: auto; text-align: center; font-size: 14px; }
+    </style>
 </head>
 <body>
+
+    <!-- Header Navigation -->
     <header class="header">
-      <div class="container header-inner">
-        <a href="/" class="logo"><span>Tour<strong>DuLich</strong></span></a>
+      <div class="header-inner">
+        <a href="/" class="logo">
+          <span class="logo-icon">✈</span>
+          <span>Tour<strong>DuLich</strong></span>
+        </a>
         <nav class="nav">
           <a href="/" class="nav-link">Trang chủ</a>
+          <a href="trangtour.html" class="nav-link">Tour</a>
           <a href="tranggioithieu.html" class="nav-link active">Giới thiệu</a>
+          <a href="trangdonhang.html" class="nav-link">Đơn hàng</a>
+          <a href="tranglienhe.html" class="nav-link">Liên hệ</a>
+          <a href="admin.html" class="nav-link nav-admin">Admin</a>
         </nav>
       </div>
     </header>
 
-    <div class="container" style="padding: 60px 0; max-width: 800px; line-height: 1.8;">
-        <h1 style="color: #158a7e; margin-bottom: 20px;">Về Chúng Tôi</h1>
-        <p>Chào mừng bạn đến với <strong>TourDuLich</strong> - Đơn vị lữ hành hàng đầu chuyên cung cấp các trải nghiệm du lịch trọn gói trong và ngoài nước.</p>
-        <p>Được thành lập với sứ mệnh mang lại những hành trình đáng nhớ, chúng tôi luôn đặt chất lượng dịch vụ và sự an toàn của khách hàng lên hàng đầu. Các tour của chúng tôi trải dài từ Bắc vào Nam: Vịnh Hạ Long, Sapa, Đà Nẵng, Phú Quốc...</p>
-        
-        <h3 style="margin-top: 30px; color: #334155;">Giá trị cốt lõi</h3>
-        <ul style="margin-left: 20px;">
-            <li><strong>Chất lượng:</strong> Dịch vụ đạt chuẩn 5 sao.</li>
-            <li><strong>Tận tâm:</strong> Hỗ trợ khách hàng 24/7.</li>
-            <li><strong>An toàn:</strong> Bảo hiểm du lịch 100% cho mọi hành trình.</li>
-        </ul>
-        
-        <div style="margin-top: 40px; text-align: center;">
-            <a href="/" class="btn btn-primary">Khám phá Tour ngay</a>
-        </div>
-    </div>
-</body>
+    <div class="container">
+      <div class="hero-about">
+        <h1>Về Chúng Tôi – TourDuLich</h1>
+        <p>Kiến tạo những kỳ nghỉ đáng nhớ và hành trình khám phá trọn vẹn mọi miền đất nước cùng bạn bè, gia đình và người thân.</p>
+      </div>
 
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-number">10+</div>
+          <div class="stat-desc">Năm Kinh Nghiệm Lữ Hành</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">50.000+</div>
+          <div class="stat-desc">Khách Hàng Hài Lòng</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">120+</div>
+          <div class="stat-desc">Tuyến Tour Đa Dạng</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">99.8%</div>
+          <div class="stat-desc">Đánh Giá 5 Sao</div>
+        </div>
+      </div>
+
+      <div class="card-content">
+        <h2 style="color: #0f172a; margin-top: 0;">Sứ Mệnh Của TourDuLich</h2>
+        <p>Được thành lập với niềm đam mê du lịch và khát khao quảng bá nét đẹp kỳ vĩ của thiên nhiên, văn hóa Việt Nam và thế giới, <strong>TourDuLich</strong> tự hào là đối tác lữ hành đáng tin cậy của hàng ngàn du khách trong và ngoài nước.</p>
+        
+        <p>Chúng tôi không chỉ bán một chuyến đi, mà trao gửi một trải nghiệm văn hóa trọn vẹn: từ cảm giác thức dậy đón bình minh trên du thuyền 5 sao Vịnh Hạ Long, chạm tay vào Nóc nhà Đông Dương Fansipan, đến những chiều thả hồn cùng đèn hoa đăng Phố cổ Hội An hay vi vu đảo ngọc Phú Quốc.</p>
+
+        <h3>Giá Trị Cốt Lõi</h3>
+        <div class="values-list">
+          <div class="value-card">
+            <h4>🛡️ Chất Lượng & Uy Tín</h4>
+            <p style="margin: 0; font-size: 14px; color: #475569;">Cam kết dịch vụ đúng như cam kết, khách sạn đạt chuẩn, lịch trình rõ ràng và không phụ phí ẩn.</p>
+          </div>
+          <div class="value-card">
+            <h4>🧑‍✈️ Đội Ngũ Tận Tâm</h4>
+            <p style="margin: 0; font-size: 14px; color: #475569;">Hướng dẫn viên giàu kiến thức, năng động, chu đáo và chăm sóc du khách suốt chuyến hành trình.</p>
+          </div>
+          <div class="value-card">
+            <h4>💡 Trải Nghiệm Mới Mẻ</h4>
+            <p style="margin: 0; font-size: 14px; color: #475569;">Liên tục cập nhật các điểm check-in hot nhất, kết hợp ẩm thực đặc sản địa phương phong phú.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-box">
+        <h2>Sẵn Sàng Khám Phá Chuyến Đi Của Bạn?</h2>
+        <p>Hàng loạt ưu đãi hấp dẫn đang chờ đón bạn cùng gia đình.</p>
+        <a href="trangtour.html" class="btn-cta">Khám Phá Các Tour Ngay →</a>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        © 2026 TourDuLich - Khám phá Việt Nam & Thế giới.
+      </div>
+    </footer>
+</body>
 </html>
