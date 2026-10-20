@@ -1,167 +1,227 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi Tiết Tour</title>
-    <!-- Nhúng CSS hiện có của bạn (Vite sẽ tự động xử lý đường dẫn này) -->
-    <link rel="stylesheet" href="/src/style.css"> 
-    <style>
-        /* CSS hỗ trợ riêng cho bố cục trang chi tiết */
-        body { background: #f4f7f6; }
-        .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
-        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
-        .itinerary-day { margin-bottom: 20px; border-left: 3px solid #f97316; padding-left: 15px; }
-        .service-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .sticky-sidebar { position: sticky; top: 20px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi Tiết Hành Trình & Lộ Trình 3 Chặng - TourDuLich</title>
+  <link rel="stylesheet" href="/src/style.css"> 
+  <style>
+    body { background: #f1f5f9; padding-top: 75px; font-family: 'Segoe UI', sans-serif; }
+    .header-fixed { position: fixed; top: 0; left: 0; right: 0; background: #06281f; padding: 15px 0; z-index: 100; }
+    .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 28px; }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+    .stage-card { margin-bottom: 16px; border: 1px solid #cbd5e1; border-left: 5px solid #0d7a5f; padding: 16px; background: #f8fafc; border-radius: 10px; }
+    .service-box { background: #f8fafc; padding: 18px; border-radius: 10px; border: 1px solid #e2e8f0; }
+    .sticky-sidebar { position: sticky; top: 95px; background: white; padding: 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+  </style>
 </head>
 <body>
-    
-    <!-- Header dùng chung -->
-    <header class="header" style="background: #111;">
-        <div class="container header-inner">
-            <a href="index.html" class="logo"><span class="logo-icon">✈</span><span style="color:white">Tour<strong>DuLich</strong></span></a>
-        </div>
-    </header>
-
-    <!-- Khu vực hiển thị nội dung chính -->
-    <div class="container" id="tourDetailContent" style="margin-top: 40px; margin-bottom: 60px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-        <h2 style="text-align: center; color: #666;">Đang tải dữ liệu tour...</h2>
+  <header class="header-fixed">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">✈</span><span style="color:white">Tour<strong style="color:#f59e0b;">DuLich</strong></span></a>
+      <nav class="nav">
+        <a href="index.html" class="nav-link">Trang chủ</a>
+        <a href="trangtour.html" class="nav-link">Tất cả Tour</a>
+        <a href="trangdonhang.html" class="nav-link">Đơn đặt chỗ</a>
+        <a href="tranglienhe.html" class="nav-link">Liên hệ</a>
+      </nav>
     </div>
+  </header>
 
-    <!-- KHUNG MODAL ĐẶT TOUR (Dùng chung logic với trang chủ) -->
-    <div id="bookingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
-        <div style="background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 500px; position: relative;">
-            <span onclick="window.closeModal()" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; font-weight: bold; color: #333;">&times;</span>
-            <h2 style="margin-top:0; color: #3b82f6;">Xác nhận đặt tour</h2>
-            <h3 id="modalTourName" style="color: #1e293b; margin: 10px 0;"></h3>
-            <p style="margin:0 0 15px 0;">Giá vé: <span id="modalTourPrice" style="color: #f97316; font-weight: bold; font-size: 18px;"></span> / người</p>
+  <div class="container" id="tourDetailContent" style="margin-top: 25px; margin-bottom: 60px; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04);">
+    <h3 style="text-align: center; color: #64748b;">⏳ Đang tải thông tin hành trình...</h3>
+  </div>
+
+  <!-- MODAL ĐẶT TOUR -->
+  <div id="bookingModal" class="tour-detail-modal">
+    <div class="tour-detail-panel" style="max-width: 500px; text-align:left;">
+      <button class="tour-detail-close" onclick="closeModal()">×</button>
+      <h3 style="margin-bottom: 6px; color: #0d7a5f;">Đặt Chỗ Trực Tuyến</h3>
+      <p id="modalTourName" style="font-weight: bold; margin-bottom: 14px; color: #1e293b;"></p>
+      
+      <form id="detailBookingForm">
+        <div style="margin-bottom: 10px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Họ và tên (*)</label>
+          <input type="text" id="cusName" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;" placeholder="Nguyễn Văn A">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom: 10px;">
+          <div>
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Số điện thoại (*)</label>
+            <input type="tel" id="cusPhone" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;" placeholder="0912345678">
+          </div>
+          <div>
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Email nhận vé (*)</label>
+            <input type="email" id="cusEmail" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;" placeholder="abc@gmail.com">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom: 10px;">
+          <div>
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Ngày đi (*)</label>
+            <input type="date" id="cusDate" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+          </div>
+          <div>
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Người lớn</label>
+            <input type="number" id="cusAdult" value="1" min="1" max="30" required oninput="calcTotal()" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+          </div>
+          <div>
+            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Trẻ em (75%)</label>
+            <input type="number" id="cusChild" value="0" min="0" max="20" oninput="calcTotal()" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+          </div>
+        </div>
+        <div style="margin-bottom: 12px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Ghi chú đặc biệt</label>
+          <input type="text" id="cusNote" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;" placeholder="Ăn chay, dị ứng, yêu cầu phòng...">
+        </div>
+        <div style="text-align: right; margin: 15px 0; padding:12px; background:#fff7ed; border:1px solid #fed7aa; border-radius:8px;">
+          Tổng thanh toán: <span id="totalPrice" style="color: #ea580c; font-weight: bold; font-size: 22px;">0đ</span>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; border-radius:8px; padding:12px;">Xác nhận & Xuất vé E-Ticket</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const formatMoney = (v) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v || 0);
+    let currentTour = null;
+
+    function getDefaultStages(tourName) {
+      return [
+        { stage: 1, title: 'Đón đoàn & Khởi hành', destination: `Điểm hẹn trung tâm ➔ ${tourName}`, vehicle: 'Xe Limousine 29B-686.86', guide: 'Nguyễn Văn Hùng (0988.123.456)' },
+        { stage: 2, title: 'Tham quan & Trải nghiệm chính', destination: `Khám phá danh thắng tại ${tourName}`, vehicle: 'Xe điện / Tàu du lịch VIP-02', guide: 'Trần Thị Mai (0912.654.321)' },
+        { stage: 3, title: 'Mua sắm đặc sản & Trả khách', destination: `Chợ đặc sản ${tourName} ➔ Điểm xuất phát`, vehicle: 'Xe Limousine 29B-686.86', guide: 'Nguyễn Văn Hùng (0988.123.456)' }
+      ];
+    }
+
+    async function initDetail() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      let jsonTours = [];
+      try {
+        const res = await fetch('tours.json');
+        jsonTours = await res.json();
+      } catch (e) {}
+      const adminTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
+      const allTours = [...adminTours, ...jsonTours];
+      currentTour = allTours.find(t => String(t.id) === String(id)) || allTours[0];
+
+      const contentDiv = document.getElementById('tourDetailContent');
+      if (!currentTour) {
+        contentDiv.innerHTML = `<h2>Không tìm thấy tour!</h2><a href="index.html" class="btn btn-primary">Quay lại trang chủ</a>`;
+        return;
+      }
+
+      const stages = (Array.isArray(currentTour.stages) && currentTour.stages.length === 3) ? currentTour.stages : getDefaultStages(currentTour.name);
+      const included = currentTour.included || ['Xe Limousine / Du thuyền đời mới suốt tuyến', 'Khách sạn tiêu chuẩn 4-5 sao (2 khách/phòng)', 'Các bữa ăn theo chương trình + Gala Dinner', 'Vé tham quan tất cả các điểm trong 3 chặng', 'Bảo hiểm du lịch trọn gói (50.000.000đ/vụ)'];
+      const excluded = currentTour.excluded || ['Chi phí cá nhân, đồ uống tự gọi trong bữa ăn', 'Thuế VAT 8%', 'Phụ thu phòng đơn (nếu ở 1 mình)'];
+
+      contentDiv.innerHTML = `
+        <a href="trangtour.html" style="color: #0d7a5f; font-weight: 600; display: inline-block; margin-bottom: 18px;">← Quay lại danh sách tour</a>
+        <div class="grid-2">
+          <div>
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+              <span class="badge" style="position:static;">${currentTour.type || currentTour.category || 'Tour trọn gói'}</span>
+              <span style="color:#0284c7; font-weight:bold; font-size:14px;">🐦 4.9/5 (Đánh giá xác thực trên Traveloka)</span>
+            </div>
+            <h1 style="margin: 0 0 15px 0; font-size: 1.9rem;">${currentTour.name}</h1>
+            <div style="display: flex; gap: 20px; margin-bottom: 22px; color: #475569; flex-wrap: wrap; background: #f8fafc; padding: 14px; border-radius: 10px; border:1px solid #e2e8f0; font-size:14px;">
+              <span>🏷️ <strong>Mã tour:</strong> ${currentTour.code || 'TO-' + currentTour.id}</span>
+              <span>🛫 <strong>Khởi hành:</strong> ${currentTour.date || 'Hàng tuần'}</span>
+              <span>⏱ <strong>Thời lượng:</strong> ${currentTour.duration || '3N2Đ'}</span>
+              <span style="color:#0d7a5f;">🔥 <strong>Số chỗ còn nhận:</strong> ${currentTour.slots ?? 12} khách</span>
+            </div>
+            <img src="${currentTour.image || 'https://picsum.photos/seed/'+currentTour.id+'/1200/600'}" style="width: 100%; border-radius: 14px; margin-bottom: 28px; max-height: 400px; object-fit: cover;">
             
-            <div style="margin-top: 15px;">
-                <div style="margin-bottom: 10px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Họ và Tên:</label>
-                    <input type="text" id="cusName" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Nhập họ tên đầy đủ...">
-                    <span id="errName" style="color: red; font-size: 13px; display: block;"></span>
+            <h3 style="font-size: 1.35rem; margin-bottom: 15px; color:#0f172a;">🗺️ Lộ trình di chuyển 3 Chặng (Đi đâu - Xe nào - HDV nào)</h3>
+            <div style="margin-bottom: 30px;">
+              ${stages.map(s => `
+                <div class="stage-card">
+                  <h4 style="color: #0d7a5f; margin: 0 0 10px 0; font-size:16px;">🚩 Chặng ${s.stage}: ${s.title || 'Hành trình'}</h4>
+                  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-size:13.5px;">
+                    <div style="background:white; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><span style="color:#64748b; font-size:11.5px; display:block;">📍 ĐI ĐẾN ĐÂU</span><strong>${s.destination}</strong></div>
+                    <div style="background:white; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><span style="color:#64748b; font-size:11.5px; display:block;">🚌 PHƯƠNG TIỆN / XE</span><strong>${s.vehicle}</strong></div>
+                    <div style="background:white; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><span style="color:#64748b; font-size:11.5px; display:block;">👨‍✈️ HƯỚNG DẪN VIÊN</span><strong>${s.guide}</strong></div>
+                  </div>
                 </div>
-                <div style="margin-bottom: 10px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Số điện thoại:</label>
-                    <input type="text" id="cusPhone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Ví dụ: 0912345678">
-                    <span id="errPhone" style="color: red; font-size: 13px; display: block;"></span>
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Email:</label>
-                    <input type="email" id="cusEmail" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="abc@gmail.com">
-                    <span id="errEmail" style="color: red; font-size: 13px; display: block;"></span>
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Ngày khởi hành:</label>
-                    <input type="date" id="cusDate" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                    <span id="errDate" style="color: red; font-size: 13px; display: block;"></span>
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Số lượng người:</label>
-                    <input type="number" id="cusQty" oninput="window.calcTotal()" value="1" min="1" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                    <span id="errQty" style="color: red; font-size: 13px; display: block;"></span>
-                </div>
+              `).join('')}
             </div>
 
-            <div style="text-align: right; margin: 15px 0; font-size: 18px;">
-                Tổng tiền: <span id="totalPrice" style="color: #f97316; font-weight: bold; font-size: 22px;">0đ</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+              <div class="service-box">
+                <h4 style="margin-bottom: 10px; color:#0f766e;">✅ Giá tour bao gồm</h4>
+                <ul style="list-style: none; padding: 0; font-size:14px;">${included.map(i => `<li style="margin-bottom:8px;">• ${i}</li>`).join('')}</ul>
+              </div>
+              <div class="service-box">
+                <h4 style="margin-bottom: 10px; color:#b91c1c;">❌ Không bao gồm</h4>
+                <ul style="list-style: none; padding: 0; font-size:14px;">${excluded.map(e => `<li style="margin-bottom:8px;">• ${e}</li>`).join('')}</ul>
+              </div>
             </div>
+          </div>
 
-            <button onclick="window.submitBooking()" style="width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px;">Xác nhận đặt ngay</button>
+          <div>
+            <div class="sticky-sidebar">
+              <span style="background:#dcfce7; color:#15803d; font-weight:bold; font-size:12px; padding:4px 10px; border-radius:99px;">⚡ Xác nhận tức thì</span>
+              <div style="font-size: 1.9rem; color: #ea580c; font-weight: 800; margin: 12px 0;">
+                ${formatMoney(currentTour.price)} <span style="font-size: 0.95rem; color: #64748b; font-weight: normal;">/ người lớn</span>
+              </div>
+              <p style="font-size:13px; color:#64748b; margin-bottom:15px;">Trẻ em (5-10 tuổi): <strong>${formatMoney(Math.round(currentTour.price * 0.75))}</strong></p>
+              <hr style="border:none; border-top:1px solid #e2e8f0; margin:15px 0;">
+              <p style="color: #475569; font-size: 0.9rem; line-height:1.7; margin-bottom: 20px;">
+                ✔️ Có sẵn lộ trình 3 chặng, số xe & HDV<br>
+                ✔️ Xuất vé điện tử (E-Ticket) kèm QR Code<br>
+                ✔️ Miễn phí hoàn hủy trước 7 ngày
+              </p>
+              <button onclick="openBooking()" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px; border-radius: 10px;">Chọn Ngày & Đặt Chỗ</button>
+            </div>
+          </div>
         </div>
-    </div>
+      `;
+    }
 
-    <!-- Nhúng file js để load mảng dữ liệu và các hàm xử lý -->
-    <script type="module" src="/src/chucnang.js"></script>
+    window.openBooking = () => {
+      document.getElementById('modalTourName').textContent = currentTour.name;
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('cusDate').min = today;
+      document.getElementById('cusDate').value = currentTour.date && currentTour.date >= today ? currentTour.date : today;
+      calcTotal();
+      document.getElementById('bookingModal').classList.add('show');
+    };
 
-    <!-- Logic bóc tách dữ liệu in ra trang chi tiết -->
-    <script type="module">
-        // SetTimeout để chờ file chucnang.js nạp xong biến window.toursData
-        setTimeout(() => {
-            // Lấy ID từ URL (Ví dụ: tour-detail.html?id=2)
-            const urlParams = new URLSearchParams(window.location.search);
-            const tourId = parseInt(urlParams.get('id'));
-            
-            // Tìm tour trong mảng
-            const tour = window.toursData ? window.toursData.find(t => t.id === tourId) : null;
-            const contentDiv = document.getElementById('tourDetailContent');
+    window.closeModal = () => document.getElementById('bookingModal').classList.remove('show');
+    window.calcTotal = () => {
+      const adults = Math.max(1, parseInt(document.getElementById('cusAdult').value) || 1);
+      const children = Math.max(0, parseInt(document.getElementById('cusChild').value) || 0);
+      const total = (adults * currentTour.price) + (children * Math.round(currentTour.price * 0.75));
+      document.getElementById('totalPrice').textContent = formatMoney(total);
+      return { adults, children, total };
+    };
 
-            if (!tour) {
-                contentDiv.innerHTML = `<h2>Không tìm thấy dữ liệu tour!</h2><a href="index.html" style="color: #3b82f6;">Quay lại trang chủ</a>`;
-                return;
-            }
+    document.getElementById('detailBookingForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('cusName').value.trim();
+      const phone = document.getElementById('cusPhone').value.trim();
+      const email = document.getElementById('cusEmail').value.trim();
+      const date = document.getElementById('cusDate').value;
+      const note = document.getElementById('cusNote').value.trim();
+      const { adults, children, total } = calcTotal();
 
-            // Xử lý chuỗi Lịch trình
-            let itineraryHTML = '';
-            if(tour.itinerary) {
-                tour.itinerary.forEach(item => {
-                    itineraryHTML += `
-                        <div class="itinerary-day">
-                            <h4 style="color: #f97316; margin-bottom: 5px;">Ngày ${item.day}: ${item.title}</h4>
-                            <p style="margin: 0; line-height: 1.6;">${item.desc}</p>
-                        </div>
-                    `;
-                });
-            }
+      if (!/(84|0[3|5|7|8|9])+([0-9]{8})\b/g.test(phone)) { alert('Số điện thoại gồm 10 số không hợp lệ!'); return; }
 
-            // Xử lý chuỗi Dịch vụ
-            let incHTML = tour.included ? tour.included.map(i => `<li style="margin-bottom: 8px;">✅ ${i}</li>`).join('') : '';
-            let excHTML = tour.excluded ? tour.excluded.map(e => `<li style="margin-bottom: 8px;">❌ ${e}</li>`).join('') : '';
+      const stages = (Array.isArray(currentTour.stages) && currentTour.stages.length === 3) ? currentTour.stages : getDefaultStages(currentTour.name);
+      const bookings = JSON.parse(localStorage.getItem('tourdulich_bookings') || '[]');
+      bookings.unshift({
+        id: 'BK-' + Date.now().toString().slice(-6),
+        guestName: name, phone, email,
+        guestCount: adults + children, adultCount: adults, childCount: children,
+        note: note || 'Không có',
+        tourName: currentTour.name, travelDate: date, totalPrice: total,
+        status: 'pending', stages
+      });
+      localStorage.setItem('tourdulich_bookings', JSON.stringify(bookings));
+      alert('🎉 Đặt chỗ thành công! Chuyển đến trang Đơn Đặt Chỗ để nhận Vé điện tử E-Ticket.');
+      window.location.href = 'trangdonhang.html';
+    });
 
-            // Đổ toàn bộ HTML vào khung
-            contentDiv.innerHTML = `
-                <a href="index.html" style="color: #3b82f6; text-decoration: none; display: inline-block; margin-bottom: 25px; font-weight: 500;">&larr; Quay lại danh sách tour</a>
-                
-                <div class="grid-2">
-                    <!-- Cột Trái: Thông tin chi tiết -->
-                    <div>
-                        <h1 style="margin-top: 0; color: #1e293b; font-size: 2.2rem; margin-bottom: 15px;">${tour.name}</h1>
-                        
-                        <div style="display: flex; gap: 20px; margin-bottom: 25px; color: #555; flex-wrap: wrap; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                            <span>📍 <strong>Điểm đến:</strong> ${tour.location}</span>
-                            <span>🛫 <strong>Khởi hành:</strong> ${tour.departure}</span>
-                            <span>🚌 <strong>Phương tiện:</strong> ${tour.transport}</span>
-                            <span>⏱ <strong>Thời gian:</strong> ${tour.days} Ngày</span>
-                        </div>
-
-                        <img src="https://picsum.photos/seed/${tour.id + 20}/1200/600" alt="${tour.name}" style="width: 100%; border-radius: 12px; margin-bottom: 35px; object-fit: cover; max-height: 450px;">
-
-                        <h3 style="font-size: 1.5rem; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Lịch trình chi tiết</h3>
-                        <div style="margin-bottom: 40px;">${itineraryHTML}</div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="service-box">
-                                <h4 style="margin-top: 0; font-size: 1.2rem;">Giá bao gồm:</h4>
-                                <ul style="padding-left: 0; list-style: none; margin: 0;">${incHTML}</ul>
-                            </div>
-                            <div class="service-box">
-                                <h4 style="margin-top: 0; font-size: 1.2rem;">Không bao gồm:</h4>
-                                <ul style="padding-left: 0; list-style: none; margin: 0;">${excHTML}</ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cột Phải: Khung Giá & Đặt Tour (Cố định khi cuộn) -->
-                    <div>
-                        <div class="sticky-sidebar">
-                            <h3 style="margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 15px; color: #1e293b;">Đặt tour này</h3>
-                            <div style="font-size: 2.2rem; color: #f97316; font-weight: bold; margin: 20px 0;">
-                                ${window.formatMoney(tour.price)}<span style="font-size: 1.1rem; color: #666; font-weight: normal;"> / khách</span>
-                            </div>
-                            <p style="color: #666; font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px;">Trải nghiệm hành trình tuyệt vời cùng chúng tôi. Đảm bảo chất lượng dịch vụ, giá tốt nhất và không phát sinh chi phí ẩn.</p>
-                            
-                            <!-- Gọi hàm openModal() của file chucnang.js -->
-                            <button onclick="window.openModal(${tour.id})" style="width: 100%; padding: 16px; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s;">
-                                Đặt Tour Ngay
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }, 200); 
-    </script>
+    initDetail();
+  </script>
 </body>
 </html>

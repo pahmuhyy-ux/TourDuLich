@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Tour Du Lịch</title>
+  <title>Admin Portal - Quản Lý Tour & Điều Phối 3 Chặng</title>
   <style>
     :root {
       --primary: #0d7a5f; --primary-dark: #0a5f49;
@@ -17,90 +17,119 @@
     
     .admin-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
     .sidebar { background: linear-gradient(180deg, #0d2d26, #0f594b); color: white; padding: 24px 18px; }
-    .brand { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: 700; margin-bottom: 28px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 1.4rem; font-weight: 700; margin-bottom: 28px; }
     
-    .nav { display: flex; flex-direction: column; gap: 12px; }
+    .nav { display: flex; flex-direction: column; gap: 10px; }
     .nav button { border: none; background: transparent; color: #e8f5f2; text-align: left; padding: 12px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; }
-    .nav button.active, .nav button:hover { background: rgba(255,255,255,0.12); }
+    .nav button.active, .nav button:hover { background: rgba(255,255,255,0.15); }
     
-    .content { padding: 28px; }
+    .content { padding: 28px; overflow-x: auto; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; padding: 18px; border-radius: 14px; border: 1px solid var(--border); }
+    .stat-card span { font-size: 0.8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+    .stat-card strong { display: block; font-size: 1.5rem; margin-top: 6px; color: var(--primary); }
+
     .panel { display: none; }
     .panel.active { display: block; }
     
-    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
-    .btn { border: none; border-radius: 12px; padding: 12px 18px; font-weight: 700; cursor: pointer; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .btn { border: none; border-radius: 10px; padding: 10px 16px; font-weight: 700; cursor: pointer; }
     .btn-primary { background: var(--primary); color: white; }
     .btn-secondary { background: #e2e8f0; color: var(--text); }
-    .btn-danger { background: var(--danger); color: white; }
     
-    .table-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+    .table-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
-    th, td { padding: 16px 18px; border-bottom: 1px solid #edf2f7; }
-    th { background: #f8fafc; font-size: 0.85rem; text-transform: uppercase; }
+    th, td { padding: 14px 16px; border-bottom: 1px solid #edf2f7; vertical-align: middle; }
+    th { background: #f8fafc; font-size: 0.8rem; text-transform: uppercase; color: var(--muted); }
     
-    .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.55); display: none; place-items: center; z-index: 99; }
+    .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.6); display: none; place-items: center; z-index: 99; padding: 20px; }
     .modal.open { display: grid; }
-    .modal-card { width: min(760px, 100%); background: white; border-radius: 22px; padding: 22px; }
+    .modal-card { width: min(820px, 100%); max-height: 90vh; overflow-y: auto; background: white; border-radius: 20px; padding: 24px; }
     
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .field { display: flex; flex-direction: column; gap: 8px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 0.85rem; font-weight: 600; color: #334155; }
     .field.full { grid-column: 1 / -1; }
-    .field input, .field select { border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
-
-    /* STYLE MỚI CHO NÚT SỬA VÀ XÓA */
-    .action-btns { display: flex; gap: 8px; }
-    .btn-sm { 
-      padding: 6px 12px; 
-      font-size: 0.85rem; 
-      border-radius: 8px; 
-      font-weight: 600; 
-      border: none; 
-      cursor: pointer; 
-      transition: all 0.2s ease; 
-    }
-    .btn-edit { background: #e0f2fe; color: #0369a1; }
-    .btn-edit:hover { background: #bae6fd; }
+    .field input, .field select { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
     
+    .stage-box { background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid var(--primary); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+    .stage-box h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 0.95rem; display: flex; justify-content: space-between; }
+    .stage-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; }
+
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+    .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; }
+    .btn-edit { background: #e0f2fe; color: #0369a1; }
+    .btn-stage { background: #fef3c7; color: #b45309; }
     .btn-delete { background: #fee2e2; color: #b91c1c; }
-    .btn-delete:hover { background: #fecaca; }
+
+    .stage-mini-list { font-size: 0.8rem; color: #475569; line-height: 1.5; margin-top: 4px; }
+    .stage-mini-list div { background: #f1f5f9; padding: 3px 8px; border-radius: 6px; margin-bottom: 3px; }
   </style>
 </head>
 <body>
   <div class="admin-shell">
     <aside class="sidebar">
-      <div class="brand">
-        <div>✈ TourDuLich</div>
-      </div>
+      <div class="brand">✈ Admin TourDuLich</div>
       <nav class="nav">
-        <button class="active" data-target="tour-panel">Quản lý tour</button>
-        <button data-target="booking-panel">Đơn đặt tour</button>
-        <!-- Nút quay lại trang chủ -->
-        <button onclick="window.location.href='/'" style="margin-top: 30px; border: 1px solid rgba(255,255,255,0.3);">← Về trang chủ</button>
+        <button class="active" data-target="tour-panel">📦 Quản lý Tour & 3 Chặng</button>
+        <button data-target="booking-panel">🚌 Duyệt Đơn & Điều phối</button>
+        <button onclick="window.location.href='trangdonhang.html'" style="background:rgba(255,255,255,0.1);">🎫 Xem Trang Đơn Khách</button>
+        <button onclick="window.location.href='/'" style="margin-top: 20px; border: 1px solid rgba(255,255,255,0.3);">← Về trang chủ</button>
       </nav>
     </aside>
 
     <main class="content">
-      <!-- QUẢN LÝ TOUR -->
+      <div class="stats-grid">
+        <div class="stat-card"><span>Tổng số Tour</span><strong id="statTours">0</strong></div>
+        <div class="stat-card"><span>Tổng đơn đặt chỗ</span><strong id="statBookings">0</strong></div>
+        <div class="stat-card"><span>Đơn chờ xác nhận</span><strong id="statPending" style="color:#f59e0b;">0</strong></div>
+        <div class="stat-card"><span>Doanh thu (Đã duyệt)</span><strong id="statRevenue" style="color:#ea580c;">0 đ</strong></div>
+      </div>
+
+      <!-- PANEL 1: QUẢN LÝ TOUR -->
       <section id="tour-panel" class="panel active">
         <div class="topbar">
-          <h2>Danh sách tour</h2>
+          <div>
+            <h2 style="margin:0;">Danh sách Tour & Cấu hình 3 Chặng</h2>
+            <p style="margin:4px 0 0; color:var(--muted); font-size:0.9rem;">Quản lý giá vé, số chỗ còn nhận và lộ trình 3 chặng mặc định</p>
+          </div>
           <button class="btn btn-primary" id="addTourBtn">+ Thêm tour mới</button>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Tour</th><th>Loại</th><th>Thời lượng</th><th>Giá</th><th>Hành động</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Tên Tour / Số chỗ</th>
+                <th>Lộ trình 3 Chặng (Điểm đến - Xe - HDV)</th>
+                <th>Giá bán</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
             <tbody id="tourTableBody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- QUẢN LÝ ĐƠN HÀNG -->
+      <!-- PANEL 2: QUẢN LÝ ĐƠN ĐẶT TOUR -->
       <section id="booking-panel" class="panel">
-        <div class="topbar"><h2>Danh sách đơn đặt tour</h2></div>
+        <div class="topbar">
+          <div>
+            <h2 style="margin:0;">Duyệt Đơn Đặt Tour & Điều Phối Lộ Trình 3 Chặng</h2>
+            <p style="margin:4px 0 0; color:var(--muted); font-size:0.9rem;">Xác nhận đơn hàng và phân công xe, Hướng dẫn viên cho từng chặng của khách</p>
+          </div>
+        </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Khách hàng</th><th>Tour</th><th>Ngày đi</th><th>Trạng thái</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Khách hàng</th>
+                <th>Tour & Ngày đi</th>
+                <th>Lộ trình 3 Chặng của khách</th>
+                <th>Trạng thái đơn</th>
+                <th>Điều phối</th>
+              </tr>
+            </thead>
             <tbody id="bookingTableBody"></tbody>
           </table>
         </div>
@@ -108,29 +137,121 @@
     </main>
   </div>
 
-  <!-- MODAL THÊM/SỬA TOUR -->
+  <!-- MODAL 1: THÊM / SỬA TOUR KÈM 3 CHẶNG -->
   <div id="tourModal" class="modal">
     <div class="modal-card">
-      <h3 id="tourModalTitle" style="margin-top: 0;">Thêm tour mới</h3>
+      <h3 id="tourModalTitle" style="margin-top: 0;">Thiết lập Tour & Lộ trình 3 Chặng</h3>
       <form id="tourForm">
         <input type="hidden" id="tourId" />
-        <div class="form-grid">
-          <div class="field"><label>Tên tour</label><input id="tourName" required /></div>
-          <div class="field"><label>Điểm đến</label><input id="tourDestination" required /></div>
+        <div class="form-grid" style="margin-bottom: 18px;">
+          <div class="field"><label>Tên tour (*)</label><input id="tourName" required /></div>
+          <div class="field"><label>Điểm đến (*)</label><input id="tourDestination" required /></div>
           <div class="field"><label>Loại tour</label>
             <select id="tourCategory">
-              <option value="Trong nước">Trong nước</option>
-              <option value="Nước ngoài">Nước ngoài</option>
+              <option value="Biển đảo">Biển đảo</option>
+              <option value="Núi rừng">Núi rừng</option>
+              <option value="Miền Bắc">Miền Bắc</option>
+              <option value="Miền Trung">Miền Trung</option>
+              <option value="Miền Nam">Miền Nam</option>
             </select>
           </div>
-          <div class="field"><label>Thời lượng</label><input id="tourDuration" required /></div>
-          <div class="field"><label>Giá (VNĐ)</label><input id="tourPrice" type="number" required /></div>
-          <div class="field"><label>Giá cũ (VNĐ)</label><input id="tourOldPrice" type="number" /></div>
+          <div class="field"><label>Thời lượng</label><input id="tourDuration" required value="3N2Đ" /></div>
+          <div class="field"><label>Giá người lớn (VNĐ)</label><input id="tourPrice" type="number" required /></div>
+          <div class="field"><label>Số chỗ mở bán</label><input id="tourSlots" type="number" required value="15" /></div>
           <div class="field full"><label>Link hình ảnh</label><input id="tourImage" type="url" required /></div>
         </div>
+
+        <h4 style="margin: 10px 0; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">🗺️ Cấu hình 3 Chặng Hành Trình Mặc Định</h4>
+        <div class="stage-box">
+          <h4><span>🚩 Chặng 1: Khởi hành & Đón đoàn</span></h4>
+          <div class="stage-grid">
+            <div class="field"><label>Điểm đón -> Điểm đến</label><input id="tStage1Dest" required /></div>
+            <div class="field"><label>Phương tiện / Số xe</label><input id="tStage1Vehicle" required /></div>
+            <div class="field"><label>Hướng dẫn viên Chặng 1</label><input id="tStage1Guide" required /></div>
+          </div>
+        </div>
+        <div class="stage-box">
+          <h4><span>🏝️ Chặng 2: Tham quan & Trải nghiệm chính</span></h4>
+          <div class="stage-grid">
+            <div class="field"><label>Lộ trình tham quan</label><input id="tStage2Dest" required /></div>
+            <div class="field"><label>Phương tiện di chuyển</label><input id="tStage2Vehicle" required /></div>
+            <div class="field"><label>Hướng dẫn viên Chặng 2</label><input id="tStage2Guide" required /></div>
+          </div>
+        </div>
+        <div class="stage-box">
+          <h4><span>🏁 Chặng 3: Mua sắm & Trả đoàn</span></h4>
+          <div class="stage-grid">
+            <div class="field"><label>Lộ trình trở về</label><input id="tStage3Dest" required /></div>
+            <div class="field"><label>Phương tiện / Số xe</label><input id="tStage3Vehicle" required /></div>
+            <div class="field"><label>Hướng dẫn viên Chặng 3</label><input id="tStage3Guide" required /></div>
+          </div>
+        </div>
+
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" onclick="closeModal('tourModal')">Hủy</button>
-          <button type="submit" class="btn btn-primary">Lưu</button>
+          <button type="submit" class="btn btn-primary">Lưu Tour & Lộ Trình</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ĐIỀU PHỐI 3 CHẶNG RIÊNG CHO TỪNG ĐƠN HÀNG -->
+  <div id="bookingStageModal" class="modal">
+    <div class="modal-card">
+      <h3 style="margin-top: 0; color: var(--primary);">🚌 Điều phối Xe & Hướng Dẫn Viên (3 Chặng)</h3>
+      <p id="dispatchBookingInfo" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 16px;"></p>
+      
+      <form id="dispatchForm">
+        <input type="hidden" id="dispatchBookingId" />
+        <div class="stage-box">
+          <h4>
+            <span>🚩 Chặng 1: Đón khách & Khởi hành</span>
+            <select id="bStage1Status" style="font-size:0.8rem; padding:2px 8px; border-radius:6px;">
+              <option value="Sắp diễn ra">⏳ Sắp diễn ra</option>
+              <option value="Đang di chuyển">🚌 Đang di chuyển</option>
+              <option value="Đã hoàn thành">✅ Đã hoàn thành</option>
+            </select>
+          </h4>
+          <div class="stage-grid">
+            <div class="field"><label>Đi đến đâu</label><input id="bStage1Dest" required /></div>
+            <div class="field"><label>Xe đón / Biển số</label><input id="bStage1Vehicle" required /></div>
+            <div class="field"><label>Hướng dẫn viên</label><input id="bStage1Guide" required /></div>
+          </div>
+        </div>
+        <div class="stage-box">
+          <h4>
+            <span>🏝️ Chặng 2: Hành trình tham quan chính</span>
+            <select id="bStage2Status" style="font-size:0.8rem; padding:2px 8px; border-radius:6px;">
+              <option value="Sắp diễn ra">⏳ Sắp diễn ra</option>
+              <option value="Đang di chuyển">🚌 Đang di chuyển</option>
+              <option value="Đã hoàn thành">✅ Đã hoàn thành</option>
+            </select>
+          </h4>
+          <div class="stage-grid">
+            <div class="field"><label>Đi đến đâu</label><input id="bStage2Dest" required /></div>
+            <div class="field"><label>Phương tiện / Số hiệu</label><input id="bStage2Vehicle" required /></div>
+            <div class="field"><label>Hướng dẫn viên</label><input id="bStage2Guide" required /></div>
+          </div>
+        </div>
+        <div class="stage-box">
+          <h4>
+            <span>🏁 Chặng 3: Kết thúc & Trả khách</span>
+            <select id="bStage3Status" style="font-size:0.8rem; padding:2px 8px; border-radius:6px;">
+              <option value="Sắp diễn ra">⏳ Sắp diễn ra</option>
+              <option value="Đang di chuyển">🚌 Đang di chuyển</option>
+              <option value="Đã hoàn thành">✅ Đã hoàn thành</option>
+            </select>
+          </h4>
+          <div class="stage-grid">
+            <div class="field"><label>Đi đến đâu</label><input id="bStage3Dest" required /></div>
+            <div class="field"><label>Xe trả khách / Biển số</label><input id="bStage3Vehicle" required /></div>
+            <div class="field"><label>Hướng dẫn viên</label><input id="bStage3Guide" required /></div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('bookingStageModal')">Đóng</button>
+          <button type="submit" class="btn btn-primary">Xác nhận & Lưu điều phối</button>
         </div>
       </form>
     </div>
@@ -139,61 +260,132 @@
   <script>
     const TOUR_KEY = 'tourdulich_tours';
     const BOOKING_KEY = 'tourdulich_bookings';
+    const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0);
 
-    function getStorage(key, fallback) {
-      try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; } 
-      catch { return fallback; }
+    function getDefaultStagesForTour(tourName = 'Điểm du lịch') {
+      return [
+        { stage: 1, title: 'Đón đoàn & Khởi hành', destination: `Điểm hẹn trung tâm ➔ ${tourName}`, vehicle: 'Xe Limousine 29B-686.86', guide: 'Nguyễn Văn Hùng (0988.123.456)', status: 'Sắp diễn ra' },
+        { stage: 2, title: 'Tham quan & Trải nghiệm', destination: `Khám phá các danh thắng tại ${tourName}`, vehicle: 'Xe điện / Tàu du lịch VIP-02', guide: 'Trần Thị Mai (0912.654.321)', status: 'Sắp diễn ra' },
+        { stage: 3, title: 'Mua sắm đặc sản & Trở về', destination: `Chợ đặc sản ${tourName} ➔ Điểm đón ban đầu`, vehicle: 'Xe Limousine 29B-686.86', guide: 'Nguyễn Văn Hùng (0988.123.456)', status: 'Sắp diễn ra' }
+      ];
     }
-    function saveStorage(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
-    
-    function getTours() { return getStorage(TOUR_KEY, []); }
-    function saveTours(tours) { saveStorage(TOUR_KEY, tours); }
-    function getBookings() { return getStorage(BOOKING_KEY, []); }
-    function saveBookings(bookings) { saveStorage(BOOKING_KEY, bookings); }
+
+    function getTours() { return JSON.parse(localStorage.getItem(TOUR_KEY) || '[]'); }
+    function saveTours(tours) { localStorage.setItem(TOUR_KEY, JSON.stringify(tours)); updateDashboard(); }
+    function getBookings() { return JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]'); }
+    function saveBookings(bookings) { localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings)); updateDashboard(); }
 
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-    function formatCurrency(value) { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value); }
+    function updateDashboard() {
+      const tours = getTours();
+      const bookings = getBookings();
+      document.getElementById('statTours').textContent = tours.length;
+      document.getElementById('statBookings').textContent = bookings.length;
+      document.getElementById('statPending').textContent = bookings.filter(b => b.status === 'pending').length;
+      const rev = bookings.filter(b => b.status === 'confirmed').reduce((s, b) => s + Number(b.totalPrice || 0), 0);
+      document.getElementById('statRevenue').textContent = formatCurrency(rev);
+    }
+
+    async function initData() {
+      let tours = getTours();
+      if (tours.length === 0) {
+        try {
+          const res = await fetch('tours.json');
+          tours = await res.json();
+        } catch (e) { tours = []; }
+      }
+      tours = tours.map(t => ({
+        ...t,
+        slots: typeof t.slots === 'number' ? t.slots : 15,
+        stages: (Array.isArray(t.stages) && t.stages.length === 3) ? t.stages : getDefaultStagesForTour(t.name)
+      }));
+      saveTours(tours);
+      renderTours();
+      renderBookings();
+    }
 
     function renderTours() {
       const tours = getTours();
       const body = document.getElementById('tourTableBody');
-      if (!tours.length) { body.innerHTML = '<tr><td colspan="5">Chưa có tour nào.</td></tr>'; return; }
-      
-      // CẬP NHẬT RENDER NÚT SỬA XÓA Ở ĐÂY
-      body.innerHTML = tours.map(t => `
+      if (!tours.length) { body.innerHTML = '<tr><td colspan="4">Chưa có tour nào.</td></tr>'; return; }
+
+      body.innerHTML = tours.map(t => {
+        const stages = t.stages || getDefaultStagesForTour(t.name);
+        return `
         <tr>
-          <td><strong>${t.name}</strong><br><small>${t.destination}</small></td>
-          <td>${t.category}</td>
-          <td>${t.duration || '3N2Đ'}</td>
-          <td>${formatCurrency(t.price)}</td>
+          <td>
+            <strong style="font-size:1rem; color:#0f172a;">${t.name}</strong><br>
+            <small style="color:var(--muted);">${t.category || t.type || 'Trong nước'} • ${t.duration || '3N2Đ'} • <b>Còn ${t.slots ?? 15} chỗ</b></small>
+          </td>
+          <td>
+            <div class="stage-mini-list">
+              ${stages.map(s => `<div><strong>Chặng ${s.stage}:</strong> 📍 ${s.destination} | 🚌 ${s.vehicle} | 👨‍✈️ ${s.guide}</div>`).join('')}
+            </div>
+          </td>
+          <td style="font-weight:700; color:var(--primary);">${formatCurrency(t.price)}</td>
           <td>
             <div class="action-btns">
-              <button class="btn-sm btn-edit" onclick="editTour('${t.id}')">Sửa</button>
+              <button class="btn-sm btn-edit" onclick="editTour('${t.id}')">Sửa Tour & Chặng</button>
               <button class="btn-sm btn-delete" onclick="deleteTour('${t.id}')">Xóa</button>
             </div>
           </td>
         </tr>
-      `).join('');
+      `}).join('');
     }
 
     function renderBookings() {
-      const bookings = getBookings();
+      const tours = getTours();
+      let bookings = getBookings();
       const body = document.getElementById('bookingTableBody');
-      if (!bookings.length) { body.innerHTML = '<tr><td colspan="4">Chưa có đơn đặt tour nào.</td></tr>'; return; }
+      if (!bookings.length) { body.innerHTML = '<tr><td colspan="5">Chưa có đơn đặt tour nào.</td></tr>'; return; }
+
+      let updated = false;
+      bookings = bookings.map(b => {
+        if (!Array.isArray(b.stages) || b.stages.length !== 3) {
+          const matchedTour = tours.find(t => t.name === b.tourName);
+          b.stages = matchedTour && matchedTour.stages ? JSON.parse(JSON.stringify(matchedTour.stages)) : getDefaultStagesForTour(b.tourName);
+          updated = true;
+        }
+        return b;
+      });
+      if (updated) saveBookings(bookings);
 
       body.innerHTML = bookings.map(b => `
         <tr>
-          <td><strong>${b.guestName}</strong><br>${b.phone}</td>
-          <td>${b.tourName}</td>
-          <td>${b.travelDate}</td>
           <td>
-            <select onchange="updateBookingStatus('${b.id}', this.value)">
-              <option value="pending" ${b.status === 'pending' ? 'selected' : ''}>Chờ xác nhận</option>
-              <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>Đã xác nhận</option>
-              <option value="cancelled" ${b.status === 'cancelled' ? 'selected' : ''}>Đã hủy</option>
+            <strong style="color:#0284c7;">${b.id}</strong><br>
+            <strong>${b.guestName}</strong><br>
+            <small style="color:var(--muted);">📞 ${b.phone} • 👥 ${b.guestCount || 1} khách</small>
+          </td>
+          <td>
+            <strong style="color:#0f172a;">${b.tourName}</strong><br>
+            <small>📅 Ngày đi: ${b.travelDate}</small><br>
+            <strong style="color:#ea580c;">${formatCurrency(b.totalPrice)}</strong>
+          </td>
+          <td>
+            <div class="stage-mini-list">
+              ${b.stages.map(s => `
+                <div>
+                  <strong>Chặng ${s.stage} (${s.status || 'Sắp diễn ra'}):</strong><br>
+                  📍 <b>${s.destination}</b> | 🚌 <b>${s.vehicle}</b> | 👨‍✈️ <b>${s.guide}</b>
+                </div>
+              `).join('')}
+            </div>
+          </td>
+          <td>
+            <select onchange="updateBookingStatus('${b.id}', this.value)" style="padding:6px; border-radius:8px; border:1px solid #cbd5e1; font-weight:600;">
+              <option value="pending" ${b.status === 'pending' ? 'selected' : ''}>⏳ Chờ xác nhận</option>
+              <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>✅ Đã xác nhận</option>
+              <option value="cancelled" ${b.status === 'cancelled' ? 'selected' : ''}>❌ Đã hủy</option>
             </select>
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-sm btn-stage" onclick="openDispatchModal('${b.id}')">🗺️ Điều phối 3 chặng</button>
+              <button class="btn-sm btn-delete" onclick="deleteBooking('${b.id}')">Xóa</button>
+            </div>
           </td>
         </tr>
       `).join('');
@@ -202,60 +394,150 @@
     document.getElementById('addTourBtn').addEventListener('click', () => {
       document.getElementById('tourForm').reset();
       document.getElementById('tourId').value = '';
+      document.getElementById('tourModalTitle').textContent = 'Thêm Tour Mới & Thiết Lập 3 Chặng';
+      const defaultSt = getDefaultStagesForTour('Điểm đến');
+      [1, 2, 3].forEach((n, idx) => {
+        document.getElementById(`tStage${n}Dest`).value = defaultSt[idx].destination;
+        document.getElementById(`tStage${n}Vehicle`).value = defaultSt[idx].vehicle;
+        document.getElementById(`tStage${n}Guide`).value = defaultSt[idx].guide;
+      });
       openModal('tourModal');
     });
 
     document.getElementById('tourForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const id = document.getElementById('tourId').value || 'tour-' + Date.now();
+      const cat = document.getElementById('tourCategory').value;
+      const stages = [1, 2, 3].map(n => ({
+        stage: n,
+        title: n === 1 ? 'Đón đoàn & Khởi hành' : (n === 2 ? 'Tham quan chính' : 'Mua sắm & Trả khách'),
+        destination: document.getElementById(`tStage${n}Dest`).value.trim(),
+        vehicle: document.getElementById(`tStage${n}Vehicle`).value.trim(),
+        guide: document.getElementById(`tStage${n}Guide`).value.trim(),
+        status: 'Sắp diễn ra'
+      }));
+
       const newTour = {
         id,
-        name: document.getElementById('tourName').value,
-        destination: document.getElementById('tourDestination').value,
-        category: document.getElementById('tourCategory').value,
-        duration: document.getElementById('tourDuration').value,
+        code: 'TO-' + String(id).slice(-4).toUpperCase(),
+        name: document.getElementById('tourName').value.trim(),
+        destination: document.getElementById('tourDestination').value.trim(),
+        category: cat, type: cat,
+        duration: document.getElementById('tourDuration').value.trim(),
         price: Number(document.getElementById('tourPrice').value),
-        oldPrice: Number(document.getElementById('tourOldPrice').value),
-        image: document.getElementById('tourImage').value,
-        status: 'open', type: document.getElementById('tourCategory').value
+        slots: Number(document.getElementById('tourSlots').value) || 15,
+        image: document.getElementById('tourImage').value.trim(),
+        status: 'open',
+        stages
       };
 
       const tours = getTours();
-      const idx = tours.findIndex(t => t.id === id);
+      const idx = tours.findIndex(t => String(t.id) === String(id));
       if (idx >= 0) tours[idx] = newTour; else tours.unshift(newTour);
-      
-      saveTours(tours);
-      closeModal('tourModal');
-      renderTours();
+      saveTours(tours); closeModal('tourModal'); renderTours();
     });
 
     window.editTour = (id) => {
-      const tour = getTours().find(t => t.id === id);
+      const tour = getTours().find(t => String(t.id) === String(id));
       if (!tour) return;
+      document.getElementById('tourModalTitle').textContent = 'Cập nhật Tour & Lộ trình 3 Chặng';
       document.getElementById('tourId').value = tour.id;
       document.getElementById('tourName').value = tour.name;
-      document.getElementById('tourDestination').value = tour.destination;
-      document.getElementById('tourCategory').value = tour.category;
-      document.getElementById('tourDuration').value = tour.duration;
+      document.getElementById('tourDestination').value = tour.destination || tour.name;
+      document.getElementById('tourCategory').value = tour.category || tour.type || 'Biển đảo';
+      document.getElementById('tourDuration').value = tour.duration || '3N2Đ';
       document.getElementById('tourPrice').value = tour.price;
-      document.getElementById('tourOldPrice').value = tour.oldPrice;
-      document.getElementById('tourImage').value = tour.image;
+      document.getElementById('tourSlots').value = tour.slots ?? 15;
+      document.getElementById('tourImage').value = tour.image || '';
+
+      const st = (tour.stages && tour.stages.length === 3) ? tour.stages : getDefaultStagesForTour(tour.name);
+      [1, 2, 3].forEach((n, i) => {
+        document.getElementById(`tStage${n}Dest`).value = st[i].destination;
+        document.getElementById(`tStage${n}Vehicle`).value = st[i].vehicle;
+        document.getElementById(`tStage${n}Guide`).value = st[i].guide;
+      });
       openModal('tourModal');
     };
 
     window.deleteTour = (id) => {
       if (confirm('Bạn có chắc chắn muốn xóa tour này?')) {
-        saveTours(getTours().filter(t => t.id !== id));
+        saveTours(getTours().filter(t => String(t.id) !== String(id)));
         renderTours();
       }
     };
 
-    window.updateBookingStatus = (id, status) => {
-      const bookings = getBookings().map(b => b.id === id ? { ...b, status } : b);
-      saveBookings(bookings);
+    window.openDispatchModal = (bookingId) => {
+      const booking = getBookings().find(b => b.id === bookingId);
+      if (!booking) return;
+      document.getElementById('dispatchBookingId').value = booking.id;
+      document.getElementById('dispatchBookingInfo').textContent = `Khách hàng: ${booking.guestName} (${booking.phone}) • Tour: ${booking.tourName} • Ngày đi: ${booking.travelDate}`;
+      
+      const st = (booking.stages && booking.stages.length === 3) ? booking.stages : getDefaultStagesForTour(booking.tourName);
+      [1, 2, 3].forEach((n, i) => {
+        document.getElementById(`bStage${n}Dest`).value = st[i].destination;
+        document.getElementById(`bStage${n}Vehicle`).value = st[i].vehicle;
+        document.getElementById(`bStage${n}Guide`).value = st[i].guide;
+        document.getElementById(`bStage${n}Status`).value = st[i].status || 'Sắp diễn ra';
+      });
+      openModal('bookingStageModal');
     };
 
-    // Chuyển tab Admin
+    document.getElementById('dispatchForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const bookingId = document.getElementById('dispatchBookingId').value;
+      if (!confirm('Bạn có chắc chắn muốn lưu điều phối lộ trình 3 chặng và xác nhận đơn hàng này không?')) return;
+
+      const updatedStages = [1, 2, 3].map(n => ({
+        stage: n,
+        title: n === 1 ? 'Đón đoàn & Khởi hành' : (n === 2 ? 'Tham quan chính' : 'Mua sắm & Trả khách'),
+        destination: document.getElementById(`bStage${n}Dest`).value.trim(),
+        vehicle: document.getElementById(`bStage${n}Vehicle`).value.trim(),
+        guide: document.getElementById(`bStage${n}Guide`).value.trim(),
+        status: document.getElementById(`bStage${n}Status`).value
+      }));
+
+      const bookings = getBookings().map(b => b.id === bookingId ? { ...b, stages: updatedStages, status: 'confirmed' } : b);
+      saveBookings(bookings);
+      closeModal('bookingStageModal');
+      renderBookings();
+      alert('✅ Hoàn thành! Đã cập nhật lộ trình 3 chặng và xác nhận vé điện tử cho khách hàng.');
+    });
+
+    // HỎI XÁC NHẬN TRƯỚC KHI ĐỔI TRẠNG THÁI ĐƠN HÀNG
+    window.updateBookingStatus = (id, newStatus) => {
+      const bookings = getBookings();
+      const targetBooking = bookings.find(b => b.id === id);
+      if (!targetBooking) return;
+
+      const statusTextMap = {
+        pending: 'Chờ xác nhận',
+        confirmed: 'Đã xác nhận',
+        cancelled: 'Đã hủy'
+      };
+
+      const isConfirmed = confirm(
+        `❓ XÁC NHẬN ĐỔI TRẠNG THÁI ĐƠN HÀNG:\n\n` +
+        `Bạn có chắc chắn muốn chuyển đơn "${targetBooking.id}" của khách hàng "${targetBooking.guestName}" sang trạng thái "${statusTextMap[newStatus]}" không?`
+      );
+
+      if (!isConfirmed) {
+        renderBookings();
+        return;
+      }
+
+      const updatedBookings = bookings.map(b => b.id === id ? { ...b, status: newStatus } : b);
+      saveBookings(updatedBookings);
+      renderBookings();
+      alert(`✅ Hoàn thành! Đơn hàng của khách "${targetBooking.guestName}" đã chuyển sang trạng thái: ${statusTextMap[newStatus]}.`);
+    };
+
+    window.deleteBooking = (id) => {
+      if (confirm('Xóa vĩnh viễn đơn đặt tour này?')) {
+        saveBookings(getBookings().filter(b => b.id !== id));
+        renderBookings();
+      }
+    };
+
     document.querySelectorAll('.nav button[data-target]').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
@@ -265,8 +547,7 @@
       });
     });
 
-    renderTours();
-    renderBookings();
+    initData();
   </script>
 </body>
 </html>

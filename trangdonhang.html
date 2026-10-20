@@ -1,70 +1,366 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <title>Danh sách Đơn Đặt Tour</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đơn Đặt Chỗ & Vé Điện Tử (E-Ticket) - TourDuLich</title>
+  <link rel="stylesheet" href="/src/style.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #f1f5f9; font-family: 'Segoe UI', sans-serif; margin: 0; color: #1e293b; }
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+    .header-bar { background: #06281f; padding: 16px 0; color: white; margin-bottom: 30px; }
+    
+    .btn { display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; padding: 9px 16px; font-size: 13.5px; transition: 0.2s; }
+    .btn-primary { background: #0d7a5f; color: #fff; }
+    
+    .status-badge { padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: bold; display: inline-block; }
+    .status-pending { background: #fef3c7; color: #d97706; }
+    .status-confirmed { background: #dcfce7; color: #15803d; }
+    .status-cancelled { background: #fee2e2; color: #b91c1c; }
+
+    .custom-modal {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65);
+      display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px;
+    }
+    .custom-modal.show { display: flex; }
+    .custom-modal-panel {
+      background: #fff; padding: 26px; border-radius: 16px; width: 100%; max-width: 760px;
+      position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+    }
+    .custom-close {
+      position: absolute; top: 15px; right: 18px; background: #f1f5f9; border: none;
+      width: 34px; height: 34px; border-radius: 50%; font-size: 20px; cursor: pointer; font-weight: bold;
+    }
+
+    /* Timeline 3 chặng */
+    .stage-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 15px; }
+    .stage-item { border: 1px solid #cbd5e1; border-left: 5px solid #0d7a5f; border-radius: 12px; padding: 15px; background: #f8fafc; }
+    .stage-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .stage-header h4 { margin: 0; color: #0d7a5f; font-size: 15px; }
+    .stage-tag { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: #e0f2fe; color: #0369a1; }
+    .stage-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 13.5px; }
+    .stage-detail-box { background: white; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .stage-detail-box span { display: block; font-size: 11.5px; color: #64748b; margin-bottom: 3px; }
+
+    /* Giao diện Vé Điện Tử E-Ticket Traveloka */
+    .eticket-box {
+      border: 2px solid #0284c7; border-radius: 16px; overflow: hidden; background: white;
+    }
+    .eticket-head {
+      background: linear-gradient(90deg, #0284c7, #0d7a5f); color: white; padding: 18px 22px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .eticket-body { padding: 22px; display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: center; }
+    .eticket-qr { text-align: center; border-left: 2px dashed #cbd5e1; padding-left: 20px; }
+    @media print {
+      body * { visibility: hidden; }
+      #eticketModal, #eticketModal * { visibility: visible; }
+      #eticketModal { position: fixed; inset: 0; background: white; }
+      .no-print { display: none !important; }
+    }
+  </style>
 </head>
-<body style="padding: 50px; background: #f8fafc;">
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Đơn Đặt Tour Của Bạn</h2>
-            <a href="/" class="btn btn-primary">Về Trang chủ</a>
-        </div>
-        
-        <table style="width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            <thead>
-                <tr style="background: #e2e8f0; text-align: left;">
-                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Mã Đơn</th>
-                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Tên Tour</th>
-                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Ngày đi</th>
-                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Tổng tiền</th>
-                    <th style="padding: 12px; border: 1px solid #cbd5e1;">Hành động</th>
-                </tr>
-            </thead>
-            <tbody id="orderList">
-                <!-- Dữ liệu render bằng JS -->
-            </tbody>
-        </table>
+<body>
+
+  <header class="header-bar">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="/" style="color: white; text-decoration: none; font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+        <span style="background: #0d7a5f; padding: 4px 10px; border-radius: 8px;">✈</span> Tour<strong style="color: #f59e0b;">DuLich</strong>
+      </a>
+      <div style="display: flex; gap: 10px;">
+        <a href="trangtour.html" class="btn" style="background: rgba(255,255,255,0.15); color: white;">Tìm thêm Tour</a>
+        <a href="admin.html" class="btn" style="background: #f59e0b; color: white;">⚙️ Trang Admin</a>
+        <a href="/" class="btn btn-primary">← Về Trang chủ</a>
+      </div>
     </div>
+  </header>
 
-    <script>
-        const formatMoney = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
-        const BOOKING_KEY = 'tourdulich_bookings';
+  <div class="container" style="padding-bottom: 60px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <h2 style="margin: 0 0 6px 0; color: #0f172a; font-size: 25px;">Quản Lý Đặt Chỗ & Vé Điện Tử (E-Ticket)</h2>
+        <p style="color: #64748b; font-size: 14px; margin: 0;">Tra cứu lộ trình 3 chặng, thanh toán VietQR và xuất vé lên xe (Boarding Pass)</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <input type="text" id="searchOrderInput" placeholder="🔍 Tìm mã đơn hoặc SĐT..." oninput="renderOrders()" style="padding:9px 14px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; width:230px;" />
+        <button onclick="createSampleOrders()" class="btn" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">+ Tạo đơn mẫu Test</button>
+      </div>
+    </div>
+    
+    <div style="background: #fff; border-radius: 14px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+      <table style="width: 100%; border-collapse: collapse; min-width: 860px;">
+        <thead>
+          <tr style="background: #f8fafc; text-align: left; font-size: 13.5px; color: #475569; border-bottom: 2px solid #e2e8f0;">
+            <th style="padding: 15px;">Mã Đặt Chỗ / Khách hàng</th>
+            <th style="padding: 15px;">Hành trình Tour</th>
+            <th style="padding: 15px;">Ngày đi / Số khách</th>
+            <th style="padding: 15px;">Tổng thanh toán</th>
+            <th style="padding: 15px;">Trạng thái</th>
+            <th style="padding: 15px; text-align: center;">Lộ trình 3 Chặng & Vé Điện Tử</th>
+          </tr>
+        </thead>
+        <tbody id="orderList"></tbody>
+      </table>
+    </div>
+  </div>
 
-        const renderOrders = () => {
-            const bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
-            const tbody = document.getElementById('orderList');
-            
-            if (bookings.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="padding: 20px; text-align: center;">Bạn chưa có đơn đặt tour nào.</td></tr>`;
-                return;
-            }
+  <!-- MODAL 1: XEM SƠ ĐỒ 3 CHẶNG -->
+  <div id="stageModal" class="custom-modal">
+    <div class="custom-modal-panel">
+      <button class="custom-close" onclick="closeModal('stageModal')">×</button>
+      <h3 style="color: #0d7a5f; margin: 0 0 6px 0; font-size: 21px;">🗺️ Chi Tiết Lộ Trình 3 Chặng (Đi Đâu - Xe Nào - HDV Nào)</h3>
+      <p id="stageModalSub" style="font-size: 14px; color: #64748b; margin: 0 0 16px 0;"></p>
+      <div id="stageTimelineContent" class="stage-timeline"></div>
+    </div>
+  </div>
 
-            tbody.innerHTML = bookings.map(b => `
-                <tr style="border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px;">${b.id}</td>
-                    <td style="padding: 12px; font-weight: bold;">${b.tourName}</td>
-                    <td style="padding: 12px;">${b.travelDate}</td>
-                    <td style="padding: 12px; color: #f97316; font-weight: bold;">${formatMoney(b.totalPrice)}</td>
-                    <td style="padding: 12px;">
-                        <button onclick="cancelOrder('${b.id}')" style="background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Hủy đơn</button>
-                    </td>
-                </tr>
-            `).join('');
-        };
+  <!-- MODAL 2: VÉ ĐIỆN TỬ E-TICKET (BOARDING PASS) -->
+  <div id="eticketModal" class="custom-modal">
+    <div class="custom-modal-panel" style="max-width: 680px;">
+      <button class="custom-close no-print" onclick="closeModal('eticketModal')">×</button>
+      <div id="eticketContent"></div>
+      <div class="no-print" style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+        <button onclick="window.print()" class="btn btn-primary">🖨️ In Vé Điện Tử / Lưu PDF</button>
+        <button onclick="closeModal('eticketModal')" class="btn" style="background:#e2e8f0;">Đóng</button>
+      </div>
+    </div>
+  </div>
 
-        window.cancelOrder = (id) => {
-            if(confirm("Bạn có chắc chắn muốn hủy đơn này không?")) {
-                let bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
-                bookings = bookings.filter(b => b.id !== id);
-                localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings));
-                renderOrders(); // Load lại bảng
-                alert("Đã hủy đơn thành công!");
-            }
-        };
+  <!-- MODAL 3: QUÉT MÃ QR THANH TOÁN -->
+  <div id="qrModal" class="custom-modal">
+    <div class="custom-modal-panel" style="max-width: 400px; text-align: center;">
+      <button class="custom-close" onclick="closeModal('qrModal')">×</button>
+      <h3 style="color: #0d7a5f; margin: 0 0 6px 0;">Thanh Toán VietQR</h3>
+      <p id="qrOrderInfo" style="font-size: 13px; color: #64748b; margin-bottom: 15px;"></p>
+      <img id="qrImage" src="" alt="VietQR" style="width: 230px; height: 230px; margin: 0 auto 15px; display: block; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px;" />
+      <p style="font-size: 13px; color: #475569; margin-bottom: 15px;">Mở ứng dụng Ngân hàng quét mã QR để thanh toán tự động.</p>
+      <button onclick="closeModal('qrModal')" class="btn btn-primary" style="width: 100%;">Đã hoàn tất chuyển khoản</button>
+    </div>
+  </div>
 
+  <script>
+    const BOOKING_KEY = 'tourdulich_bookings';
+    const TOUR_KEY = 'tourdulich_tours';
+
+    const formatMoney = (val) => {
+      const num = Number(val);
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(isNaN(num) ? 0 : num);
+    };
+
+    const statusMap = {
+      pending: { text: '⏳ Chờ Admin xác nhận', cls: 'status-pending' },
+      confirmed: { text: '✅ Đã xuất vé E-Ticket', cls: 'status-confirmed' },
+      cancelled: { text: '❌ Đã hủy chỗ', cls: 'status-cancelled' }
+    };
+
+    function getDefaultStages(tourName = 'Hạ Long 3N2Đ') {
+      try {
+        const tours = JSON.parse(localStorage.getItem(TOUR_KEY) || '[]');
+        const found = tours.find(t => t.name === tourName);
+        if (found && Array.isArray(found.stages) && found.stages.length === 3) return found.stages;
+      } catch (e) {}
+      return [
+        { stage: 1, title: 'Đón đoàn & Khởi hành', destination: `Điểm hẹn trung tâm ➔ ${tourName}`, vehicle: 'Xe Limousine 29B-686.86', guide: 'Nguyễn Văn Hùng (0988.123.456)', status: 'Sắp diễn ra' },
+        { stage: 2, title: 'Tham quan & Trải nghiệm', destination: `Khám phá danh thắng tại ${tourName}`, vehicle: 'Xe điện / Tàu du lịch VIP-02', guide: 'Trần Thị Mai (0912.654.321)', status: 'Sắp diễn ra' },
+        { stage: 3, title: 'Mua sắm & Trả khách', destination: `Chợ đặc sản ${tourName} ➔ Điểm xuất phát`, vehicle: 'Xe Limousine 29B-686.86', guide: 'Nguyễn Văn Hùng (0988.123.456)', status: 'Sắp diễn ra' }
+      ];
+    }
+
+    function getSafeBookings() {
+      try {
+        const raw = localStorage.getItem(BOOKING_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) { return []; }
+    }
+
+    window.createSampleOrders = () => {
+      const sampleOrders = [
+        {
+          id: 'BK-889901',
+          guestName: 'Phạm Nguyễn Đức Huy',
+          phone: '0988123456',
+          email: 'huy@gmail.com',
+          guestCount: 2,
+          adultCount: 2,
+          childCount: 0,
+          tourName: 'Hạ Long 3N2Đ - Ngủ Đêm Du Thuyền 5 Sao',
+          travelDate: '2026-10-25',
+          totalPrice: 8980000,
+          status: 'confirmed',
+          note: 'Phòng view biển tầng 2',
+          stages: [
+            { stage: 1, title: 'Đón đoàn & Khởi hành', destination: 'Nhà hát lớn Hà Nội ➔ Cảng Tuần Châu', vehicle: 'Limousine VIP 29B-888.99', guide: 'Nguyễn Văn Hùng (0988.111.222)', status: 'Đã hoàn thành' },
+            { stage: 2, title: 'Tham quan Vịnh Hạ Long', destination: 'Hang Sửng Sốt ➔ Đảo Titop ➔ Ngủ đêm trên Vịnh', vehicle: 'Du thuyền 5 Sao Ambassador QN-6868', guide: 'Lê Hoàng Nam (0912.333.444)', status: 'Đang di chuyển' },
+            { stage: 3, title: 'Mua sắm & Trở về', destination: 'Chợ Hạ Long ➔ Trả đoàn tại Hà Nội', vehicle: 'Limousine VIP 29B-888.99', guide: 'Nguyễn Văn Hùng (0988.111.222)', status: 'Sắp diễn ra' }
+          ]
+        },
+        {
+          id: 'BK-889902',
+          guestName: 'Nguyễn Minh Anh',
+          phone: '0912345678',
+          email: 'minhanh@gmail.com',
+          guestCount: 3,
+          adultCount: 2,
+          childCount: 1,
+          tourName: 'Sapa - Đỉnh Fansipan - Bản Cát Cát',
+          travelDate: '2026-11-15',
+          totalPrice: 14547500,
+          status: 'pending',
+          note: 'Có 1 trẻ em 7 tuổi',
+          stages: getDefaultStages('Sapa - Đỉnh Fansipan - Bản Cát Cát')
+        }
+      ];
+      localStorage.setItem(BOOKING_KEY, JSON.stringify(sampleOrders));
+      renderOrders();
+    };
+
+    window.renderOrders = () => {
+      let bookings = getSafeBookings();
+      const tbody = document.getElementById('orderList');
+      const kw = (document.getElementById('searchOrderInput')?.value || '').toLowerCase().trim();
+
+      if (bookings.length === 0 && !sessionStorage.getItem('initialized_sample')) {
+        sessionStorage.setItem('initialized_sample', 'true');
+        window.createSampleOrders();
+        return;
+      }
+
+      if (kw) {
+        bookings = bookings.filter(b => 
+          (b.id && b.id.toLowerCase().includes(kw)) ||
+          (b.phone && b.phone.includes(kw)) ||
+          (b.guestName && b.guestName.toLowerCase().includes(kw))
+        );
+      }
+
+      if (bookings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="padding: 45px; text-align: center; color: #64748b;">Không tìm thấy đơn đặt chỗ nào.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = bookings.map((b, idx) => {
+        const orderId = b.id || ('BK-' + (1000 + idx));
+        const st = statusMap[b.status] || statusMap.pending;
+        return `
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 15px;">
+            <strong style="color: #0284c7; font-size:15px;">${orderId}</strong><br>
+            <span style="font-weight: 600;">${b.guestName || 'Khách hàng'}</span><br>
+            <small style="color: #64748b;">📞 ${b.phone || ''}</small>
+          </td>
+          <td style="padding: 15px; font-weight: 700; color: #0f172a;">
+            ${b.tourName}<br>
+            <small style="color:#64748b; font-weight:normal;">Ghi chú: ${b.note || 'Không có'}</small>
+          </td>
+          <td style="padding: 15px;">
+            📅 ${b.travelDate}<br>
+            <small style="color: #64748b;">👥 ${b.guestCount || 1} khách ${b.childCount ? `(${b.adultCount} NL, ${b.childCount} TE)` : ''}</small>
+          </td>
+          <td style="padding: 15px; color: #ea580c; font-weight: bold; font-size: 16px;">${formatMoney(b.totalPrice)}</td>
+          <td style="padding: 15px;"><span class="status-badge ${st.cls}">${st.text}</span></td>
+          <td style="padding: 15px; text-align: center;">
+            <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+              <button onclick="viewStages('${orderId}')" class="btn" style="background: #0d7a5f; color: #fff; padding: 7px 11px; font-size: 12.5px;">🗺️ Lộ trình 3 chặng</button>
+              <button onclick="viewETicket('${orderId}')" class="btn" style="background: #0284c7; color: #fff; padding: 7px 11px; font-size: 12.5px;">🎫 Vé E-Ticket</button>
+              ${b.status === 'pending' ? `
+                <button onclick="openQR('${orderId}', ${b.totalPrice || 0})" class="btn" style="background: #f59e0b; color: #fff; padding: 7px 11px; font-size: 12.5px;">💳 QR Pay</button>
+                <button onclick="cancelOrder('${orderId}')" class="btn" style="background: #fee2e2; color: #b91c1c; padding: 7px 11px; font-size: 12.5px;">Hủy</button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `}).join('');
+    };
+
+    window.viewStages = (id) => {
+      const b = getSafeBookings().find(item => String(item.id) === String(id));
+      if (!b) return;
+      const stages = (Array.isArray(b.stages) && b.stages.length === 3) ? b.stages : getDefaultStages(b.tourName);
+      document.getElementById('stageModalSub').textContent = `Mã đặt chỗ: ${b.id} • Tour: ${b.tourName} • Ngày đi: ${b.travelDate}`;
+      
+      document.getElementById('stageTimelineContent').innerHTML = stages.map(s => `
+        <div class="stage-item">
+          <div class="stage-header">
+            <h4>🚩 Chặng ${s.stage}: ${s.title || 'Lộ trình di chuyển'}</h4>
+            <span class="stage-tag">${s.status || 'Sắp diễn ra'}</span>
+          </div>
+          <div class="stage-details">
+            <div class="stage-detail-box"><span>📍 Đi đến đâu</span><strong>${s.destination}</strong></div>
+            <div class="stage-detail-box"><span>🚌 Phương tiện & Biển số</span><strong>${s.vehicle}</strong></div>
+            <div class="stage-detail-box"><span>👨‍✈️ Hướng dẫn viên</span><strong>${s.guide}</strong></div>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('stageModal').classList.add('show');
+    };
+
+    // XUẤT VÉ ĐIỆN TỬ E-TICKET KIỂU TRAVELOKA
+    window.viewETicket = (id) => {
+      const b = getSafeBookings().find(item => String(item.id) === String(id));
+      if (!b) return;
+      const stages = (Array.isArray(b.stages) && b.stages.length === 3) ? b.stages : getDefaultStages(b.tourName);
+      const st1 = stages[0];
+
+      document.getElementById('eticketContent').innerHTML = `
+        <div class="eticket-box">
+          <div class="eticket-head">
+            <div>
+              <div style="font-size:12px; text-transform:uppercase; letter-spacing:1px; opacity:0.9;">Traveloka / TourDuLich E-Voucher</div>
+              <h3 style="margin:4px 0 0; color:white; font-size:20px;">${b.tourName}</h3>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:12px; opacity:0.9;">MÃ ĐẶT CHỖ (PNR)</div>
+              <strong style="font-size:22px; color:#fde047;">${b.id}</strong>
+            </div>
+          </div>
+          <div class="eticket-body">
+            <div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; font-size:14px;">
+                <div><span style="color:#64748b; font-size:12px; display:block;">HÀNH KHÁCH ĐẠI DIỆN</span><strong>${b.guestName}</strong></div>
+                <div><span style="color:#64748b; font-size:12px; display:block;">SỐ ĐIỆN THOẠI</span><strong>${b.phone}</strong></div>
+                <div><span style="color:#64748b; font-size:12px; display:block;">NGÀY KHỞI HÀNH</span><strong style="color:#0d7a5f;">📅 ${b.travelDate}</strong></div>
+                <div><span style="color:#64748b; font-size:12px; display:block;">SỐ LƯỢNG KHÁCH</span><strong>👥 ${b.guestCount} Hành khách</strong></div>
+              </div>
+              <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px;">
+                <div style="font-weight:bold; color:#0284c7; margin-bottom:4px;">🚌 THÔNG TIN ĐÓN ĐOÀN (CHẶNG 1):</div>
+                <div>• <strong>Lộ trình:</strong> ${st1.destination}</div>
+                <div>• <strong>Phương tiện / Biển số:</strong> ${st1.vehicle}</div>
+                <div>• <strong>HDV đón đoàn:</strong> ${st1.guide}</div>
+              </div>
+            </div>
+            <div class="eticket-qr">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=ETICKET-${b.id}-${b.phone}" alt="QR Ticket" style="margin:0 auto 8px;" />
+              <div style="font-size:12px; color:#64748b;">Đưa mã QR này cho Hướng dẫn viên khi lên xe</div>
+              <div style="margin-top:8px; font-weight:bold; font-size:13px; color:${b.status === 'confirmed' ? '#15803d' : '#d97706'};">
+                ${b.status === 'confirmed' ? '✅ VÉ HỢP LỆ' : '⏳ CHỜ XÁC NHẬN'}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('eticketModal').classList.add('show');
+    };
+
+    window.openQR = (id, amount) => {
+      document.getElementById('qrOrderInfo').textContent = `Mã đơn: ${id} • Cần thanh toán: ${formatMoney(amount)}`;
+      document.getElementById('qrImage').src = `https://img.vietqr.io/image/MB-0987654321-compact2.png?amount=${amount}&addInfo=THANH%20TOAN%20${id}`;
+      document.getElementById('qrModal').classList.add('show');
+    };
+
+    window.closeModal = (modalId) => document.getElementById(modalId).classList.remove('show');
+
+    window.cancelOrder = (id) => {
+      if (confirm("Bạn có chắc chắn muốn hủy đơn đặt tour này không?")) {
+        let bookings = getSafeBookings().map(b => String(b.id) === String(id) ? { ...b, status: 'cancelled' } : b);
+        localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings));
         renderOrders();
-    </script>
+        alert("✅ Đã hủy đơn đặt tour thành công!");
+      }
+    };
+
+    renderOrders();
+  </script>
 </body>
 </html>
