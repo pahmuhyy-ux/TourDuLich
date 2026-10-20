@@ -283,6 +283,20 @@
           isSubjectValid &&
           isMessageValid
         ) {
+          try {
+            const contacts = JSON.parse(localStorage.getItem('tourdulich_contacts') || '[]');
+            contacts.unshift({
+              id: 'ct-' + Date.now(),
+              fullName: document.getElementById('fullName').value.trim(),
+              email: document.getElementById('email').value.trim(),
+              phone: document.getElementById('phone').value.trim(),
+              subject: document.getElementById('subject').value,
+              message: document.getElementById('message').value.trim(),
+              date: new Date().toISOString(),
+              status: 'unread'
+            });
+            localStorage.setItem('tourdulich_contacts', JSON.stringify(contacts));
+          } catch(e) {}
           successMessage.hidden = false;
           form.reset();
           ['fullName', 'email', 'phone', 'subject', 'message'].forEach(clearError);
