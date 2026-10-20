@@ -177,19 +177,34 @@ const openTourDetail = (tour) => {
   const codeStr = tour.code || `TO-${tour.id}`;
   const typeStr = tour.type || tour.category || 'Tour trọn gói';
   
-  document.querySelector('#tourDetailType').textContent = typeStr;
-  document.querySelector('#tourDetailName').textContent = tour.name;
-  document.querySelector('#tourDetailMeta').textContent = `Mã: ${codeStr} • Phân loại: ${typeStr} • Còn nhận: ${tour.slots ?? 10} khách`;
-  document.querySelector('#tourDetailDate').textContent = tour.date ? new Date(tour.date).toLocaleDateString('vi-VN') : 'Khởi hành hàng tuần';
-  document.querySelector('#tourDetailPrice').textContent = formatCurrency(tour.price);
-  document.querySelector('#tourDetailOldPrice').textContent = formatCurrency(tour.oldPrice || Math.round(tour.price * 1.18));
-  document.querySelector('#tourDetailStatus').textContent = (tour.slots <= 0 || tour.status === 'closed') ? 'Đã hết chỗ' : 'Đang nhận khách';
-  document.querySelector('#tourDetailImage').src = tour.image || img(tour.code || tour.name);
-  document.querySelector('#btnFullDetailPage').href = `tourdetail.html?id=${tour.id}`;
-  document.querySelector('#virtual360Box').style.display = 'none';
+  const detailType = document.querySelector('#tourDetailType');
+  if (detailType) detailType.textContent = typeStr;
+  const detailName = document.querySelector('#tourDetailName');
+  if (detailName) detailName.textContent = tour.name;
+  const detailMeta = document.querySelector('#tourDetailMeta');
+  if (detailMeta) detailMeta.textContent = `Mã: ${codeStr} • Phân loại: ${typeStr} • Còn nhận: ${tour.slots ?? 10} khách`;
+  const detailDate = document.querySelector('#tourDetailDate');
+  if (detailDate) detailDate.textContent = tour.date ? new Date(tour.date).toLocaleDateString('vi-VN') : 'Khởi hành hàng tuần';
+  const detailPrice = document.querySelector('#tourDetailPrice');
+  if (detailPrice) detailPrice.textContent = formatCurrency(tour.price);
+  const detailOldPrice = document.querySelector('#tourDetailOldPrice');
+  if (detailOldPrice) detailOldPrice.textContent = formatCurrency(tour.oldPrice || Math.round(tour.price * 1.18));
+  const detailStatus = document.querySelector('#tourDetailStatus');
+  if (detailStatus) detailStatus.textContent = (tour.slots <= 0 || tour.status === 'closed') ? 'Đã hết chỗ' : 'Đang nhận khách';
+  const detailImage = document.querySelector('#tourDetailImage');
+  if (detailImage) {
+    detailImage.src = tour.image || img(tour.code || tour.name);
+    detailImage.alt = tour.name;
+  }
+  const btnFullDetail = document.querySelector('#btnFullDetailPage') || document.querySelector('#tourDetailFullPageLink');
+  if (btnFullDetail) btnFullDetail.href = `tourdetail.html?id=${tour.id}`;
+  
+  const box360 = document.querySelector('#virtual360Box');
+  if (box360) box360.style.display = 'none';
   
   renderWeatherAndPacking(tour);
-  modal.classList.add('show'); modal.setAttribute('aria-hidden', 'false')
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
 }
 
 // ==========================================
@@ -270,6 +285,41 @@ document.querySelector('#app').innerHTML = `
     </div>
     <div style="font-weight:bold; font-size:14px; background:rgba(0,0,0,0.25); padding:6px 14px; border-radius:8px;">
       Kết thúc sau: <span id="flashTimer" style="color:#fde047; font-family:monospace; font-size:16px;">04:59:59</span>
+    </div>
+  </div>
+</div>
+
+<section class="section" style="padding: 40px 0;">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Điểm Đến Thịnh Hành</h2>
+      <p class="section-desc">Những địa danh được yêu thích nhất dành cho chuyến đi của bạn.</p>
+    </div>
+    <div class="grid destinations">
+      <a href="trangtour.html?dest=Hạ+Long" class="card dest-card dest-lg">
+        <img src="${img('halong')}" alt="Vịnh Hạ Long" />
+        <div class="dest-info"><h3>Vịnh Hạ Long</h3><p>Quảng Ninh • 120+ tour</p></div>
+      </a>
+      <a href="trangtour.html" class="card dest-card">
+        <img src="${img('danang')}" alt="Đà Nẵng" />
+        <div class="dest-info"><h3>Đà Nẵng</h3><p>Miền Trung • 85 tour</p></div>
+      </a>
+      <a href="trangtour.html" class="card dest-card">
+        <img src="${img('dalat')}" alt="Đà Lạt" />
+        <div class="dest-info"><h3>Đà Lạt</h3><p>Lâm Đồng • 60 tour</p></div>
+      </a>
+      <a href="trangtour.html" class="card dest-card">
+        <img src="${img('hanoi')}" alt="Hà Nội" />
+        <div class="dest-info"><h3>Hà Nội</h3><p>Thủ đô • 95 tour</p></div>
+      </a>
+      <a href="trangtour.html" class="card dest-card">
+        <img src="${img('phuquoc')}" alt="Phú Quốc" />
+        <div class="dest-info"><h3>Phú Quốc</h3><p>Kiên Giang • 50 tour</p></div>
+      </a>
+      <a href="trangtour.html" class="card dest-card">
+        <img src="${img('nhatrang')}" alt="Nha Trang" />
+        <div class="dest-info"><h3>Nha Trang</h3><p>Khánh Hòa • 72 tour</p></div>
+      </a>
     </div>
   </div>
 </div>
@@ -377,7 +427,7 @@ document.querySelector('#app').innerHTML = `
       <div style="margin-top: 20px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; padding-top:15px;">
         <div><span class="price-old" id="tourDetailOldPrice">0đ</span><span class="price" id="tourDetailPrice" style="color:#ea580c;">0đ</span></div>
         <div style="display:flex; gap:10px;">
-          <a id="btnFullDetailPage" href="#" class="btn btn-sm" style="background:#e2e8f0; color:#1e293b;">Xem lịch trình</a>
+          <a id="btnFullDetailPage" href="tourdetail.html" class="btn btn-sm" style="text-decoration: none; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700; color: #0284c7; background: #f0f9ff;">Xem lịch trình chi tiết →</a>
           <button class="btn btn-primary btn-sm" id="btnBookTour" type="button">Chọn ghế & Đặt ngay</button>
         </div>
       </div>

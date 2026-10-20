@@ -91,6 +91,11 @@ locationList.forEach(loc => {
     }
 });
 
+// Gán biến toàn cục phục vụ trang chi tiết và trang tour
+window.toursData = tours;
+window.tours = tours;
+window.formatMoney = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0);
+
 // ==========================================
 // 2. RENDER DANH SÁCH TOUR
 // ==========================================
@@ -352,9 +357,34 @@ window.submitBooking = () => {
     }
 
     if (isValid) {
-        const total = (currentTour.price * qty).toLocaleString('vi-VN');
-        alert(`Chúc mừng ${name}!\nBạn đã đặt thành công tour: ${currentTour.name}.\nNgày đi: ${dateStr}\nSố người: ${qty}\nTổng thanh toán: ${total} đ\n\nChúng tôi sẽ liên hệ vào số ${phone} sớm nhất!`);
+        const total = currentTour.price * qty;
+        try {
+            const BOOKING_KEY = 'tourdulich_bookings';
+            const bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
+            bookings.unshift({
+                id: 'BK-' + Date.now().toString().slice(-4),
+                guestName: name,
+                phone: phone,
+                email: email,
+                guestCount: qty,
+                tourName: currentTour.name,
+                travelDate: dateStr,
+                totalPrice: total,
+                promoInfo: '',
+                paymentMethod: 'Chuyển khoản',
+                paymentStatus: 'Chờ xác nhận',
+                status: 'pending',
+                notes: 'Đặt từ trang chi tiết',
+                createdAt: new Date().toISOString()
+            });
+            localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings));
+        } catch(e) { console.error(e); }
+
+        alert(`Chúc mừng ${name}!\nBạn đã đặt thành công tour: ${currentTour.name}.\nNgày đi: ${dateStr}\nSố người: ${qty}\nTổng thanh toán: ${total.toLocaleString('vi-VN')} đ\n\nĐơn của bạn đã được ghi nhận vào mục "Đơn hàng".`);
         window.closeModal();
+        if (window.location.pathname.includes('tourdetail.html')) {
+            window.location.href = 'trangdonhang.html';
+        }
     }
 };
 
@@ -364,6 +394,10 @@ window.submitBooking = () => {
 const navLinks = document.querySelectorAll('.nav-link');
 navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href && href !== '#' && !href.startsWith('#')) {
+            return; // Cho phép chuyển trang bình thường
+        }
         e.preventDefault();
         
         // Cập nhật trạng thái active[cite: 1]

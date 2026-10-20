@@ -1,227 +1,485 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chi Tiết Hành Trình & Lộ Trình 3 Chặng - TourDuLich</title>
-  <link rel="stylesheet" href="/src/style.css"> 
-  <style>
-    body { background: #f1f5f9; padding-top: 75px; font-family: 'Segoe UI', sans-serif; }
-    .header-fixed { position: fixed; top: 0; left: 0; right: 0; background: #06281f; padding: 15px 0; z-index: 100; }
-    .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 28px; }
-    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
-    .stage-card { margin-bottom: 16px; border: 1px solid #cbd5e1; border-left: 5px solid #0d7a5f; padding: 16px; background: #f8fafc; border-radius: 10px; }
-    .service-box { background: #f8fafc; padding: 18px; border-radius: 10px; border: 1px solid #e2e8f0; }
-    .sticky-sidebar { position: sticky; top: 95px; background: white; padding: 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Tour Du Lịch - TourDuLich</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="src/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { background: #f8fafc; font-family: 'Nunito', sans-serif; color: #1e293b; margin: 0; }
+        .header { background: #0f172a; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-inner { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; max-width: 1200px; margin: 0 auto; }
+        .logo { font-size: 22px; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .logo-icon { color: #0ea5e9; font-size: 24px; }
+        .logo strong { color: #34d399; }
+        .nav { display: flex; align-items: center; gap: 20px; }
+        .nav-link { color: #cbd5e1; text-decoration: none; font-weight: 600; font-size: 15px; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { color: white; }
+        .nav-admin { color: #f97316 !important; font-weight: 800; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .breadcrumb { padding: 18px 0; font-size: 14px; color: #64748b; }
+        .breadcrumb a { color: #0284c7; text-decoration: none; font-weight: 600; }
+        .breadcrumb span { margin: 0 8px; }
+
+        .tour-detail-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 60px; }
+        @media (max-width: 900px) { .tour-detail-layout { grid-template-columns: 1fr; } }
+
+        .main-card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .tour-hero-img { width: 100%; height: 420px; border-radius: 12px; object-fit: cover; margin-bottom: 24px; }
+        .tour-header-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+        .tag-badge { background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; }
+        .tag-badge.hot { background: #fee2e2; color: #b91c1c; }
+
+        .tour-title { font-size: 2.2rem; font-weight: 800; color: #0f172a; margin: 0 0 16px 0; line-height: 1.25; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 30px; }
+        .info-item { display: flex; flex-direction: column; gap: 4px; }
+        .info-item small { color: #64748b; font-size: 12px; text-transform: uppercase; font-weight: 700; }
+        .info-item strong { color: #0f172a; font-size: 15px; }
+
+        .section-subheading { font-size: 1.35rem; font-weight: 800; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin: 30px 0 20px; }
+        .itinerary-step { margin-bottom: 22px; padding-left: 20px; border-left: 3px solid #0d7a5f; position: relative; }
+        .itinerary-step h4 { margin: 0 0 6px 0; font-size: 1.05rem; color: #0d7a5f; }
+        .itinerary-step p { margin: 0; color: #475569; line-height: 1.6; }
+
+        .services-box { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        @media (max-width: 600px) { .services-box { grid-template-columns: 1fr; } }
+        .service-panel { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
+        .service-panel h4 { margin: 0 0 12px 0; font-size: 1.05rem; }
+        .service-panel ul { list-style: none; padding: 0; margin: 0; }
+        .service-panel li { margin-bottom: 8px; color: #334155; font-size: 14px; line-height: 1.5; }
+
+        /* Sticky Booking Sidebar */
+        .sticky-card { position: sticky; top: 90px; background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
+        .price-box { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+        .price-current { font-size: 2rem; font-weight: 800; color: #0d7a5f; }
+        .price-old { text-decoration: line-through; color: #94a3b8; font-size: 1rem; margin-left: 8px; }
+        
+        .form-row { margin-bottom: 16px; }
+        .form-row label { display: block; font-weight: 700; font-size: 13px; margin-bottom: 6px; color: #334155; }
+        .form-row input, .form-row select { width: 100%; padding: 11px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 14px; box-sizing: border-box; }
+        .form-row input:focus, .form-row select:focus { outline: none; border-color: #0d7a5f; box-shadow: 0 0 0 3px rgba(13, 122, 95, 0.15); }
+        
+        .total-box { display: flex; justify-content: space-between; align-items: center; background: #e7faf4; padding: 14px 18px; border-radius: 10px; margin-bottom: 18px; }
+        .total-box span { font-weight: 700; color: #065f46; font-size: 15px; }
+        .total-box strong { font-size: 1.35rem; color: #0d7a5f; font-weight: 800; }
+
+        .btn-book-now { width: 100%; padding: 14px; background: #0d7a5f; color: white; border: none; border-radius: 10px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .btn-book-now:hover { background: #0a5f49; transform: translateY(-1px); }
+
+        .footer { background: #0f172a; color: #94a3b8; padding: 40px 0 20px; margin-top: 60px; }
+        .footer-inner { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-bottom: 30px; }
+        .footer h4 { color: white; margin-bottom: 16px; font-size: 16px; }
+        .footer a { color: #94a3b8; text-decoration: none; display: block; margin-bottom: 8px; font-size: 14px; }
+        .footer a:hover { color: white; }
+        .footer-bottom { text-align: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; font-size: 13px; }
+    </style>
 </head>
 <body>
-  <header class="header-fixed">
-    <div class="container header-inner">
-      <a href="index.html" class="logo"><span class="logo-icon">✈</span><span style="color:white">Tour<strong style="color:#f59e0b;">DuLich</strong></span></a>
-      <nav class="nav">
-        <a href="index.html" class="nav-link">Trang chủ</a>
-        <a href="trangtour.html" class="nav-link">Tất cả Tour</a>
-        <a href="trangdonhang.html" class="nav-link">Đơn đặt chỗ</a>
-        <a href="tranglienhe.html" class="nav-link">Liên hệ</a>
-      </nav>
+
+    <!-- Header Navigation -->
+    <header class="header">
+      <div class="header-inner">
+        <a href="/" class="logo">
+          <span class="logo-icon">✈</span>
+          <span>Tour<strong>DuLich</strong></span>
+        </a>
+        <nav class="nav">
+          <a href="/" class="nav-link">Trang chủ</a>
+          <a href="trangtour.html" class="nav-link active">Tour</a>
+          <a href="tranggioithieu.html" class="nav-link">Giới thiệu</a>
+          <a href="trangdonhang.html" class="nav-link">Đơn hàng</a>
+          <a href="tranglienhe.html" class="nav-link">Liên hệ</a>
+          <a href="admin.html" class="nav-link nav-admin">Admin</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/">Trang chủ</a> <span>/</span> 
+        <a href="trangtour.html">Danh sách tour</a> <span>/</span> 
+        <strong id="breadcrumbTourName" style="color: #1e293b;">Chi tiết tour</strong>
+      </div>
+
+      <div id="tourDetailContainer">
+        <!-- Rendered by JS -->
+        <div style="text-align: center; padding: 60px 0;">
+          <h2>Đang tải thông tin chuyến đi...</h2>
+        </div>
+      </div>
     </div>
-  </header>
 
-  <div class="container" id="tourDetailContent" style="margin-top: 25px; margin-bottom: 60px; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04);">
-    <h3 style="text-align: center; color: #64748b;">⏳ Đang tải thông tin hành trình...</h3>
-  </div>
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-inner">
+          <div>
+            <div class="logo" style="margin-bottom: 12px;"><span class="logo-icon">✈</span><span>Tour<strong>DuLich</strong></span></div>
+            <p style="font-size: 14px; line-height: 1.6;">Khám phá trọn vẹn vẻ đẹp Việt Nam & thế giới với dịch vụ chất lượng, an toàn và mức giá tốt nhất.</p>
+          </div>
+          <div>
+            <h4>Về Chúng Tôi</h4>
+            <a href="tranggioithieu.html">Giới thiệu công ty</a>
+            <a href="trangtour.html">Tất cả tour du lịch</a>
+            <a href="trangdonhang.html">Tra cứu đơn đặt tour</a>
+          </div>
+          <div>
+            <h4>Hỗ Trợ Khách Hàng</h4>
+            <a href="tranglienhe.html">Liên hệ tư vấn</a>
+            <a href="#">Quy định & Chính sách</a>
+            <a href="admin.html">Dành cho Quản trị viên</a>
+          </div>
+          <div>
+            <h4>Liên Hệ Nhanh</h4>
+            <p style="font-size: 14px;">📞 Hotline: 1900 6868</p>
+            <p style="font-size: 14px;">✉ Email: contact@tourdulich.com</p>
+            <p style="font-size: 14px;">📍 Tầng 6, Travel Center, Hà Nội</p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          © 2026 TourDuLich. Tất cả quyền được bảo lưu.
+        </div>
+      </div>
+    </footer>
 
-  <!-- MODAL ĐẶT TOUR -->
-  <div id="bookingModal" class="tour-detail-modal">
-    <div class="tour-detail-panel" style="max-width: 500px; text-align:left;">
-      <button class="tour-detail-close" onclick="closeModal()">×</button>
-      <h3 style="margin-bottom: 6px; color: #0d7a5f;">Đặt Chỗ Trực Tuyến</h3>
-      <p id="modalTourName" style="font-weight: bold; margin-bottom: 14px; color: #1e293b;"></p>
-      
-      <form id="detailBookingForm">
-        <div style="margin-bottom: 10px;">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Họ và tên (*)</label>
-          <input type="text" id="cusName" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;" placeholder="Nguyễn Văn A">
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom: 10px;">
-          <div>
-            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Số điện thoại (*)</label>
-            <input type="tel" id="cusPhone" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;" placeholder="0912345678">
-          </div>
-          <div>
-            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Email nhận vé (*)</label>
-            <input type="email" id="cusEmail" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;" placeholder="abc@gmail.com">
-          </div>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom: 10px;">
-          <div>
-            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Ngày đi (*)</label>
-            <input type="date" id="cusDate" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
-          </div>
-          <div>
-            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Người lớn</label>
-            <input type="number" id="cusAdult" value="1" min="1" max="30" required oninput="calcTotal()" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
-          </div>
-          <div>
-            <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Trẻ em (75%)</label>
-            <input type="number" id="cusChild" value="0" min="0" max="20" oninput="calcTotal()" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
-          </div>
-        </div>
-        <div style="margin-bottom: 12px;">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Ghi chú đặc biệt</label>
-          <input type="text" id="cusNote" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px;" placeholder="Ăn chay, dị ứng, yêu cầu phòng...">
-        </div>
-        <div style="text-align: right; margin: 15px 0; padding:12px; background:#fff7ed; border:1px solid #fed7aa; border-radius:8px;">
-          Tổng thanh toán: <span id="totalPrice" style="color: #ea580c; font-weight: bold; font-size: 22px;">0đ</span>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; border-radius:8px; padding:12px;">Xác nhận & Xuất vé E-Ticket</button>
-      </form>
-    </div>
-  </div>
+    <script>
+      const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0);
 
-  <script>
-    const formatMoney = (v) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v || 0);
-    let currentTour = null;
-
-    function getDefaultStages(tourName) {
-      return [
-        { stage: 1, title: 'Đón đoàn & Khởi hành', destination: `Điểm hẹn trung tâm ➔ ${tourName}`, vehicle: 'Xe Limousine 29B-686.86', guide: 'Nguyễn Văn Hùng (0988.123.456)' },
-        { stage: 2, title: 'Tham quan & Trải nghiệm chính', destination: `Khám phá danh thắng tại ${tourName}`, vehicle: 'Xe điện / Tàu du lịch VIP-02', guide: 'Trần Thị Mai (0912.654.321)' },
-        { stage: 3, title: 'Mua sắm đặc sản & Trả khách', destination: `Chợ đặc sản ${tourName} ➔ Điểm xuất phát`, vehicle: 'Xe Limousine 29B-686.86', guide: 'Nguyễn Văn Hùng (0988.123.456)' }
+      const getDefaultStages = (tourName) => [
+        { stage: 1, title: 'Chặng 1: Đón đoàn & Khởi hành', destination: `Điểm hẹn trung tâm ➔ ${tourName}`, vehicle: 'Xe Limousine VIP 29 chỗ', guide: 'Nguyễn Văn Hùng (0988.123.456)', status: 'Sắp diễn ra' },
+        { stage: 2, title: 'Chặng 2: Tham quan & Trải nghiệm', destination: `Khám phá các danh thắng tại ${tourName}`, vehicle: 'Tàu du lịch / Xe điện VIP', guide: 'Trần Thị Mai (0912.654.321)', status: 'Sắp diễn ra' },
+        { stage: 3, title: 'Chặng 3: Mua sắm đặc sản & Trở về', destination: `Chợ đặc sản ${tourName} ➔ Điểm trả khách`, vehicle: 'Xe Limousine VIP 29 chỗ', guide: 'Nguyễn Văn Hùng (0988.123.456)', status: 'Sắp diễn ra' }
       ];
-    }
 
-    async function initDetail() {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
-      let jsonTours = [];
-      try {
-        const res = await fetch('tours.json');
-        jsonTours = await res.json();
-      } catch (e) {}
-      const adminTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
-      const allTours = [...adminTours, ...jsonTours];
-      currentTour = allTours.find(t => String(t.id) === String(id)) || allTours[0];
+      // Default tours if localStorage is empty
+      const defaultTours = [
+        {
+          id: 'tour-halong',
+          code: 'TO-1023',
+          name: 'Hạ Long 3N2Đ – Du Thuyền 5 Sao',
+          destination: 'Vịnh Hạ Long',
+          depart: 'Hà Nội',
+          duration: '3N2Đ',
+          category: 'Biển đảo',
+          price: 4490000,
+          oldPrice: 5200000,
+          vehicle: 'Xe limousine, Du thuyền 5 sao',
+          image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
+          badge: 'Giảm 15%',
+          schedule: 'Ngày 1: Hà Nội - Tuần Châu - Nhận phòng du thuyền, chèo thuyền Kayak ngắm hoàng hôn.\nNgày 2: Hang Sửng Sốt - Đảo Ti Tốp tắm biển - Tiệc Gala dinner trên boong tàu.\nNgày 3: Hang Luồn - Mua sắm đặc sản chả mực - Xe đưa về Hà Nội.',
+          inc: 'Xe limousine đón trả tại Hà Nội, 2 đêm nghỉ dưỡng du thuyền 5 sao, Toàn bộ các bữa ăn buffet cao cấp, Vé thắng cảnh tham quan trọn gói, Hướng dẫn viên vui tính nhiệt tình',
+          exc: 'Đồ uống gọi riêng trong bữa ăn, Dịch vụ spa thư giãn, Tiền tip cho thủy thủ đoàn, Thuế VAT'
+        },
+        {
+          id: 'tour-danang',
+          code: 'TO-1129',
+          name: 'Đà Nẵng – Bà Nà Hills – Phố Cổ Hội An',
+          destination: 'Đà Nẵng & Hội An',
+          depart: 'TP.HCM / Hà Nội',
+          duration: '4N3Đ',
+          category: 'Miền Trung',
+          price: 5890000,
+          oldPrice: 6500000,
+          vehicle: 'Máy bay khứ hồi, Xe du lịch đời mới',
+          image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
+          badge: 'Hot Nhất',
+          schedule: 'Ngày 1: Đón sân bay Đà Nẵng - Bán đảo Sơn Trà - Chùa Linh Ứng - Tắm biển Mỹ Khê.\nNgày 2: Khám phá Cầu Vàng Bà Nà Hills - Vui chơi Fantasy Park - Buffet đỉnh núi.\nNgày 3: Rừng dừa Bảy Mẫu chèo thuyền thúng - Phố cổ Hội An lung linh đèn lồng.\nNgày 4: Mua sắm đặc sản Chợ Hàn - Tiễn sân bay về lại.',
+          inc: 'Khách sạn 4 sao gần biển Mỹ Khê, Vé cáp treo Bà Nà Hills + Buffet trưa 350K, Thuyền thúng Rừng Dừa, Xe ô tô du lịch đời mới suốt tuyến',
+          exc: 'Vé máy bay khứ hồi (hỗ trợ book giá gốc), Chi phí cá nhân, Mua sắm'
+        },
+        {
+          id: 'tour-phuquoc',
+          code: 'TO-1155',
+          name: 'Phú Quốc – Thiên Đường Nghỉ Dưỡng Grand World',
+          destination: 'Đảo Ngọc Phú Quốc',
+          depart: 'Hà Nội',
+          duration: '3N2Đ',
+          category: 'Biển đảo',
+          price: 6790000,
+          oldPrice: 7900000,
+          vehicle: 'Máy bay, Cano cao tốc',
+          image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80',
+          badge: 'Mới',
+          schedule: 'Ngày 1: Bay đến Phú Quốc - Check-in Grand World Venice thu nhỏ - Xem show Tinh hoa Việt Nam.\nNgày 2: Tour 4 đảo cano cao tốc - Lặn ngắm san hô Hòn Mây Rút - Cáp treo Hòn Thơm.\nNgày 3: Chợ đêm Phú Quốc - Mua đặc sản tiêu, ngọc trai - Bay về.',
+          inc: 'Resort 4 sao có bãi biển riêng và hồ bơi vô cực, Cano 4 đảo lặn ngắm san hô, Vé cáp treo Hòn Thơm Sun World, Bữa ăn hải sản tươi ngon',
+          exc: 'Chi phí lặn bình dưỡng khí chuyên nghiệp, Đồ uống cá nhân'
+        }
+      ];
 
-      const contentDiv = document.getElementById('tourDetailContent');
-      if (!currentTour) {
-        contentDiv.innerHTML = `<h2>Không tìm thấy tour!</h2><a href="index.html" class="btn btn-primary">Quay lại trang chủ</a>`;
-        return;
+      function getAllTours() {
+        try {
+          const stored = localStorage.getItem('tourdulich_tours');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch(e) {}
+        return defaultTours;
       }
 
-      const stages = (Array.isArray(currentTour.stages) && currentTour.stages.length === 3) ? currentTour.stages : getDefaultStages(currentTour.name);
-      const included = currentTour.included || ['Xe Limousine / Du thuyền đời mới suốt tuyến', 'Khách sạn tiêu chuẩn 4-5 sao (2 khách/phòng)', 'Các bữa ăn theo chương trình + Gala Dinner', 'Vé tham quan tất cả các điểm trong 3 chặng', 'Bảo hiểm du lịch trọn gói (50.000.000đ/vụ)'];
-      const excluded = currentTour.excluded || ['Chi phí cá nhân, đồ uống tự gọi trong bữa ăn', 'Thuế VAT 8%', 'Phụ thu phòng đơn (nếu ở 1 mình)'];
+      function loadTourDetail() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tourId = urlParams.get('id') || 'tour-halong';
+        const tours = getAllTours();
 
-      contentDiv.innerHTML = `
-        <a href="trangtour.html" style="color: #0d7a5f; font-weight: 600; display: inline-block; margin-bottom: 18px;">← Quay lại danh sách tour</a>
-        <div class="grid-2">
-          <div>
-            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
-              <span class="badge" style="position:static;">${currentTour.type || currentTour.category || 'Tour trọn gói'}</span>
-              <span style="color:#0284c7; font-weight:bold; font-size:14px;">🐦 4.9/5 (Đánh giá xác thực trên Traveloka)</span>
+        let tour = tours.find(t => String(t.id) === String(tourId) || t.code === tourId);
+        if (!tour && tours.length > 0) tour = tours[0];
+
+        const container = document.getElementById('tourDetailContainer');
+        if (!tour) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 60px 0;">
+              <h2>Không tìm thấy thông tin tour!</h2>
+              <p>Tour này có thể đã kết thúc hoặc không còn tồn tại.</p>
+              <a href="trangtour.html" class="btn-book-now" style="display: inline-block; width: auto; margin-top: 15px; padding: 12px 24px; text-decoration: none;">Xem các tour khác</a>
             </div>
-            <h1 style="margin: 0 0 15px 0; font-size: 1.9rem;">${currentTour.name}</h1>
-            <div style="display: flex; gap: 20px; margin-bottom: 22px; color: #475569; flex-wrap: wrap; background: #f8fafc; padding: 14px; border-radius: 10px; border:1px solid #e2e8f0; font-size:14px;">
-              <span>🏷️ <strong>Mã tour:</strong> ${currentTour.code || 'TO-' + currentTour.id}</span>
-              <span>🛫 <strong>Khởi hành:</strong> ${currentTour.date || 'Hàng tuần'}</span>
-              <span>⏱ <strong>Thời lượng:</strong> ${currentTour.duration || '3N2Đ'}</span>
-              <span style="color:#0d7a5f;">🔥 <strong>Số chỗ còn nhận:</strong> ${currentTour.slots ?? 12} khách</span>
+          `;
+          return;
+        }
+
+        document.getElementById('breadcrumbTourName').textContent = tour.name;
+        document.title = `${tour.name} - TourDuLich`;
+
+        // Lấy danh sách lộ trình 3 chặng
+        const stages = (Array.isArray(tour.stages) && tour.stages.length === 3) ? tour.stages : getDefaultStages(tour.name);
+        const stagesHTML = stages.map(st => `
+          <div style="margin-bottom: 14px; border: 1px solid #cbd5e1; border-left: 5px solid #0d7a5f; padding: 14px 18px; background: #f8fafc; border-radius: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <strong style="color: #0d7a5f; font-size: 15px;">${st.title}</strong>
+              <span style="background: #e0f2fe; color: #0369a1; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 99px;">${st.status || 'Sắp diễn ra'}</span>
             </div>
-            <img src="${currentTour.image || 'https://picsum.photos/seed/'+currentTour.id+'/1200/600'}" style="width: 100%; border-radius: 14px; margin-bottom: 28px; max-height: 400px; object-fit: cover;">
-            
-            <h3 style="font-size: 1.35rem; margin-bottom: 15px; color:#0f172a;">🗺️ Lộ trình di chuyển 3 Chặng (Đi đâu - Xe nào - HDV nào)</h3>
-            <div style="margin-bottom: 30px;">
-              ${stages.map(s => `
-                <div class="stage-card">
-                  <h4 style="color: #0d7a5f; margin: 0 0 10px 0; font-size:16px;">🚩 Chặng ${s.stage}: ${s.title || 'Hành trình'}</h4>
-                  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-size:13.5px;">
-                    <div style="background:white; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><span style="color:#64748b; font-size:11.5px; display:block;">📍 ĐI ĐẾN ĐÂU</span><strong>${s.destination}</strong></div>
-                    <div style="background:white; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><span style="color:#64748b; font-size:11.5px; display:block;">🚌 PHƯƠNG TIỆN / XE</span><strong>${s.vehicle}</strong></div>
-                    <div style="background:white; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><span style="color:#64748b; font-size:11.5px; display:block;">👨‍✈️ HƯỚNG DẪN VIÊN</span><strong>${s.guide}</strong></div>
-                  </div>
+            <p style="margin: 4px 0; font-size: 14px;"><strong>Lộ trình:</strong> ${st.destination}</p>
+            <p style="margin: 4px 0; font-size: 13.5px; color: #475569;"><strong>Phương tiện:</strong> ${st.vehicle} • <strong>HDV:</strong> ${st.guide}</p>
+          </div>
+        `).join('');
+
+        // Parse schedule
+        let scheduleHTML = '';
+        if (typeof tour.schedule === 'string' && tour.schedule.trim()) {
+          const lines = tour.schedule.split('\n').filter(Boolean);
+          scheduleHTML = lines.map((line, idx) => `
+            <div class="itinerary-step">
+              <h4>${line.includes(':') ? line.split(':')[0] : `Ngày ${idx + 1}`}</h4>
+              <p>${line.includes(':') ? line.split(':').slice(1).join(':').trim() : line}</p>
+            </div>
+          `).join('');
+        } else if (Array.isArray(tour.schedule)) {
+          scheduleHTML = tour.schedule.map(s => `
+            <div class="itinerary-step">
+              <h4>Ngày ${s.day}</h4>
+              <p>${s.desc}</p>
+            </div>
+          `).join('');
+        } else {
+          scheduleHTML = `
+            <div class="itinerary-step"><h4>Ngày 1</h4><p>Khởi hành từ ${tour.depart || 'Hà Nội'} đến ${tour.destination || tour.location || 'Điểm đến'}, nhận phòng khách sạn và tham quan thắng cảnh nổi tiếng.</p></div>
+            <div class="itinerary-step"><h4>Ngày 2</h4><p>Trải nghiệm vui chơi, khám phá ẩm thực địa phương và mua sắm quà lưu niệm.</p></div>
+          `;
+        }
+
+        // Parse Inclusions & Exclusions
+        let incHTML = '';
+        const incText = tour.inc || 'Xe đưa đón đời mới, Khách sạn tiêu chuẩn 4 sao, Các bữa ăn theo chương trình, Vé tham quan, Hướng dẫn viên';
+        incText.split(/,|\n/).map(i => i.trim()).filter(Boolean).forEach(item => {
+          incHTML += `<li>✅ ${item}</li>`;
+        });
+
+        let excHTML = '';
+        const excText = tour.exc || 'Chi phí cá nhân ngoài chương trình, Đồ uống trong bữa ăn, Tiền tip cho HDV và lái xe, Thuế VAT';
+        excText.split(/,|\n/).map(e => e.trim()).filter(Boolean).forEach(item => {
+          excHTML += `<li>❌ ${item}</li>`;
+        });
+
+        const oldPriceVal = tour.oldPrice || Math.round(tour.price * 1.15);
+
+        container.innerHTML = `
+          <div class="tour-detail-layout">
+            <!-- Cột trái: Thông tin chính -->
+            <div class="main-card">
+              <div class="tour-header-meta">
+                <span class="tag-badge ${tour.badge ? 'hot' : ''}">${tour.badge || tour.category || 'Tour hot'}</span>
+                <span class="tag-badge">Mã: ${tour.code || 'TO-' + tour.id}</span>
+                <span class="tag-badge">Thời lượng: ${tour.duration || (tour.days ? tour.days + ' Ngày' : '3N2Đ')}</span>
+              </div>
+
+              <h1 class="tour-title">${tour.name}</h1>
+
+              <img src="${tour.image || 'https://picsum.photos/seed/' + tour.id + '/1200/800'}" class="tour-hero-img" alt="${tour.name}" />
+
+              <div class="info-grid">
+                <div class="info-item">
+                  <small>Điểm đến</small>
+                  <strong>📍 ${tour.destination || tour.location || 'Việt Nam'}</strong>
                 </div>
-              `).join('')}
+                <div class="info-item">
+                  <small>Khởi hành từ</small>
+                  <strong>🛫 ${tour.depart || 'Hà Nội / TP.HCM'}</strong>
+                </div>
+                <div class="info-item">
+                  <small>Phương tiện</small>
+                  <strong>🚌 ${tour.vehicle || 'Xe Limousine đời mới'}</strong>
+                </div>
+                <div class="info-item">
+                  <small>Tình trạng chỗ</small>
+                  <strong>✅ Sẵn sàng nhận khách</strong>
+                </div>
+              </div>
+
+              <div class="section-subheading">Lộ Trình Di Chuyển 3 Chặng Độc Quyền</div>
+              <div>${stagesHTML}</div>
+
+              <div class="section-subheading">Lịch trình chi tiết</div>
+              <div>${scheduleHTML}</div>
+
+              <div class="section-subheading">Dịch vụ đi kèm</div>
+              <div class="services-box">
+                <div class="service-panel">
+                  <h4 style="color: #065f46;">Giá bao gồm:</h4>
+                  <ul>${incHTML}</ul>
+                </div>
+                <div class="service-panel">
+                  <h4 style="color: #991b1b;">Không bao gồm:</h4>
+                  <ul>${excHTML}</ul>
+                </div>
+              </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
-              <div class="service-box">
-                <h4 style="margin-bottom: 10px; color:#0f766e;">✅ Giá tour bao gồm</h4>
-                <ul style="list-style: none; padding: 0; font-size:14px;">${included.map(i => `<li style="margin-bottom:8px;">• ${i}</li>`).join('')}</ul>
-              </div>
-              <div class="service-box">
-                <h4 style="margin-bottom: 10px; color:#b91c1c;">❌ Không bao gồm</h4>
-                <ul style="list-style: none; padding: 0; font-size:14px;">${excluded.map(e => `<li style="margin-bottom:8px;">• ${e}</li>`).join('')}</ul>
+            <!-- Cột phải: Form đặt tour sticky -->
+            <div>
+              <div class="sticky-card">
+                <div class="price-box">
+                  <span style="font-size: 13px; color: #64748b; font-weight: 700; display: block; text-transform: uppercase;">Giá tour trọn gói</span>
+                  <span class="price-current">${formatCurrency(tour.price)}</span>
+                  <span class="price-old">${formatCurrency(oldPriceVal)}</span>
+                  <span style="font-size: 13px; color: #64748b; margin-left: 4px;">/ khách</span>
+                </div>
+
+                <form id="bookTourForm">
+                  <div class="form-row">
+                    <label>Họ và tên của bạn (*)</label>
+                    <input type="text" id="custName" placeholder="Ví dụ: Nguyễn Văn A" required />
+                  </div>
+                  <div class="form-row">
+                    <label>Số điện thoại liên hệ (*)</label>
+                    <input type="tel" id="custPhone" placeholder="Ví dụ: 0912345678" required />
+                  </div>
+                  <div class="form-row">
+                    <label>Email nhận vé</label>
+                    <input type="email" id="custEmail" placeholder="example@gmail.com" />
+                  </div>
+                  <div class="form-row">
+                    <label>Ngày bạn muốn khởi hành (*)</label>
+                    <input type="date" id="custDate" required />
+                  </div>
+                  <div class="form-row">
+                    <label>Số lượng người lớn (*)</label>
+                    <input type="number" id="custQty" min="1" max="50" value="2" required />
+                  </div>
+                  <div class="form-row">
+                    <label>Số lượng trẻ em (giảm 25%)</label>
+                    <input type="number" id="custChildQty" min="0" max="20" value="0" />
+                  </div>
+                  <div class="form-row">
+                    <label>Mã giảm giá (nếu có)</label>
+                    <input type="text" id="custPromo" placeholder="Nhập mã: HE2026, VIPTOUR, SUMMER300..." style="text-transform: uppercase;" />
+                  </div>
+
+                  <div class="total-box">
+                    <span>TỔNG TIỀN:</span>
+                    <strong id="displayTotal">${formatCurrency(tour.price * 2)}</strong>
+                  </div>
+
+                  <button type="submit" class="btn-book-now">Xác Nhận Đặt Tour Ngay</button>
+                  <p style="text-align: center; font-size: 12px; color: #64748b; margin: 12px 0 0;">Cam kết bảo mật thông tin & Giữ giá tốt nhất.</p>
+                </form>
               </div>
             </div>
           </div>
+        `;
 
-          <div>
-            <div class="sticky-sidebar">
-              <span style="background:#dcfce7; color:#15803d; font-weight:bold; font-size:12px; padding:4px 10px; border-radius:99px;">⚡ Xác nhận tức thì</span>
-              <div style="font-size: 1.9rem; color: #ea580c; font-weight: 800; margin: 12px 0;">
-                ${formatMoney(currentTour.price)} <span style="font-size: 0.95rem; color: #64748b; font-weight: normal;">/ người lớn</span>
-              </div>
-              <p style="font-size:13px; color:#64748b; margin-bottom:15px;">Trẻ em (5-10 tuổi): <strong>${formatMoney(Math.round(currentTour.price * 0.75))}</strong></p>
-              <hr style="border:none; border-top:1px solid #e2e8f0; margin:15px 0;">
-              <p style="color: #475569; font-size: 0.9rem; line-height:1.7; margin-bottom: 20px;">
-                ✔️ Có sẵn lộ trình 3 chặng, số xe & HDV<br>
-                ✔️ Xuất vé điện tử (E-Ticket) kèm QR Code<br>
-                ✔️ Miễn phí hoàn hủy trước 7 ngày
-              </p>
-              <button onclick="openBooking()" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px; border-radius: 10px;">Chọn Ngày & Đặt Chỗ</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
+        // Calculate total dynamically
+        const dateInput = document.getElementById('custDate');
+        const qtyInput = document.getElementById('custQty');
+        const childQtyInput = document.getElementById('custChildQty');
+        const totalDisplay = document.getElementById('displayTotal');
 
-    window.openBooking = () => {
-      document.getElementById('modalTourName').textContent = currentTour.name;
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('cusDate').min = today;
-      document.getElementById('cusDate').value = currentTour.date && currentTour.date >= today ? currentTour.date : today;
-      calcTotal();
-      document.getElementById('bookingModal').classList.add('show');
-    };
+        // Set min date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateInput.min = tomorrow.toISOString().split('T')[0];
+        dateInput.value = tomorrow.toISOString().split('T')[0];
 
-    window.closeModal = () => document.getElementById('bookingModal').classList.remove('show');
-    window.calcTotal = () => {
-      const adults = Math.max(1, parseInt(document.getElementById('cusAdult').value) || 1);
-      const children = Math.max(0, parseInt(document.getElementById('cusChild').value) || 0);
-      const total = (adults * currentTour.price) + (children * Math.round(currentTour.price * 0.75));
-      document.getElementById('totalPrice').textContent = formatMoney(total);
-      return { adults, children, total };
-    };
+        const updateTotal = () => {
+          const adults = Math.max(1, parseInt(qtyInput.value) || 1);
+          const children = Math.max(0, parseInt(childQtyInput.value) || 0);
+          let total = (adults * tour.price) + (children * Math.round(tour.price * 0.75));
+          const promo = document.getElementById('custPromo').value.trim().toUpperCase();
+          if (promo === 'HE2026') total = Math.max(0, total - 500000);
+          else if (promo === 'VIPTOUR') total = Math.max(0, total - 1000000);
+          else if (promo === 'SUMMER300') total = Math.max(0, total - 300000);
 
-    document.getElementById('detailBookingForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('cusName').value.trim();
-      const phone = document.getElementById('cusPhone').value.trim();
-      const email = document.getElementById('cusEmail').value.trim();
-      const date = document.getElementById('cusDate').value;
-      const note = document.getElementById('cusNote').value.trim();
-      const { adults, children, total } = calcTotal();
+          totalDisplay.textContent = formatCurrency(total);
+        };
 
-      if (!/(84|0[3|5|7|8|9])+([0-9]{8})\b/g.test(phone)) { alert('Số điện thoại gồm 10 số không hợp lệ!'); return; }
+        qtyInput.addEventListener('input', updateTotal);
+        childQtyInput.addEventListener('input', updateTotal);
+        document.getElementById('custPromo').addEventListener('input', updateTotal);
 
-      const stages = (Array.isArray(currentTour.stages) && currentTour.stages.length === 3) ? currentTour.stages : getDefaultStages(currentTour.name);
-      const bookings = JSON.parse(localStorage.getItem('tourdulich_bookings') || '[]');
-      bookings.unshift({
-        id: 'BK-' + Date.now().toString().slice(-6),
-        guestName: name, phone, email,
-        guestCount: adults + children, adultCount: adults, childCount: children,
-        note: note || 'Không có',
-        tourName: currentTour.name, travelDate: date, totalPrice: total,
-        status: 'pending', stages
-      });
-      localStorage.setItem('tourdulich_bookings', JSON.stringify(bookings));
-      alert('🎉 Đặt chỗ thành công! Chuyển đến trang Đơn Đặt Chỗ để nhận Vé điện tử E-Ticket.');
-      window.location.href = 'trangdonhang.html';
-    });
+        // Submit form
+        document.getElementById('bookTourForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const name = document.getElementById('custName').value.trim();
+          const phone = document.getElementById('custPhone').value.trim();
+          const email = document.getElementById('custEmail').value.trim();
+          const date = document.getElementById('custDate').value;
+          const adults = parseInt(document.getElementById('custQty').value) || 1;
+          const children = parseInt(document.getElementById('custChildQty').value) || 0;
+          const promo = document.getElementById('custPromo').value.trim().toUpperCase();
 
-    initDetail();
-  </script>
+          let finalTotal = (adults * tour.price) + (children * Math.round(tour.price * 0.75));
+          if (promo === 'HE2026') finalTotal = Math.max(0, finalTotal - 500000);
+          else if (promo === 'VIPTOUR') finalTotal = Math.max(0, finalTotal - 1000000);
+          else if (promo === 'SUMMER300') finalTotal = Math.max(0, finalTotal - 300000);
+
+          // Save to localStorage
+          const BOOKING_KEY = 'tourdulich_bookings';
+          const bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
+          const newBookingId = 'BK-' + Math.floor(1000 + Math.random() * 9000);
+          const bookingStages = (Array.isArray(tour.stages) && tour.stages.length === 3) ? tour.stages : getDefaultStages(tour.name);
+
+          bookings.unshift({
+            id: newBookingId,
+            guestName: name,
+            phone: phone,
+            email: email,
+            guestCount: adults + children,
+            adultCount: adults,
+            childCount: children,
+            tourName: tour.name,
+            travelDate: date,
+            totalPrice: finalTotal,
+            promoInfo: promo,
+            paymentMethod: 'Chuyển khoản / VietQR',
+            paymentStatus: 'Chờ xác nhận',
+            status: 'pending',
+            stages: bookingStages,
+            notes: 'Đặt trực tiếp qua trang chi tiết',
+            createdAt: new Date().toISOString()
+          });
+
+          localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings));
+
+          alert(`🎉 ĐẶT TOUR THÀNH CÔNG!\n\nCảm ơn Quý khách ${name}!\nMã đơn của bạn: #${newBookingId}\nTour: ${tour.name}\nSố khách: ${adults + children} người (${adults} lớn, ${children} trẻ em)\nTổng thanh toán: ${formatCurrency(finalTotal)}\n\nĐơn hàng đã được lưu. Chuyển sang trang "Đơn hàng" để kiểm tra và xem Vé điện tử E-Ticket!`);
+          window.location.href = 'trangdonhang.html';
+        });
+      }
+
+      loadTourDetail();
+    </script>
 </body>
 </html>
