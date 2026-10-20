@@ -172,6 +172,20 @@
         const isMsgValid = validateField('message', msgVal.length >= 10, 'Nội dung phải có ít nhất 10 ký tự.');
 
         if (isNameValid && isEmailValid && isPhoneValid && isSubValid && isMsgValid) {
+          try {
+            const contacts = JSON.parse(localStorage.getItem('tourdulich_contacts') || '[]');
+            contacts.unshift({
+              id: 'ct-' + Date.now(),
+              fullName: nameVal,
+              email: emailVal,
+              phone: phoneVal,
+              subject: subVal,
+              message: msgVal,
+              date: new Date().toISOString(),
+              status: 'unread'
+            });
+            localStorage.setItem('tourdulich_contacts', JSON.stringify(contacts));
+          } catch(e) {}
           successMessage.hidden = false;
           form.reset();
           setTimeout(() => { successMessage.hidden = true; }, 5000); // Tự ẩn thông báo sau 5 giây
