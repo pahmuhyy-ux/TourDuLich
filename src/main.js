@@ -542,21 +542,113 @@ document.querySelector('#app').innerHTML = `
   </div>
 </div>
 
-<!-- MODAL PHÒNG BÌNH CHỌN TOUR THEO NHÓM (PHẦN 1) -->
+<!-- MODAL PHÒNG BÌNH CHỌN TOUR THEO NHÓM & GIA ĐÌNH -->
 <div class="tour-detail-modal" id="groupPollModal" aria-hidden="true">
-  <div class="tour-detail-panel" style="max-width: 680px; text-align: left; max-height: 90vh; overflow-y: auto;">
+  <div class="tour-detail-panel" style="max-width: 720px; text-align: left; max-height: 90vh; overflow-y: auto; padding: 24px;">
     <button class="tour-detail-close" id="closeGroupPollModal" type="button">×</button>
-    <h3 style="margin: 0 0 6px 0; font-size: 22px; color: #0d7a5f;">🗳️ Phòng Bình Chọn Tour Cho Nhóm Bạn & Gia Đình</h3>
-    <p style="font-size: 13.5px; color: #64748b; margin-bottom: 16px;">Tạo cuộc bình chọn để các thành viên trong đoàn bấm Vote chọn hành trình yêu thích nhất trước khi chốt đơn!</p>
     
-    <div style="background:#f8fafc; padding:14px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:18px;">
-      <label style="font-weight:700; font-size:13px; display:block; margin-bottom:8px;">➕ Thêm Tour vào danh sách bình chọn của nhóm:</label>
-      <div style="display:flex; gap:10px;">
-        <select id="pollTourSelect" style="flex:1; padding:10px; border:1px solid #cbd5e1; border-radius:8px;"></select>
-        <button type="button" id="btnAddPollTour" class="btn btn-primary btn-sm">Thêm vào bảng Vote</button>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom: 4px;">
+      <span style="font-size:26px;">🗳️</span>
+      <div>
+        <h3 style="margin: 0; font-size: 21px; color: #0d7a5f; font-weight:800;">Phòng Bình Chọn Tour Cho Nhóm Bạn & Gia Đình</h3>
+        <p style="font-size: 13px; color: #64748b; margin: 2px 0 0;">Cùng người thân và bạn bè Vote chọn hành trình yêu thích nhất trước khi chốt đơn!</p>
       </div>
     </div>
 
+    <!-- KHỐI 1: THÔNG TIN PHÒNG NHÓM HIỆN TẠI -->
+    <div id="pollRoomHeaderCard" style="background: linear-gradient(135deg, #f0fdf4 0%, #e6f6f2 100%); border: 1.5px solid #a7f3d0; border-radius: 14px; padding: 14px 18px; margin: 16px 0 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: #0d7a5f; color: white; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 99px;">ĐANG THAM GIA</span>
+            <strong id="currentRoomNameDisplay" style="font-size: 17px; color: #0f172a;">Gia Đình Hạnh Phúc 👨‍👩‍👧‍👦</strong>
+          </div>
+          <div style="font-size: 13px; color: #475569; margin-top: 5px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span>Mã phòng: <strong id="currentRoomCodeDisplay" style="font-family: monospace; font-size: 14px; background: white; padding: 2px 8px; border-radius: 6px; border: 1px solid #cbd5e1; color: #0d7a5f;">GD-2026</strong></span>
+            <span>• Trưởng nhóm: <strong id="currentRoomLeaderDisplay">Đức Huy</strong></span>
+          </div>
+        </div>
+
+        <!-- Các nút thao tác phòng: Chia sẻ mã, đổi nhóm, tạo nhóm -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button type="button" id="btnCopyRoomCode" class="btn btn-sm" style="background: white; border: 1px solid #0d7a5f; color: #0d7a5f; font-weight: 700; font-size: 12px; padding: 6px 10px; border-radius: 8px; cursor: pointer;" title="Sao chép mã phòng để gửi cho người thân">
+            📋 Sao chép mã
+          </button>
+          <button type="button" id="btnShareRoomLink" class="btn btn-sm" style="background: #0d7a5f; color: white; font-weight: 700; font-size: 12px; padding: 6px 12px; border-radius: 8px; cursor: pointer;" title="Chia sẻ link phòng này để người khác bấm vào là tham gia ngay">
+            🔗 Mời người thân
+          </button>
+          <button type="button" id="btnToggleRoomManager" class="btn btn-sm" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; font-weight: 700; font-size: 12px; padding: 6px 10px; border-radius: 8px; cursor: pointer;">
+            🔄 Đổi / Tạo nhóm
+          </button>
+        </div>
+      </div>
+
+      <!-- Danh sách thành viên trong nhóm -->
+      <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #bbf7d0; font-size: 12.5px; color: #475569;">
+        <span>👥 <strong>Thành viên trong nhóm:</strong> </span>
+        <span id="currentRoomMembersList" style="color: #0d7a5f; font-weight: 600;">Đức Huy, Minh Anh, Tuấn Kiệt, Hoàng Nam...</span>
+      </div>
+    </div>
+
+    <!-- KHỐI 2: KHU VỰC ĐỔI / TẠO PHÒNG MỚI (Ẩn/Hiện khi bấm 'Đổi / Tạo nhóm') -->
+    <div id="roomManagerBox" style="display:none; background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;">
+        <strong style="color:#0f172a; font-size:14px;">🔑 Vào Nhóm Chung Bằng Mã Hoặc Tạo Phòng Mới</strong>
+        <button type="button" id="btnCloseRoomManager" style="background:none; border:none; color:#64748b; font-size:16px; cursor:pointer; font-weight:bold;">✕</button>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+        <!-- Cột 1: Nhập mã phòng để vào -->
+        <div style="background:#f8fafc; padding:12px; border-radius:10px; border:1px solid #e2e8f0;">
+          <label style="font-weight:700; font-size:12.5px; color:#1e293b; display:block; margin-bottom:6px;">🚀 Nhập Mã Phòng Để Vào Cùng Gia Đình / Bạn Bè:</label>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="inputJoinRoomCode" placeholder="Ví dụ: GD-2026" style="flex:1; padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; font-family:monospace; font-weight:700; text-transform:uppercase; font-size:13px;" />
+            <button type="button" id="btnJoinRoomByCode" class="btn btn-primary btn-sm" style="white-space:nowrap; padding:8px 12px; font-size:13px;">Vào phòng</button>
+          </div>
+          <div style="margin-top:8px; font-size:12px; color:#64748b;">
+            Phòng mẫu có sẵn: 
+            <a href="#" class="quick-room-link" data-code="GD-2026" style="color:#0d7a5f; font-weight:700; text-decoration:underline; margin-right:8px;">GD-2026 (Gia Đình)</a>
+            <a href="#" class="quick-room-link" data-code="BANTHAN-88" style="color:#0d7a5f; font-weight:700; text-decoration:underline;">BANTHAN-88 (Bạn Thân)</a>
+          </div>
+        </div>
+
+        <!-- Cột 2: Tạo nhóm gia đình mới -->
+        <div style="background:#f8fafc; padding:12px; border-radius:10px; border:1px solid #e2e8f0;">
+          <label style="font-weight:700; font-size:12.5px; color:#1e293b; display:block; margin-bottom:6px;">➕ Tạo Phòng Nhóm / Gia Đình Mới:</label>
+          <input type="text" id="inputNewRoomName" placeholder="Tên nhóm: VD Gia Đình Bác Ba Đi Đà Lạt..." style="width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:6px; font-size:12.5px;" />
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="inputNewRoomCode" placeholder="Mã phòng (VD: GD-8899)" style="flex:1; padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; font-family:monospace; font-size:12px; text-transform:uppercase;" />
+            <button type="button" id="btnCreateNewRoom" class="btn btn-sm" style="background:#0d7a5f; color:white; font-weight:700; white-space:nowrap; padding:8px 12px; border:none; border-radius:6px; cursor:pointer;">Tạo phòng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KHỐI 3: ĐỊNH DANH NGƯỜI ĐANG BÌNH CHỌN (BẠN LÀ AI?) -->
+    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 14px; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:16px;">👤</span>
+        <span style="font-size:13px; color:#334155;">Bạn đang bình chọn với tên: <strong id="currentVoterDisplay" style="color:#0d7a5f; font-size:13.5px;">Đức Huy</strong></span>
+      </div>
+      <div>
+        <button type="button" id="btnChangeVoterName" style="background:white; border:1px solid #cbd5e1; border-radius:6px; font-size:12px; padding:4px 10px; color:#0284c7; cursor:pointer; font-weight:700;">
+          ✏️ Đổi tên của bạn
+        </button>
+      </div>
+    </div>
+
+    <!-- KHỐI 4: THÊM TOUR VÀO DANH SÁCH BÌNH CHỌN CỦA NHÓM NÀY -->
+    <div style="background:#f8fafc; padding:12px 14px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:16px;">
+      <label style="font-weight:700; font-size:13px; display:block; margin-bottom:6px; color:#1e293b;">
+        ➕ Đề xuất thêm Tour vào danh sách bình chọn của nhóm:
+      </label>
+      <div style="display:flex; gap:10px;">
+        <select id="pollTourSelect" style="flex:1; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13.5px;"></select>
+        <button type="button" id="btnAddPollTour" class="btn btn-primary btn-sm" style="white-space:nowrap; padding:9px 16px;">Thêm vào bảng Vote</button>
+      </div>
+    </div>
+
+    <!-- KHỐI 5: DANH SÁCH CÁC TOUR ĐANG ĐƯỢC BÌNH CHỌN TRONG NHÓM -->
     <div id="pollItemsContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
   </div>
 </div>
@@ -778,95 +870,477 @@ document.querySelector('#btnClearNotifs')?.addEventListener('click', () => {
   renderNotifications();
 });
 
-// --- Logic Phòng Bình Chọn Tour Nhóm (Phần 1) ---
-const getPolls = () => {
-  const saved = JSON.parse(localStorage.getItem('tourdulich_group_polls') || 'null');
-  if (saved) return saved;
-  const initial = [
-    { tourId: 1, name: 'Hạ Long 3N2Đ - Ngủ Đêm Du Thuyền 5 Sao', price: 4490000, votes: 4, voters: ['Đức Huy', 'Minh Anh', 'Tuấn Kiệt', 'Hoàng Nam'] },
-    { tourId: 4, name: 'Sapa - Đỉnh Fansipan - Bản Cát Cát', price: 5290000, votes: 2, voters: ['Yến Nhi', 'Bảo Ngọc'] }
-  ];
-  localStorage.setItem('tourdulich_group_polls', JSON.stringify(initial));
-  return initial;
-};
+// --- Logic Phòng Bình Chọn Tour Nhóm & Gia Đình (Phần 1) ---
+const POLL_ROOMS_KEY = 'tourdulich_poll_rooms';
+const CURRENT_ROOM_KEY = 'tourdulich_current_poll_room';
+const VOTER_NAME_KEY = 'tourdulich_voter_name';
 
-const renderGroupPolls = () => {
-  const polls = getPolls().sort((a, b) => b.votes - a.votes);
+const getInitialRooms = () => ({
+  'GD-2026': {
+    code: 'GD-2026',
+    name: 'Gia Đình Hạnh Phúc 👨‍👩‍👧‍👦',
+    leader: 'Đức Huy (Trưởng đoàn)',
+    createdAt: '2026-10-21',
+    members: ['Đức Huy', 'Minh Anh', 'Tuấn Kiệt', 'Hoàng Nam', 'Yến Nhi', 'Bảo Ngọc'],
+    tours: [
+      {
+        tourId: 1,
+        name: 'Hạ Long 3N2Đ - Ngủ Đêm Du Thuyền 5 Sao',
+        price: 4490000,
+        voters: ['Đức Huy', 'Minh Anh', 'Tuấn Kiệt', 'Hoàng Nam']
+      },
+      {
+        tourId: 4,
+        name: 'Sapa - Đỉnh Fansipan - Bản Cát Cát',
+        price: 5290000,
+        voters: ['Yến Nhi', 'Bảo Ngọc']
+      }
+    ]
+  },
+  'BANTHAN-88': {
+    code: 'BANTHAN-88',
+    name: 'Hội Bạn Thân Phượt Hè 🏖️',
+    leader: 'Minh Anh',
+    createdAt: '2026-10-20',
+    members: ['Minh Anh', 'Hoàng Nam', 'Yến Nhi', 'Đức Huy'],
+    tours: [
+      {
+        tourId: 3,
+        name: 'Phú Quốc 4N3Đ - Cáp Treo Hòn Thơm & Cano 4 Đảo',
+        price: 6790000,
+        voters: ['Minh Anh', 'Hoàng Nam']
+      },
+      {
+        tourId: 2,
+        name: 'Đà Nẵng - Hội An - Bà Nà Hills',
+        price: 5890000,
+        voters: ['Yến Nhi', 'Đức Huy']
+      }
+    ]
+  }
+});
+
+function getAllPollRooms() {
+  try {
+    const raw = localStorage.getItem(POLL_ROOMS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+        return parsed;
+      }
+    }
+  } catch(e) {}
+
+  const rooms = getInitialRooms();
+  try {
+    const legacy = JSON.parse(localStorage.getItem('tourdulich_group_polls') || 'null');
+    if (Array.isArray(legacy) && legacy.length > 0) {
+      rooms['GD-2026'].tours = legacy.map(p => ({
+        tourId: p.tourId,
+        name: p.name,
+        price: p.price,
+        voters: Array.isArray(p.voters) ? p.voters : ['Trưởng nhóm']
+      }));
+      const allMembers = new Set(rooms['GD-2026'].members);
+      legacy.forEach(p => (p.voters || []).forEach(v => allMembers.add(v)));
+      rooms['GD-2026'].members = Array.from(allMembers);
+    }
+  } catch(e) {}
+
+  saveAllPollRooms(rooms);
+  return rooms;
+}
+
+function saveAllPollRooms(rooms) {
+  localStorage.setItem(POLL_ROOMS_KEY, JSON.stringify(rooms));
+}
+
+function getCurrentRoomCode() {
+  let code = localStorage.getItem(CURRENT_ROOM_KEY);
+  const rooms = getAllPollRooms();
+  if (!code || !rooms[code]) {
+    code = Object.keys(rooms)[0] || 'GD-2026';
+    localStorage.setItem(CURRENT_ROOM_KEY, code);
+  }
+  return code;
+}
+
+function setCurrentRoomCode(code) {
+  localStorage.setItem(CURRENT_ROOM_KEY, code);
+}
+
+function getActiveVoterName() {
+  const custom = localStorage.getItem(VOTER_NAME_KEY);
+  if (custom && custom.trim()) return custom.trim();
+  const activeUser = JSON.parse(localStorage.getItem('tourdulich_active_user') || 'null');
+  if (activeUser && activeUser.name) return activeUser.name;
+  return 'Đức Huy';
+}
+
+function setActiveVoterName(name) {
+  localStorage.setItem(VOTER_NAME_KEY, name.trim());
+}
+
+function renderGroupPolls() {
+  const rooms = getAllPollRooms();
+  const currentCode = getCurrentRoomCode();
+  const room = rooms[currentCode] || rooms['GD-2026'];
+  const currentVoter = getActiveVoterName();
+
+  // Ensure current voter is recorded in room members
+  if (room.members && !room.members.includes(currentVoter)) {
+    room.members.push(currentVoter);
+    saveAllPollRooms(rooms);
+  }
+
+  // Update Room Header Card
+  const nameEl = document.querySelector('#currentRoomNameDisplay');
+  const codeEl = document.querySelector('#currentRoomCodeDisplay');
+  const leaderEl = document.querySelector('#currentRoomLeaderDisplay');
+  const membersEl = document.querySelector('#currentRoomMembersList');
+  const voterEl = document.querySelector('#currentVoterDisplay');
+
+  if (nameEl) nameEl.textContent = room.name;
+  if (codeEl) codeEl.textContent = room.code;
+  if (leaderEl) leaderEl.textContent = room.leader || 'Trưởng nhóm';
+  if (membersEl) membersEl.textContent = (room.members && room.members.length > 0) ? room.members.join(', ') : currentVoter;
+  if (voterEl) voterEl.textContent = currentVoter;
+
+  // Render Poll items
   const container = document.querySelector('#pollItemsContainer');
-  const totalVotes = polls.reduce((s, p) => s + p.votes, 0) || 1;
+  if (!container) return;
 
-  container.innerHTML = polls.map((p, idx) => {
-    const pct = Math.round((p.votes / totalVotes) * 100);
+  const tours = [...(room.tours || [])].sort((a, b) => (b.voters ? b.voters.length : 0) - (a.voters ? a.voters.length : 0));
+  const totalVotes = tours.reduce((sum, p) => sum + (p.voters ? p.voters.length : 0), 0) || 1;
+
+  if (tours.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:32px 16px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; color:#64748b;">
+        <div style="font-size:2rem; margin-bottom:8px;">🏖️</div>
+        <strong style="color:#0f172a;">Chưa có chuyến đi nào trong danh sách bình chọn của nhóm này!</strong>
+        <p style="margin:6px 0 0; font-size:13px;">Hãy chọn một tour ở ô bên trên và bấm "Thêm vào bảng Vote" để cả gia đình cùng bình chọn.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = tours.map((p, idx) => {
+    const votesCount = p.voters ? p.voters.length : 0;
+    const pct = Math.round((votesCount / totalVotes) * 100);
+    const hasVoted = p.voters && p.voters.includes(currentVoter);
+
     return `
-      <div style="border:1px solid ${idx === 0 ? '#0d7a5f' : '#e2e8f0'}; background:${idx === 0 ? '#f0fdf4' : 'white'}; padding:14px; border-radius:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <div>
-            ${idx === 0 ? '<span style="background:#0d7a5f; color:white; font-size:11px; padding:2px 8px; border-radius:99px; font-weight:bold; margin-right:6px;">🏆 Đang dẫn đầu</span>' : ''}
+      <div style="border:1.5px solid ${idx === 0 && votesCount > 0 ? '#0d7a5f' : '#e2e8f0'}; background:${idx === 0 && votesCount > 0 ? '#f0fdf4' : 'white'}; padding:14px; border-radius:12px; transition:all 0.2s;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:10px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:200px;">
+            ${idx === 0 && votesCount > 0 ? '<span style="background:#0d7a5f; color:white; font-size:11px; padding:2px 8px; border-radius:99px; font-weight:bold; margin-right:6px;">🏆 Đang dẫn đầu</span>' : ''}
             <strong style="font-size:15px; color:#0f172a;">${p.name}</strong>
-            <div style="font-size:13px; color:#ea580c; font-weight:bold;">${formatCurrency(p.price)} / khách</div>
+            <div style="font-size:13px; color:#ea580c; font-weight:bold; margin-top:2px;">${formatCurrency(p.price)} / khách</div>
           </div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button type="button" class="btn-vote-tour" data-id="${p.tourId}" style="background:#e0f2fe; color:#0284c7; border:none; padding:7px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">👍 Vote (+1)</button>
-            <button type="button" class="btn-book-poll" data-id="${p.tourId}" style="background:#0d7a5f; color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">Chốt đặt</button>
+          <div style="display:flex; gap:6px; align-items:center;">
+            ${hasVoted ? `
+              <button type="button" class="btn-vote-tour voted" data-id="${p.tourId}" style="background:#0d7a5f; color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Bấm để rút lại phiếu bình chọn của bạn">
+                ✓ Đã vote (${votesCount})
+              </button>
+            ` : `
+              <button type="button" class="btn-vote-tour" data-id="${p.tourId}" style="background:#e0f2fe; color:#0284c7; border:none; padding:7px 12px; border-radius:8px; font-weight:bold; cursor:pointer;" title="Bấm để bình chọn cho tour này">
+                👍 Vote (+1)
+              </button>
+            `}
+            <button type="button" class="btn-book-poll" data-id="${p.tourId}" style="background:#f97316; color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:bold; cursor:pointer;" title="Chốt đặt ngay tour này">
+              Chốt đặt
+            </button>
+            <button type="button" class="btn-delete-poll-tour" data-id="${p.tourId}" style="background:#fee2e2; color:#ef4444; border:none; padding:7px 10px; border-radius:8px; cursor:pointer; font-weight:bold;" title="Xóa tour này khỏi danh sách bình chọn của nhóm">
+              🗑️
+            </button>
           </div>
         </div>
+
         <div style="background:#e2e8f0; height:8px; border-radius:99px; overflow:hidden; margin:8px 0;">
-          <div style="background:#0d7a5f; width:${pct}%; height:100%;"></div>
+          <div style="background:${idx === 0 && votesCount > 0 ? '#0d7a5f' : '#0284c7'}; width:${pct}%; height:100%; border-radius:99px; transition:width 0.3s ease;"></div>
         </div>
-        <div style="font-size:12px; color:#64748b; display:flex; justify-content:space-between;">
-          <span>👥 Đã bình chọn (${p.votes} phiếu): ${p.voters.join(', ')}</span>
-          <strong>${pct}%</strong>
+
+        <div style="font-size:12px; color:#64748b; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+          <span>👥 Đã bình chọn (${votesCount} phiếu): <strong style="color:#334155;">${(p.voters && p.voters.length > 0) ? p.voters.join(', ') : 'Chưa có phiếu nào'}</strong></span>
+          <strong style="color:${idx === 0 && votesCount > 0 ? '#0d7a5f' : '#64748b'}; font-size:13px;">${pct}%</strong>
         </div>
       </div>
     `;
   }).join('');
-};
+}
 
+// Event Listeners for Group Poll
 document.querySelector('#btnGroupPoll')?.addEventListener('click', (e) => {
   e.preventDefault();
-  document.querySelector('#pollTourSelect').innerHTML = toursList.map(t => `<option value="${t.id}">${t.name} (${formatCurrency(t.price)})</option>`).join('');
+  const availableTours = (toursList && toursList.length > 0) ? toursList : defaultTours;
+  document.querySelector('#pollTourSelect').innerHTML = availableTours.map(t => `<option value="${t.id}">${t.name} (${formatCurrency(t.price)})</option>`).join('');
   renderGroupPolls();
   document.querySelector('#groupPollModal').classList.add('show');
 });
-document.querySelector('#closeGroupPollModal')?.addEventListener('click', () => document.querySelector('#groupPollModal').classList.remove('show'));
+
+document.querySelector('#closeGroupPollModal')?.addEventListener('click', () => {
+  document.querySelector('#groupPollModal').classList.remove('show');
+});
+
+document.querySelector('#btnToggleRoomManager')?.addEventListener('click', () => {
+  const box = document.querySelector('#roomManagerBox');
+  if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+});
+
+document.querySelector('#btnCloseRoomManager')?.addEventListener('click', () => {
+  const box = document.querySelector('#roomManagerBox');
+  if (box) box.style.display = 'none';
+});
+
+document.querySelector('#btnCopyRoomCode')?.addEventListener('click', () => {
+  const code = getCurrentRoomCode();
+  const text = code;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert(`📋 ĐÃ SAO CHÉP MÃ PHÒNG: ${code}\n\nHãy gửi mã này cho người thân hoặc bạn bè. Họ chỉ cần mở web, bấm "Bình chọn nhóm" -> "Đổi / Tạo nhóm" -> Nhập mã "${code}" là vào chung phòng bình chọn với bạn!`);
+    }).catch(() => {
+      prompt('Mã phòng bình chọn nhóm của bạn là:', code);
+    });
+  } else {
+    prompt('Mã phòng bình chọn nhóm của bạn là:', code);
+  }
+});
+
+document.querySelector('#btnShareRoomLink')?.addEventListener('click', () => {
+  const code = getCurrentRoomCode();
+  const room = getAllPollRooms()[code];
+  const shareUrl = `${window.location.origin}${window.location.pathname}?poll_room=${code}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert(`🔗 ĐÃ SAO CHÉP ĐƯỜNG LINK MỜI!\n\nNhóm: ${room ? room.name : code}\nLink: ${shareUrl}\n\nBạn hãy gửi liên kết này qua Zalo hoặc Messenger để các thành viên bấm vào là vào ngay phòng bình chọn!`);
+    }).catch(() => {
+      prompt('Đường dẫn tham gia phòng bình chọn:', shareUrl);
+    });
+  } else {
+    prompt('Đường dẫn tham gia phòng bình chọn:', shareUrl);
+  }
+});
+
+document.querySelector('#btnChangeVoterName')?.addEventListener('click', () => {
+  const current = getActiveVoterName();
+  const newName = prompt('Nhập tên hoặc vai trò của bạn trong gia đình/nhóm (Ví dụ: Bố Tuấn, Mẹ Mai, Đức Huy, Bé Linh...):', current);
+  if (newName && newName.trim()) {
+    setActiveVoterName(newName.trim());
+    const rooms = getAllPollRooms();
+    const code = getCurrentRoomCode();
+    if (rooms[code]) {
+      if (!rooms[code].members.includes(newName.trim())) {
+        rooms[code].members.push(newName.trim());
+        saveAllPollRooms(rooms);
+      }
+    }
+    renderGroupPolls();
+  }
+});
+
+document.querySelector('#btnJoinRoomByCode')?.addEventListener('click', () => {
+  const input = document.querySelector('#inputJoinRoomCode');
+  const code = input ? input.value.trim().toUpperCase() : '';
+  if (!code) {
+    alert('Vui lòng nhập mã phòng (Ví dụ: GD-2026)!');
+    return;
+  }
+  const rooms = getAllPollRooms();
+  if (!rooms[code]) {
+    alert(`Không tìm thấy phòng có mã "${code}".\nVui lòng kiểm tra lại mã hoặc tạo phòng mới!`);
+    return;
+  }
+  setCurrentRoomCode(code);
+  const currentVoter = getActiveVoterName();
+  if (!rooms[code].members.includes(currentVoter)) {
+    rooms[code].members.push(currentVoter);
+    saveAllPollRooms(rooms);
+  }
+  const box = document.querySelector('#roomManagerBox');
+  if (box) box.style.display = 'none';
+  if (input) input.value = '';
+  renderGroupPolls();
+  alert(`🎉 CHÀO MỪNG BẠN!\nĐã tham gia phòng bình chọn: "${rooms[code].name}" (Mã: ${code}).\nHãy bấm Vote chọn chuyến đi bạn thích nhé!`);
+});
+
+// Setup quick room links delegation
+document.addEventListener('click', (e) => {
+  const quickLink = e.target.closest('.quick-room-link');
+  if (quickLink) {
+    e.preventDefault();
+    const code = quickLink.dataset.code;
+    const rooms = getAllPollRooms();
+    if (rooms[code]) {
+      setCurrentRoomCode(code);
+      const currentVoter = getActiveVoterName();
+      if (!rooms[code].members.includes(currentVoter)) {
+        rooms[code].members.push(currentVoter);
+        saveAllPollRooms(rooms);
+      }
+      const box = document.querySelector('#roomManagerBox');
+      if (box) box.style.display = 'none';
+      renderGroupPolls();
+    }
+  }
+});
+
+document.querySelector('#btnCreateNewRoom')?.addEventListener('click', () => {
+  const nameInput = document.querySelector('#inputNewRoomName');
+  const codeInput = document.querySelector('#inputNewRoomCode');
+  const name = nameInput ? nameInput.value.trim() : '';
+  let code = codeInput ? codeInput.value.trim().toUpperCase() : '';
+
+  if (!name) {
+    alert('Vui lòng nhập tên cho nhóm hoặc gia đình của bạn (VD: Gia Đình Bác Ba, Team Bạn Thân...)!');
+    return;
+  }
+
+  if (!code) {
+    code = 'GD-' + Math.floor(1000 + Math.random() * 9000);
+  }
+
+  const rooms = getAllPollRooms();
+  if (rooms[code]) {
+    alert(`Mã phòng "${code}" đã tồn tại. Vui lòng chọn mã khác hoặc để trống để hệ thống tự tạo!`);
+    return;
+  }
+
+  const currentVoter = getActiveVoterName();
+  const availableTours = (toursList && toursList.length > 0) ? toursList : defaultTours;
+  const seedTours = availableTours.slice(0, 2).map(t => ({
+    tourId: t.id,
+    name: t.name,
+    price: t.price,
+    voters: [currentVoter]
+  }));
+
+  rooms[code] = {
+    code: code,
+    name: name,
+    leader: currentVoter,
+    createdAt: new Date().toISOString().split('T')[0],
+    members: [currentVoter],
+    tours: seedTours
+  };
+
+  saveAllPollRooms(rooms);
+  setCurrentRoomCode(code);
+
+  if (nameInput) nameInput.value = '';
+  if (codeInput) codeInput.value = '';
+  const box = document.querySelector('#roomManagerBox');
+  if (box) box.style.display = 'none';
+
+  renderGroupPolls();
+  alert(`🎉 TẠO PHÒNG BÌNH CHỌN THÀNH CÔNG!\n\nTên nhóm: ${name}\nMã phòng của bạn: ${code}\n\nBạn có thể bấm "Sao chép mã" hoặc "Mời người thân" để gửi mã này cho mọi người cùng vào vote!`);
+});
 
 document.querySelector('#btnAddPollTour')?.addEventListener('click', () => {
   const tourId = document.querySelector('#pollTourSelect').value;
-  const tour = toursList.find(t => String(t.id) === String(tourId));
+  const availableTours = (toursList && toursList.length > 0) ? toursList : defaultTours;
+  const tour = availableTours.find(t => String(t.id) === String(tourId));
   if (!tour) return;
-  const polls = getPolls();
-  if (polls.some(p => String(p.tourId) === String(tourId))) {
-    alert('Tour này đã có trong danh sách bình chọn!');
+
+  const rooms = getAllPollRooms();
+  const code = getCurrentRoomCode();
+  const room = rooms[code];
+  if (!room) return;
+
+  if (room.tours && room.tours.some(p => String(p.tourId) === String(tourId))) {
+    alert('Tour này đã có sẵn trong danh sách bình chọn của nhóm!');
     return;
   }
-  polls.push({ tourId: tour.id, name: tour.name, price: tour.price, votes: 1, voters: ['Trưởng nhóm'] });
-  localStorage.setItem('tourdulich_group_polls', JSON.stringify(polls));
+
+  const currentVoter = getActiveVoterName();
+  if (!room.tours) room.tours = [];
+  room.tours.push({
+    tourId: tour.id,
+    name: tour.name,
+    price: tour.price,
+    voters: [currentVoter]
+  });
+
+  saveAllPollRooms(rooms);
   renderGroupPolls();
 });
 
 document.querySelector('#pollItemsContainer')?.addEventListener('click', (e) => {
-  if (e.target.classList.contains('btn-vote-tour')) {
-    const id = e.target.dataset.id;
-    const voterName = prompt('Nhập tên của bạn để bình chọn cho Tour này:', 'Thành viên nhóm');
-    if (!voterName) return;
-    const polls = getPolls().map(p => {
-      if (String(p.tourId) === String(id)) {
-        return { ...p, votes: p.votes + 1, voters: [...p.voters, voterName.trim()] };
+  const voteBtn = e.target.closest('.btn-vote-tour');
+  const deleteBtn = e.target.closest('.btn-delete-poll-tour');
+  const bookBtn = e.target.closest('.btn-book-poll');
+
+  if (voteBtn) {
+    const id = voteBtn.dataset.id;
+    const rooms = getAllPollRooms();
+    const code = getCurrentRoomCode();
+    const room = rooms[code];
+    if (!room) return;
+
+    const currentVoter = getActiveVoterName();
+    const tourPoll = room.tours.find(p => String(p.tourId) === String(id));
+    if (tourPoll) {
+      if (!Array.isArray(tourPoll.voters)) tourPoll.voters = [];
+      const voterIdx = tourPoll.voters.indexOf(currentVoter);
+      if (voterIdx >= 0) {
+        tourPoll.voters.splice(voterIdx, 1);
+      } else {
+        tourPoll.voters.push(currentVoter);
       }
-      return p;
-    });
-    localStorage.setItem('tourdulich_group_polls', JSON.stringify(polls));
-    renderGroupPolls();
+      if (!room.members.includes(currentVoter)) {
+        room.members.push(currentVoter);
+      }
+      saveAllPollRooms(rooms);
+      renderGroupPolls();
+    }
   }
-  if (e.target.classList.contains('btn-book-poll')) {
-    const id = e.target.dataset.id;
-    const tour = toursList.find(t => String(t.id) === String(id));
+
+  if (deleteBtn) {
+    const id = deleteBtn.dataset.id;
+    const rooms = getAllPollRooms();
+    const code = getCurrentRoomCode();
+    const room = rooms[code];
+    if (!room) return;
+
+    const tourPoll = room.tours.find(p => String(p.tourId) === String(id));
+    const tourName = tourPoll ? tourPoll.name : 'tour này';
+
+    if (confirm(`Bạn có chắc muốn xóa tour "${tourName}" khỏi danh sách bình chọn của nhóm "${room.name}"?`)) {
+      room.tours = room.tours.filter(p => String(p.tourId) !== String(id));
+      saveAllPollRooms(rooms);
+      renderGroupPolls();
+    }
+  }
+
+  if (bookBtn) {
+    const id = bookBtn.dataset.id;
+    const availableTours = (toursList && toursList.length > 0) ? toursList : defaultTours;
+    const tour = availableTours.find(t => String(t.id) === String(id));
     if (tour) {
       document.querySelector('#groupPollModal').classList.remove('show');
       openTourDetail(tour);
     }
   }
 });
+
+// Auto detect URL param ?poll_room= or ?poll_group=
+const checkPollRoomFromUrl = () => {
+  const params = new URLSearchParams(window.location.search);
+  const roomCode = params.get('poll_room') || params.get('poll_group');
+  if (roomCode) {
+    const cleanCode = roomCode.trim().toUpperCase();
+    const rooms = getAllPollRooms();
+    if (rooms[cleanCode]) {
+      setCurrentRoomCode(cleanCode);
+      const availableTours = (toursList && toursList.length > 0) ? toursList : defaultTours;
+      const select = document.querySelector('#pollTourSelect');
+      if (select) select.innerHTML = availableTours.map(t => `<option value="${t.id}">${t.name} (${formatCurrency(t.price)})</option>`).join('');
+      renderGroupPolls();
+      document.querySelector('#groupPollModal')?.classList.add('show');
+    }
+  }
+};
+checkPollRoomFromUrl();
+
 
 // ==========================================
 // 6. ĐỒNG HỒ FLASH SALE, SLIDE & TABS TÌM KIẾM

@@ -412,6 +412,7 @@
         <nav class="nav">
           <a href="/" class="nav-link">Trang chủ</a>
           <a href="trangtour.html" class="nav-link active">Tour</a>
+          <a href="/?poll_room=GD-2026" class="nav-link" style="color: #34d399; font-weight: 700;">🗳️ Bình chọn nhóm</a>
           <a href="tranggioithieu.html" class="nav-link">Giới thiệu</a>
           <a href="trangdonhang.html" class="nav-link">Đơn hàng</a>
           <a href="tranglienhe.html" class="nav-link">Liên hệ</a>
@@ -673,8 +674,6 @@
               <div class="reviews-section" id="reviewsSection">
                 <div class="reviews-header-wrap">
                   <h3 class="reviews-title">⭐ Đánh Giá & Nhận Xét Của Du Khách</h3>
-                  <a href="admin.html?tab=reviews-panel" class="admin-link-btn" target="_blank" title="Mở trang Quản trị để Duyệt, Ẩn hoặc Xóa các đánh giá">
-                    ⚙️ Quản lý đánh giá (Admin) ↗
                   </a>
                 </div>
 
@@ -773,6 +772,9 @@
 
                   <button type="submit" class="btn-book-now">Xác Nhận Đặt Tour Ngay</button>
                   <p style="text-align: center; font-size: 12px; color: #64748b; margin: 12px 0 0;">Cam kết bảo mật thông tin & Giữ giá tốt nhất.</p>
+                  <button type="button" id="btnAddCurrentTourToPoll" style="width:100%; margin-top:12px; background:#f0fdf4; border:1.5px solid #86efac; color:#065f46; font-weight:700; padding:11px; border-radius:10px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                    🗳️ Thêm vào Bình chọn Nhóm & Gia đình
+                  </button>
                 </form>
               </div>
             </div>
@@ -858,6 +860,41 @@
         // Initialize Reviews for this Tour
         renderTourReviews(tour);
         setupReviewForm(tour);
+
+        // Add to group poll
+        document.getElementById('btnAddCurrentTourToPoll')?.addEventListener('click', () => {
+          const POLL_ROOMS_KEY = 'tourdulich_poll_rooms';
+          const CURRENT_ROOM_KEY = 'tourdulich_current_poll_room';
+          let rooms = {};
+          try {
+            rooms = JSON.parse(localStorage.getItem(POLL_ROOMS_KEY) || '{}');
+          } catch(e) {}
+          let currentCode = localStorage.getItem(CURRENT_ROOM_KEY) || 'GD-2026';
+          if (!rooms[currentCode]) {
+            currentCode = Object.keys(rooms)[0] || 'GD-2026';
+          }
+          if (rooms[currentCode]) {
+            if (!rooms[currentCode].tours) rooms[currentCode].tours = [];
+            const exists = rooms[currentCode].tours.some(p => String(p.tourId) === String(tour.id) || p.name === tour.name);
+            if (exists) {
+              if (confirm(`Tour này đã có trong phòng bình chọn "${rooms[currentCode].name}" (Mã: ${currentCode})!\n\nBạn có muốn mở phòng bình chọn ngay bây giờ không?`)) {
+                window.location.href = `/?poll_room=${currentCode}`;
+              }
+              return;
+            }
+            const voterName = localStorage.getItem('tourdulich_voter_name') || 'Đức Huy';
+            rooms[currentCode].tours.push({
+              tourId: tour.id,
+              name: tour.name,
+              price: tour.price,
+              voters: [voterName]
+            });
+            localStorage.setItem(POLL_ROOMS_KEY, JSON.stringify(rooms));
+            if (confirm(`🎉 Đã thêm tour "${tour.name}" vào phòng bình chọn "${rooms[currentCode].name}" (Mã: ${currentCode})!\n\nBạn có muốn mở phòng bình chọn ngay để mời người thân cùng vote không?`)) {
+              window.location.href = `/?poll_room=${currentCode}`;
+            }
+          }
+        });
       }
 
       // Seed reviews if not present in localStorage
