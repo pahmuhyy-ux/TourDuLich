@@ -480,28 +480,45 @@ document.querySelector('#app').innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div>
             <label style="font-size:12px; color:#475569;">Người lớn (100% giá vé)</label>
-            <input type="number" id="guestCount" min="1" max="16" value="1" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; margin-top:4px;" required />
+            <input type="number" id="guestCount" min="1" max="99" value="1" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; margin-top:4px;" required />
           </div>
           <div>
             <label style="font-size:12px; color:#475569;">Trẻ em 5-10 tuổi (75% giá vé)</label>
-            <input type="number" id="childCount" min="0" max="15" value="0" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; margin-top:4px;" />
+            <input type="number" id="childCount" min="0" max="99" value="0" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; margin-top:4px;" />
           </div>
         </div>
         <span id="errCount" style="color: #ef4444; font-size: 12px; display: none; margin-top:6px;">Vượt quá số chỗ còn nhận!</span>
       </div>
 
-      <!-- SƠ ĐỒ CHỌN GHẾ NGỒI TRÊN XE LIMOUSINE 16 CHỖ (PHẦN 4) -->
-      <div style="background:#f0fdf4; padding:14px; border-radius:10px; border:1px solid #bbf7d0; margin-bottom:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <strong style="font-size:13px; color:#065f46;">🚌 Chọn ghế ngồi trên xe Limousine (<span id="seatPickCount">0/1</span> ghế)</strong>
-          <small style="color:#64748b;">Ghế đã chọn: <b id="selectedSeatsText" style="color:#ea580c;">Chưa chọn</b></small>
+            <!-- LỰA CHỌN PHƯƠNG TIỆN DI CHUYỂN & HƯỚNG DẪN VIÊN DU LỊCH -->
+      <div style="background: #f0fdf4; padding: 14px; border-radius: 12px; border: 1.5px solid #a7f3d0; margin-bottom: 14px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <!-- Cột 1: Lựa chọn Phương tiện di chuyển -->
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 13px; color: #065f46; margin-bottom: 6px;">
+              🚍 Phương tiện di chuyển (*)
+            </label>
+            <select id="travelVehicle" style="width: 100%; padding: 10px; border: 1px solid #86efac; border-radius: 8px; font-size: 13.5px; background: white; font-weight: 600; color: #0f172a;" required>
+              <option value="Ô tô du lịch Limousine VIP">🚌 Xe Limousine VIP / Ô tô đời mới</option>
+              <option value="Máy bay khứ hồi cao cấp">✈️ Vé máy bay khứ hồi (Bao gồm hành lý)</option>
+            </select>
+            <small style="color: #64748b; font-size: 11.5px; display: block; margin-top: 4px;">Đưa đón tận nơi toàn đoàn</small>
+          </div>
+
+          <!-- Cột 2: Chọn Hướng dẫn viên du lịch -->
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 13px; color: #065f46; margin-bottom: 6px;">
+              👨‍🏫 Chọn Hướng dẫn viên (HDV) (*)
+            </label>
+            <select id="tourGuideSelect" style="width: 100%; padding: 10px; border: 1px solid #86efac; border-radius: 8px; font-size: 13.5px; background: white; font-weight: 600; color: #0f172a;" required>
+              <option value="Nguyễn Văn Hùng (Chuyên tuyến 10 năm kinh nghiệm)">⭐ Nguyễn Văn Hùng (Chuyên tuyến 10 năm)</option>
+              <option value="Trần Thị Mai (Nhiệt tình, am hiểu văn hóa)">⭐ Trần Thị Mai (Nhiệt tình, chu đáo)</option>
+              <option value="Lê Hoàng Nam (Vui vẻ, chụp ảnh đẹp)">⭐ Lê Hoàng Nam (Vui vẻ, chụp ảnh đẹp)</option>
+              <option value="Đoàn tự động sắp xếp (HDV 5 sao)">🎯 Công ty tự động sắp xếp HDV 5 sao</option>
+            </select>
+            <small style="color: #64748b; font-size: 11.5px; display: block; margin-top: 4px;">HDV có thẻ quốc tế suốt tuyến</small>
+          </div>
         </div>
-        <div style="display:flex; gap:12px; font-size:11.5px; margin-bottom:10px; color:#475569;">
-          <span>⬜ Trống</span>
-          <span>🟧 Đang chọn</span>
-          <span>⬛ Đã có người đặt</span>
-        </div>
-        <div id="seatMapGrid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; max-width:340px; margin:0 auto; background:white; padding:12px; border-radius:10px; border:1px solid #cbd5e1;"></div>
       </div>
 
       <!-- DỊCH VỤ CỘNG THÊM -->
@@ -1533,7 +1550,7 @@ const getOccupiedSeats = (tourName, travelDate) => {
   return occupied;
 };
 
-const renderSeatMap = () => {
+const renderSeatMap = () => { return; 
   const grid = document.querySelector('#seatMapGrid');
   if (!grid) return;
   const tourName = selectedTourObj ? selectedTourObj.name : '';
@@ -1707,7 +1724,7 @@ document.querySelector('#bookingForm')?.addEventListener('submit', (e) => {
   if (name.length < 2) { document.querySelector('#errName').style.display = 'block'; isValid = false; }
   if (!/(84|0[3|5|7|8|9])+([0-9]{8})\b/g.test(phone)) { document.querySelector('#errPhone').style.display = 'block'; isValid = false; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { document.querySelector('#errEmail').style.display = 'block'; isValid = false; }
-  if (totalGuests < 1 || totalGuests > maxSlots) {
+  if (totalGuests < 1) {
     document.querySelector('#errCount').textContent = `Tổng số khách (${totalGuests}) vượt quá số chỗ còn lại (${maxSlots} chỗ)!`;
     document.querySelector('#errCount').style.display = 'block';
     isValid = false;
@@ -1717,10 +1734,7 @@ document.querySelector('#bookingForm')?.addEventListener('submit', (e) => {
 
   if (!isValid) return;
 
-  if (selectedSeats.length !== totalGuests) {
-    alert(`💺 Vui lòng chọn đủ ${totalGuests} ghế ngồi trên sơ đồ xe Limousine (Hiện tại bạn mới chọn ${selectedSeats.length} ghế)!`);
-    return;
-  }
+  // Bỏ kiểm tra ghế giới hạn 16 chỗ, cho phép đặt số lượng đoàn tùy ý
 
   const bookings = JSON.parse(localStorage.getItem('tourdulich_bookings') || '[]');
   const isDuplicate = bookings.some(b => 
@@ -1788,7 +1802,7 @@ document.querySelector('#bookingForm')?.addEventListener('submit', (e) => {
   notifs.unshift({
     id: 'nt-' + Date.now(),
     title: '🎉 Đặt chỗ thành công!',
-    message: `Đơn ${newBookingId} (${tourName}) với ghế [${selectedSeats.join(', ')}] đã được ghi nhận và đang chờ Admin xác nhận.`,
+    message: `Đơn ${newBookingId} (${tourName}) - Phương tiện: ${vehicle} | HDV: ${tourGuide} đã được ghi nhận thành công.`,
     time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
     read: false
   });
@@ -1797,7 +1811,7 @@ document.querySelector('#bookingForm')?.addEventListener('submit', (e) => {
 
   bookingModal.classList.remove('show');
   
-  if (confirm(`🎉 ĐẶT CHỖ THÀNH CÔNG (Mã đặt chỗ: ${newBookingId})\n- Số ghế Limousine: ${selectedSeats.join(', ')}\n- Tổng thanh toán: ${formatCurrency(finalTotal)}\n\nChuyển đến trang Đơn Đặt Chỗ để xem Vé điện tử E-Ticket & Công cụ Chia tiền nhóm?`)) {
+  if (confirm(`🎉 ĐẶT TOUR THÀNH CÔNG (Mã đơn: ${newBookingId})\n- Tour: ${tourName}\n- Số lượng khách: ${totalGuests} người (${adults} lớn, ${children} trẻ em)\n- Phương tiện: ${vehicle}\n- Hướng dẫn viên: ${tourGuide}\n- Tổng thanh toán: ${formatCurrency(finalTotal)}\n\nChuyển đến trang Đơn Đặt Chỗ để xem Vé điện tử E-Ticket & Công cụ Chia tiền nhóm?`)) {
     window.location.href = 'trangdonhang.html';
   }
 });

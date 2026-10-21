@@ -1420,6 +1420,11 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="text" id="bookingSearchInput" placeholder="Tìm theo mã đơn, họ tên khách, số điện thoại, tên tour..." />
             </div>
+            <select class="filter-select" id="bookingVehicleFilter">
+              <option value="all">Tất cả phương tiện</option>
+              <option value="Ô tô">🚌 Ô tô / Limousine</option>
+              <option value="Máy bay">✈️ Máy bay khứ hồi</option>
+            </select>
             <input type="date" class="filter-select" id="bookingDateFilter" title="Lọc theo ngày khởi hành" />
           </div>
 
@@ -1865,6 +1870,24 @@
               </select>
             </div>
 
+            <div class="form-group">
+              <label>Phương tiện di chuyển</label>
+              <select class="form-control" id="bkFieldVehicle">
+                <option value="Ô tô du lịch Limousine VIP">🚌 Xe Limousine VIP / Ô tô đời mới</option>
+                <option value="Máy bay khứ hồi cao cấp">✈️ Vé máy bay khứ hồi (Bao gồm hành lý)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Hướng dẫn viên phụ trách</label>
+              <select class="form-control" id="bkFieldTourGuide">
+                <option value="Nguyễn Văn Hùng (Chuyên tuyến 10 năm kinh nghiệm)">⭐ Nguyễn Văn Hùng (Chuyên tuyến 10 năm)</option>
+                <option value="Trần Thị Mai (Nhiệt tình, am hiểu văn hóa)">⭐ Trần Thị Mai (Nhiệt tình, chu đáo)</option>
+                <option value="Lê Hoàng Nam (Vui vẻ, chụp ảnh đẹp)">⭐ Lê Hoàng Nam (Vui vẻ, chụp ảnh đẹp)</option>
+                <option value="Đoàn tự động sắp xếp (HDV 5 sao)">🎯 Phân công HDV 5 sao</option>
+              </select>
+            </div>
+
             <div class="form-group col-full">
               <label>Phương thức thanh toán</label>
               <select class="form-control" id="bkFieldPaymentMethod">
@@ -2264,6 +2287,8 @@
           paymentMethod: 'Chuyển khoản',
           paymentStatus: 'Đã thanh toán',
           status: 'confirmed',
+          vehicle: 'Ô tô du lịch Limousine VIP',
+          tourGuide: 'Nguyễn Văn Hùng (Chuyên tuyến 10 năm kinh nghiệm)',
           notes: 'Yêu cầu phòng tầng 2 thoáng mát',
           createdAt: '2026-10-18T09:30:00Z'
         },
@@ -2280,6 +2305,8 @@
           paymentMethod: 'Chuyển khoản',
           paymentStatus: 'Đã cọc 50%',
           status: 'pending',
+          vehicle: 'Máy bay khứ hồi cao cấp',
+          tourGuide: 'Trần Thị Mai (Nhiệt tình, am hiểu văn hóa)',
           notes: 'Gia đình có 2 bé nhỏ, hỗ trợ xếp phòng liền kề',
           createdAt: '2026-10-19T14:15:00Z'
         },
@@ -2296,6 +2323,8 @@
           paymentMethod: 'Tiền mặt',
           paymentStatus: 'Đã thanh toán',
           status: 'paid',
+          vehicle: 'Máy bay khứ hồi cao cấp',
+          tourGuide: 'Lê Hoàng Nam (Vui vẻ, chụp ảnh đẹp)',
           notes: 'Đón tại Sân bay Đà Nẵng chuyến bay lúc 10h sáng',
           createdAt: '2026-10-19T16:45:00Z'
         },
@@ -2312,6 +2341,8 @@
           paymentMethod: 'VNPAY',
           paymentStatus: 'Đã thanh toán',
           status: 'confirmed',
+          vehicle: 'Máy bay khứ hồi cao cấp',
+          tourGuide: 'Nguyễn Văn Hùng (Chuyên tuyến 10 năm kinh nghiệm)',
           notes: 'Tour trăng mật kỷ niệm ngày cưới',
           createdAt: '2026-10-20T08:10:00Z'
         },
@@ -3072,12 +3103,15 @@
       document.getElementById('countBookingCompleted').textContent = bookings.filter(b => b.status === 'completed').length;
       document.getElementById('countBookingCancelled').textContent = bookings.filter(b => b.status === 'cancelled').length;
 
+      const vehicleFilter = document.getElementById('bookingVehicleFilter') ? document.getElementById('bookingVehicleFilter').value : 'all';
+
       const filtered = bookings.filter(b => {
-        const text = `${b.id} ${b.guestName} ${b.phone} ${b.email} ${b.tourName}`.toLowerCase();
+        const text = `${b.id} ${b.guestName} ${b.phone} ${b.email || ''} ${b.tourName} ${b.tourGuide || ''}`.toLowerCase();
         const matchesSearch = !searchKey || text.includes(searchKey);
         const matchesStatus = currentBookingStatusFilter === 'all' || b.status === currentBookingStatusFilter;
         const matchesDate = !dateFilter || b.travelDate === dateFilter;
-        return matchesSearch && matchesStatus && matchesDate;
+        const matchesVehicle = vehicleFilter === 'all' || (b.vehicle && b.vehicle.includes(vehicleFilter));
+        return matchesSearch && matchesStatus && matchesDate && matchesVehicle;
       });
 
       const tbody = document.getElementById('bookingsTableBody');
@@ -3107,6 +3141,12 @@
           <td>
             <div style="max-width:240px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${b.tourName}">${b.tourName}</div>
             <small style="color:#0284c7;">🗓 Khởi hành: ${formatDate(b.travelDate)}</small>
+            <div style="margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <span style="background:${b.vehicle && b.vehicle.includes('Máy bay') ? '#e0f2fe' : '#f0fdf4'}; color:${b.vehicle && b.vehicle.includes('Máy bay') ? '#0284c7' : '#059669'}; font-size:11px; font-weight:700; padding:1px 6px; border-radius:4px; border:1px solid ${b.vehicle && b.vehicle.includes('Máy bay') ? '#bae6fd' : '#bbf7d0'};">
+                ${b.vehicle && b.vehicle.includes('Máy bay') ? '✈️ Máy bay' : '🚌 Ô tô / Limousine'}
+              </span>
+              <small style="color:#475569;">HDV: <strong style="color:#0f172a;">${b.tourGuide ? b.tourGuide.split('(')[0].trim() : 'Sắp xếp 5 sao'}</strong></small>
+            </div>
           </td>
           <td><strong>${b.guestCount || 1}</strong> khách</td>
           <td>
@@ -3145,6 +3185,7 @@
 
     document.getElementById('bookingSearchInput').addEventListener('input', renderBookingsTable);
     document.getElementById('bookingDateFilter').addEventListener('change', renderBookingsTable);
+    document.getElementById('bookingVehicleFilter')?.addEventListener('change', renderBookingsTable);
 
     window.updateBookingStatus = (id, newStatus) => {
       const bookings = getBookings();
@@ -3198,6 +3239,8 @@
         document.getElementById('bkFieldTotalPrice').value = booking.totalPrice || 0;
         document.getElementById('bkFieldStatus').value = booking.status || 'pending';
         document.getElementById('bkFieldPaymentMethod').value = booking.paymentMethod || 'Chuyển khoản';
+        document.getElementById('bkFieldVehicle').value = booking.vehicle || 'Ô tô du lịch Limousine VIP';
+        document.getElementById('bkFieldTourGuide').value = booking.tourGuide || 'Nguyễn Văn Hùng (Chuyên tuyến 10 năm kinh nghiệm)';
         document.getElementById('bkFieldNotes').value = booking.notes || '';
       } else {
         document.getElementById('bookingModalHeading').textContent = 'Tạo Đơn Đặt Tour Mới';
@@ -3223,6 +3266,8 @@
       const totalPrice = Number(document.getElementById('bkFieldTotalPrice').value);
       const status = document.getElementById('bkFieldStatus').value;
       const paymentMethod = document.getElementById('bkFieldPaymentMethod').value;
+      const vehicle = document.getElementById('bkFieldVehicle').value;
+      const tourGuide = document.getElementById('bkFieldTourGuide').value;
       const notes = document.getElementById('bkFieldNotes').value.trim();
 
       if (!guestName || !phone || !tourName || !travelDate || !totalPrice) {
@@ -3242,6 +3287,8 @@
         status,
         paymentMethod,
         paymentStatus: status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán',
+        vehicle,
+        tourGuide,
         notes,
         createdAt: new Date().toISOString()
       };
@@ -3309,6 +3356,8 @@
           <div>
             <h4 style="margin: 0 0 8px; color: #0f172a; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;">Thông Tin Dịch Vụ & Thanh Toán</h4>
             <div style="color: #475569;">Ngày khởi hành: <strong>${formatDate(b.travelDate)}</strong></div>
+            <div style="color: #475569;">Phương tiện: <strong style="color: #0d7a5f;">${b.vehicle || 'Ô tô du lịch Limousine VIP'}</strong></div>
+            <div style="color: #475569;">Hướng dẫn viên: <strong>${b.tourGuide || 'Công ty phân công HDV 5 sao'}</strong></div>
             <div style="color: #475569;">Phương thức: ${b.paymentMethod || 'Chuyển khoản'}</div>
             <div style="color: #475569;">Trạng thái: <strong style="color: #0d7a5f;">${b.status === 'confirmed' ? 'Đã xác nhận' : b.status === 'paid' ? 'Đã thanh toán đủ' : 'Chờ xác nhận'}</strong></div>
             <div style="color: #475569;">Ghi chú: ${b.notes || 'Không có ghi chú'}</div>

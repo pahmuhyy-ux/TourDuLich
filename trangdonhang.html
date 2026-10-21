@@ -146,7 +146,7 @@
               <th>Mã đơn</th>
               <th>Khách hàng</th>
               <th>Tour du lịch</th>
-              <th>Ngày đi & Ghế xe</th>
+              <th>Ngày đi & Phương tiện / HDV</th>
               <th>Số khách</th>
               <th>Tổng tiền</th>
               <th>Trạng thái</th>
@@ -351,7 +351,8 @@
               </td>
               <td>
                 📅 ${b.travelDate || '---'}<br>
-                <small style="color:#0d7a5f; font-weight:bold;">💺 Ghế: ${seatsStr}</small>
+                <small style="color:#0d7a5f; font-weight:bold;">${b.vehicle && b.vehicle.includes('Máy bay') ? '✈️ Máy bay khứ hồi' : '🚌 Ô tô Limousine VIP'}</small><br>
+                <small style="color:#475569;">HDV: <b>${b.tourGuide ? b.tourGuide.split('(')[0].trim() : 'Sắp xếp tự động'}</b></small>
               </td>
               <td><strong>${b.guestCount || 1}</strong> người</td>
               <td><strong style="color: #ea580c; font-size: 15px;">${formatCurrency(b.totalPrice)}</strong></td>
@@ -419,7 +420,8 @@
                   <div><span style="color:#64748b; font-size:12px; display:block;">HÀNH KHÁCH ĐẠI DIỆN</span><strong>${b.guestName}</strong></div>
                   <div><span style="color:#64748b; font-size:12px; display:block;">SỐ ĐIỆN THOẠI</span><strong>${b.phone}</strong></div>
                   <div><span style="color:#64748b; font-size:12px; display:block;">NGÀY KHỞI HÀNH</span><strong style="color:#0d7a5f;">📅 ${b.travelDate}</strong></div>
-                  <div><span style="color:#64748b; font-size:12px; display:block;">GHẾ NGỒI LIMOUSINE</span><strong style="color:#ea580c;">💺 ${seatsStr} (${b.guestCount || 1} khách)</strong></div>
+                  <div><span style="color:#64748b; font-size:12px; display:block;">PHƯƠNG TIỆN DI CHUYỂN</span><strong style="color:#0284c7;">${b.vehicle || 'Ô tô du lịch Limousine VIP'}</strong></div>
+                  <div style="grid-column: span 2;"><span style="color:#64748b; font-size:12px; display:block;">HƯỚNG DẪN VIÊN PHỤ TRÁCH</span><strong style="color:#ea580c;">👨‍🏫 ${b.tourGuide || 'Công ty sắp xếp HDV 5 sao'}</strong></div>
                 </div>
                 <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px;">
                   <div style="font-weight:bold; color:#0284c7; margin-bottom:4px;">🚌 THÔNG TIN ĐÓN ĐOÀN (CHẶNG 1):</div>
@@ -429,7 +431,7 @@
                 </div>
               </div>
               <div class="eticket-qr">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=ETICKET-${b.id}-SEATS-${seatsStr}" alt="QR Ticket" style="margin:0 auto 8px; width: 140px; height: 140px; display: block;" />
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=ETICKET-${b.id}" alt="QR Ticket" style="margin:0 auto 8px; width: 140px; height: 140px; display: block;" />
                 <div style="font-size:12px; color:#64748b;">Đưa mã QR này cho Hướng dẫn viên khi lên xe</div>
                 <div style="margin-top:8px; font-weight:bold; font-size:13px; color:${b.status === 'confirmed' || b.status === 'paid' ? '#15803d' : '#d97706'};">
                   ${b.status === 'confirmed' || b.status === 'paid' ? '✅ VÉ HỢP LỆ' : '⏳ CHỜ XÁC NHẬN'}

@@ -761,6 +761,22 @@
                     <input type="number" id="custChildQty" min="0" max="20" value="0" />
                   </div>
                   <div class="form-row">
+                    <label>Phương tiện di chuyển (*)</label>
+                    <select id="custVehicle" required>
+                      <option value="Ô tô du lịch Limousine VIP">🚌 Xe Limousine VIP / Ô tô đời mới</option>
+                      <option value="Máy bay khứ hồi cao cấp">✈️ Vé máy bay khứ hồi (Bao gồm hành lý)</option>
+                    </select>
+                  </div>
+                  <div class="form-row">
+                    <label>Hướng dẫn viên đồng hành (*)</label>
+                    <select id="custTourGuide" required>
+                      <option value="Nguyễn Văn Hùng (Chuyên tuyến 10 năm kinh nghiệm)">⭐ Nguyễn Văn Hùng (Chuyên tuyến 10 năm)</option>
+                      <option value="Trần Thị Mai (Nhiệt tình, am hiểu văn hóa)">⭐ Trần Thị Mai (Nhiệt tình, chu đáo)</option>
+                      <option value="Lê Hoàng Nam (Vui vẻ, chụp ảnh đẹp)">⭐ Lê Hoàng Nam (Vui vẻ, chụp ảnh đẹp)</option>
+                      <option value="Đoàn tự động sắp xếp (HDV 5 sao)">🎯 Công ty tự động sắp xếp HDV 5 sao</option>
+                    </select>
+                  </div>
+                  <div class="form-row">
                     <label>Mã giảm giá (nếu có)</label>
                     <input type="text" id="custPromo" placeholder="Nhập mã: HE2026, VIPTOUR, SUMMER300..." style="text-transform: uppercase;" />
                   </div>
@@ -798,6 +814,8 @@
           const children = Math.max(0, parseInt(childQtyInput.value) || 0);
           let total = (adults * tour.price) + (children * Math.round(tour.price * 0.75));
           const promo = document.getElementById('custPromo').value.trim().toUpperCase();
+          const vehicle = document.getElementById('custVehicle').value;
+          const tourGuide = document.getElementById('custTourGuide').value;
           if (promo === 'HE2026') total = Math.max(0, total - 500000);
           else if (promo === 'VIPTOUR') total = Math.max(0, total - 1000000);
           else if (promo === 'SUMMER300') total = Math.max(0, total - 300000);
@@ -839,6 +857,8 @@
             guestCount: adults + children,
             adultCount: adults,
             childCount: children,
+            vehicle: vehicle,
+            tourGuide: tourGuide,
             tourName: tour.name,
             travelDate: date,
             totalPrice: finalTotal,
@@ -853,7 +873,7 @@
 
           localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings));
 
-          alert(`🎉 ĐẶT TOUR THÀNH CÔNG!\n\nCảm ơn Quý khách ${name}!\nMã đơn của bạn: #${newBookingId}\nTour: ${tour.name}\nSố khách: ${adults + children} người (${adults} lớn, ${children} trẻ em)\nTổng thanh toán: ${formatCurrency(finalTotal)}\n\nĐơn hàng đã được lưu. Chuyển sang trang "Đơn hàng" để kiểm tra và xem Vé điện tử E-Ticket!`);
+          alert(`🎉 ĐẶT TOUR THÀNH CÔNG!\n\nCảm ơn Quý khách ${name}!\nMã đơn của bạn: #${newBookingId}\nTour: ${tour.name}\nSố khách: ${adults + children} người (${adults} lớn, ${children} trẻ em)\nPhương tiện: ${vehicle}\nHướng dẫn viên: ${tourGuide}\nTổng thanh toán: ${formatCurrency(finalTotal)}\n\nĐơn hàng đã được lưu. Chuyển sang trang "Đơn hàng" để kiểm tra và xem Vé điện tử E-Ticket!`);
           window.location.href = 'trangdonhang.html';
         });
 
