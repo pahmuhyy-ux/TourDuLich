@@ -763,8 +763,8 @@
                   <div class="form-row">
                     <label>Phương tiện di chuyển (*)</label>
                     <select id="custVehicle" required>
-                      <option value="Ô tô du lịch Limousine VIP">🚌 Xe Limousine VIP / Ô tô đời mới</option>
-                      <option value="Máy bay khứ hồi cao cấp">✈️ Vé máy bay khứ hồi (Bao gồm hành lý)</option>
+                      <option value="Ô tô du lịch Limousine VIP">🚌 Xe Limousine VIP / Ô tô đời mới (Tiêu chuẩn)</option>
+                      <option value="Máy bay khứ hồi cao cấp">✈️ Vé máy bay khứ hồi (+1.200.000đ/khách)</option>
                     </select>
                   </div>
                   <div class="form-row">
@@ -812,20 +812,23 @@
         const updateTotal = () => {
           const adults = Math.max(1, parseInt(qtyInput.value) || 1);
           const children = Math.max(0, parseInt(childQtyInput.value) || 0);
-          let total = (adults * tour.price) + (children * Math.round(tour.price * 0.75));
+          const vehicle = document.getElementById('custVehicle') ? document.getElementById('custVehicle').value : 'Ô tô du lịch Limousine VIP';
+          const isPlane = vehicle.includes('Máy bay');
+          const planeSurcharge = isPlane ? (adults * 1200000 + children * 900000) : 0;
+          let total = (adults * tour.price) + (children * Math.round(tour.price * 0.75)) + planeSurcharge;
           const promo = document.getElementById('custPromo').value.trim().toUpperCase();
-          const vehicle = document.getElementById('custVehicle').value;
-          const tourGuide = document.getElementById('custTourGuide').value;
           if (promo === 'HE2026') total = Math.max(0, total - 500000);
           else if (promo === 'VIPTOUR') total = Math.max(0, total - 1000000);
           else if (promo === 'SUMMER300') total = Math.max(0, total - 300000);
 
-          totalDisplay.textContent = formatCurrency(total);
+          totalDisplay.innerHTML = `${formatCurrency(total)}${isPlane ? ` <div style="font-size:12px; font-weight:normal; color:#0284c7; margin-top:4px;">(Đã gồm phụ thu vé máy bay: +${formatCurrency(planeSurcharge)})</div>` : ''}`;
         };
 
         qtyInput.addEventListener('input', updateTotal);
         childQtyInput.addEventListener('input', updateTotal);
         document.getElementById('custPromo').addEventListener('input', updateTotal);
+        document.getElementById('custVehicle').addEventListener('change', updateTotal);
+        updateTotal();
 
         // Submit form
         document.getElementById('bookTourForm').addEventListener('submit', (e) => {
@@ -838,7 +841,11 @@
           const children = parseInt(document.getElementById('custChildQty').value) || 0;
           const promo = document.getElementById('custPromo').value.trim().toUpperCase();
 
-          let finalTotal = (adults * tour.price) + (children * Math.round(tour.price * 0.75));
+          const vehicle = document.getElementById('custVehicle') ? document.getElementById('custVehicle').value : 'Ô tô du lịch Limousine VIP';
+          const tourGuide = document.getElementById('custTourGuide') ? document.getElementById('custTourGuide').value : 'Đoàn tự động sắp xếp (HDV 5 sao)';
+          const isPlane = vehicle.includes('Máy bay');
+          const planeSurcharge = isPlane ? (adults * 1200000 + children * 900000) : 0;
+          let finalTotal = (adults * tour.price) + (children * Math.round(tour.price * 0.75)) + planeSurcharge;
           if (promo === 'HE2026') finalTotal = Math.max(0, finalTotal - 500000);
           else if (promo === 'VIPTOUR') finalTotal = Math.max(0, finalTotal - 1000000);
           else if (promo === 'SUMMER300') finalTotal = Math.max(0, finalTotal - 300000);

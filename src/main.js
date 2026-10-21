@@ -499,8 +499,8 @@ document.querySelector('#app').innerHTML = `
               🚍 Phương tiện di chuyển (*)
             </label>
             <select id="travelVehicle" style="width: 100%; padding: 10px; border: 1px solid #86efac; border-radius: 8px; font-size: 13.5px; background: white; font-weight: 600; color: #0f172a;" required>
-              <option value="Ô tô du lịch Limousine VIP">🚌 Xe Limousine VIP / Ô tô đời mới</option>
-              <option value="Máy bay khứ hồi cao cấp">✈️ Vé máy bay khứ hồi (Bao gồm hành lý)</option>
+              <option value="Ô tô du lịch Limousine VIP">🚌 Xe Limousine VIP / Ô tô đời mới (Tiêu chuẩn)</option>
+              <option value="Máy bay khứ hồi cao cấp">✈️ Vé máy bay khứ hồi (+1.200.000đ/khách)</option>
             </select>
             <small style="color: #64748b; font-size: 11.5px; display: block; margin-top: 4px;">Đưa đón tận nơi toàn đoàn</small>
           </div>
@@ -1614,24 +1614,32 @@ const calculateBreakdown = () => {
     addonNames.push(chk.dataset.name);
   });
 
-  const subTotal = adultTotal + childTotal + addonTotal;
+  const vehicleSelect = document.querySelector('#travelVehicle');
+  const travelVehicle = vehicleSelect ? vehicleSelect.value : 'Ô tô du lịch Limousine VIP';
+  const isPlane = travelVehicle.includes('Máy bay');
+  const planeSurcharge = isPlane ? (adults * 1200000 + children * 900000) : 0;
+
+  const subTotal = adultTotal + childTotal + addonTotal + planeSurcharge;
   const selectDiscount = promoCodeSelect && promoCodeSelect.value !== '0' ? parseInt(promoCodeSelect.value) : 0; 
   const finalDiscount = selectDiscount > 0 ? selectDiscount : manualDiscountAmount; 
   const finalTotal = Math.max(0, subTotal - finalDiscount);
 
   let breakdownHtml = `<div>• Người lớn (${adults} x ${formatCurrency(currentTourPrice)}): <strong>${formatCurrency(adultTotal)}</strong></div>`;
   if (children > 0) breakdownHtml += `<div>• Trẻ em (${children} x ${formatCurrency(childPrice)}): <strong>${formatCurrency(childTotal)}</strong></div>`;
+  if (isPlane) breakdownHtml += `<div style="color:#0284c7;">• Phụ thu vé máy bay khứ hồi (${adults} lớn${children > 0 ? ` + ${children} trẻ em` : ''}): <strong>+${formatCurrency(planeSurcharge)}</strong></div>`;
   if (addonTotal > 0) breakdownHtml += `<div>• Dịch vụ cộng thêm (${addonNames.join(', ')}): <strong>+${formatCurrency(addonTotal)}</strong></div>`;
   if (finalDiscount > 0) breakdownHtml += `<div style="color:#10b981;">• Giảm giá Voucher / Affiliate: <strong>-${formatCurrency(finalDiscount)}</strong></div>`;
 
   document.querySelector('#priceBreakdown').innerHTML = breakdownHtml;
   document.querySelector('#totalPriceDisplay').innerHTML = `<strong style="font-size: 22px; color: #ea580c;">${formatCurrency(finalTotal)}</strong>`;
   renderSeatMap();
-  return { adults, children, totalGuests: adults + children, finalTotal, addonNames, finalDiscount };
+  return { adults, children, totalGuests: adults + children, finalTotal, addonNames, finalDiscount, planeSurcharge, vehicle: travelVehicle, tourGuide: document.querySelector('#tourGuideSelect')?.value || 'Đoàn tự động sắp xếp (HDV 5 sao)' };
 };
 
 guestCountInput?.addEventListener('input', calculateBreakdown);
 childCountInput?.addEventListener('input', calculateBreakdown);
+document.querySelector('#travelVehicle')?.addEventListener('change', calculateBreakdown);
+document.querySelector('#tourGuideSelect')?.addEventListener('change', calculateBreakdown);
 document.querySelector('#departureDate')?.addEventListener('change', renderSeatMap);
 document.querySelectorAll('.addon-check').forEach(chk => chk.addEventListener('change', calculateBreakdown));
 
@@ -1716,6 +1724,8 @@ document.querySelector('#bookingForm')?.addEventListener('submit', (e) => {
   const date = document.querySelector('#departureDate').value;
   const note = document.querySelector('#guestHealthNote').value.trim();
   const tourName = selectedTourObj ? selectedTourObj.name : document.querySelector('#bookingTourName').textContent;
+  const vehicle = document.querySelector('#travelVehicle')?.value || 'Ô tô du lịch Limousine VIP';
+  const tourGuide = document.querySelector('#tourGuideSelect')?.value || 'Đoàn tự động sắp xếp (HDV 5 sao)';
   const { adults, children, totalGuests, finalTotal, addonNames } = calculateBreakdown();
   const maxSlots = selectedTourObj && typeof selectedTourObj.slots === 'number' ? selectedTourObj.slots : 20;
 
@@ -1785,6 +1795,8 @@ document.querySelector('#bookingForm')?.addEventListener('submit', (e) => {
     guestCount: totalGuests,
     adultCount: adults,
     childCount: children,
+    vehicle: vehicle,
+    tourGuide: tourGuide,
     seats: [...selectedSeats],
     note: combinedNote,
     tourName: tourName,
