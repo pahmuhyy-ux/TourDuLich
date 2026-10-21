@@ -61,19 +61,25 @@ const fetchTours = async () => {
   } catch (error) {
     fetchedData = [...defaultTours];
   }
-  const adminTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
-  const adminIds = new Set(adminTours.map(t => String(t.id)));
-  
-  const combined = [...adminTours, ...fetchedData.filter(t => !adminIds.has(String(t.id)))].map((t, index) => ({
-    ...t,
-    slots: typeof t.slots === 'number' ? t.slots : (12 - (index % 5)),
-    rating: t.rating || (4.7 + (index % 3) * 0.1).toFixed(1),
-    reviews: t.reviews || (50 + index * 23),
-    stages: (Array.isArray(t.stages) && t.stages.length === 3) ? t.stages : getDefaultStagesForTour(t.name)
-  }));
-
-  toursList = combined;
-  localStorage.setItem('tourdulich_tours', JSON.stringify(toursList));
+  const rawStored = localStorage.getItem('tourdulich_tours');
+  if (rawStored !== null) {
+    try {
+      toursList = JSON.parse(rawStored);
+    } catch (e) {
+      toursList = [];
+    }
+  } else {
+    // Chỉ khởi tạo dữ liệu mẫu lần đầu tiên khi chưa có dữ liệu trong máy
+    const initialTours = fetchedData.map((t, index) => ({
+      ...t,
+      slots: typeof t.slots === 'number' ? t.slots : (12 - (index % 5)),
+      rating: t.rating || (4.7 + (index % 3) * 0.1).toFixed(1),
+      reviews: t.reviews || (50 + index * 23),
+      stages: (Array.isArray(t.stages) && t.stages.length === 3) ? t.stages : getDefaultStagesForTour(t.name)
+    }));
+    toursList = initialTours;
+    localStorage.setItem('tourdulich_tours', JSON.stringify(toursList));
+  }
   renderTourCards(toursList);
   renderStories();
 }

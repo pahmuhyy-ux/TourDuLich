@@ -2965,7 +2965,7 @@
       };
 
       const tours = getTours();
-      const idx = tours.findIndex(t => t.id === id);
+      const idx = tours.findIndex(t => String(t.id) === String(id));
       if (idx >= 0) {
         tours[idx] = tourPayload;
         showToast(`Đã cập nhật tour "${name}" thành công!`);
@@ -2981,12 +2981,12 @@
     });
 
     window.editTour = (id) => {
-      const tour = getTours().find(t => t.id === id);
+      const tour = getTours().find(t => String(t.id) === String(id));
       if (tour) openTourModal(tour);
     };
 
     window.duplicateTour = (id) => {
-      const tour = getTours().find(t => t.id === id);
+      const tour = getTours().find(t => String(t.id) === String(id));
       if (!tour) return;
       const copy = {
         ...tour,
@@ -3005,17 +3005,29 @@
 
     let pendingDeleteAction = null;
     window.confirmDeleteTour = (id) => {
-      const tour = getTours().find(t => t.id === id);
-      if (!tour) return;
-      document.getElementById('deleteConfirmMessage').innerHTML = `Bạn có chắc chắn muốn xóa tour <strong>"${tour.name}"</strong> không?`;
+      const tour = getTours().find(t => String(t.id) === String(id));
+      if (!tour) {
+        // Fallback: direct delete if tour metadata not found
+        const next = getTours().filter(t => String(t.id) !== String(id));
+        setTours(next);
+        showToast('Đã xóa tour khỏi hệ thống!');
+        renderToursTable();
+        renderDashboard();
+        return;
+      }
+      document.getElementById('deleteConfirmMessage').innerHTML = `Bạn có chắc chắn muốn xóa tour <strong>"${tour.name}"</strong> không? Thao tác này sẽ xóa tour vĩnh viễn khỏi danh sách.`;
       pendingDeleteAction = () => {
-        const next = getTours().filter(t => t.id !== id);
+        const next = getTours().filter(t => String(t.id) !== String(id));
         setTours(next);
         showToast('Đã xóa tour thành công!');
         renderToursTable();
         renderDashboard();
       };
       openModal('deleteConfirmModal');
+    };
+
+    window.deleteTour = (id) => {
+      window.confirmDeleteTour(id);
     };
 
     document.getElementById('btnConfirmDeleteAction').addEventListener('click', () => {
@@ -3131,7 +3143,7 @@
 
     window.updateBookingStatus = (id, newStatus) => {
       const bookings = getBookings();
-      const match = bookings.find(b => b.id === id);
+      const match = bookings.find(b => String(b.id) === String(id));
       if (match) {
         match.status = newStatus;
         setBookings(bookings);
@@ -3230,7 +3242,7 @@
       };
 
       const bookings = getBookings();
-      const idx = bookings.findIndex(b => b.id === id);
+      const idx = bookings.findIndex(b => String(b.id) === String(id));
       if (idx >= 0) {
         bookings[idx] = { ...bookings[idx], ...payload };
         showToast(`Đã cập nhật đơn #${id} thành công!`);
@@ -3246,14 +3258,14 @@
     });
 
     window.editBooking = (id) => {
-      const b = getBookings().find(x => x.id === id);
+      const b = getBookings().find(x => String(x.id) === String(id));
       if (b) openBookingModal(b);
     };
 
     window.confirmDeleteBooking = (id) => {
       document.getElementById('deleteConfirmMessage').innerHTML = `Bạn có chắc chắn muốn xóa đơn đặt tour <strong>#${id}</strong> không?`;
       pendingDeleteAction = () => {
-        const next = getBookings().filter(b => b.id !== id);
+        const next = getBookings().filter(b => String(b.id) !== String(id));
         setBookings(next);
         showToast(`Đã xóa đơn #${id} thành công!`);
         renderBookingsTable();
@@ -3555,7 +3567,7 @@
     window.deleteVoucher = (code) => {
       document.getElementById('deleteConfirmMessage').innerHTML = `Bạn có chắc muốn xóa mã giảm giá <strong>${code}</strong>?`;
       pendingDeleteAction = () => {
-        const next = getVouchers().filter(v => v.code !== code);
+        const next = getVouchers().filter(v => String(v.code) !== String(code));
         setVouchers(next);
         showToast(`Đã xóa mã voucher ${code}!`);
         renderVouchersTable();
@@ -3668,7 +3680,7 @@
     window.deleteContact = (id) => {
       document.getElementById('deleteConfirmMessage').innerHTML = 'Bạn có chắc chắn muốn xóa tin nhắn này không?';
       pendingDeleteAction = () => {
-        const next = getContacts().filter(c => c.id !== id);
+        const next = getContacts().filter(c => String(c.id) !== String(id));
         setContacts(next);
         showToast('Đã xóa tin nhắn liên hệ!');
         renderContactsTable();
@@ -3737,7 +3749,7 @@
     window.deleteReview = (id) => {
       document.getElementById('deleteConfirmMessage').innerHTML = 'Bạn có chắc muốn xóa nhận xét đánh giá này?';
       pendingDeleteAction = () => {
-        const next = getReviews().filter(x => x.id !== id);
+        const next = getReviews().filter(x => String(x.id) !== String(id));
         setReviews(next);
         showToast('Đã xóa đánh giá thành công!');
         renderReviewsTable();
