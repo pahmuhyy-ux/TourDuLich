@@ -1164,6 +1164,7 @@
         <button class="nav-item" data-target="reviews-panel">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           Đánh giá (Reviews)
+          <span class="nav-badge" id="badgeReviewCount">0</span>
         </button>
       </li>
       <li>
@@ -2370,9 +2371,10 @@
         }
       ],
       reviews: [
-        { id: 'rv-1', guestName: 'Nguyễn Văn An', tourName: 'Hạ Long 3N2Đ – Du Thuyền 5 Sao', rating: 5, comment: 'Chuyến đi tuyệt vời! Du thuyền sang trọng, ngắm hoàng hôn vịnh Hạ Long siêu đẹp.', date: '2026-10-16', status: 'approved' },
-        { id: 'rv-2', guestName: 'Hoàng Thùy Linh', tourName: 'Đà Nẵng – Bà Nà Hills – Phố Cổ Hội An', rating: 5, comment: 'Khách sạn sạch sẽ gần biển, HDV chụp ảnh có tâm. Rất đáng tiền!', date: '2026-10-15', status: 'approved' },
-        { id: 'rv-3', guestName: 'Đặng Quốc Huy', tourName: 'Sapa – Chinh Phục Đỉnh Fansipan – Bản Cát Cát', rating: 4, comment: 'Lịch trình hợp lý, săn được biển mây Fansipan tuyệt đẹp, chỉ có đường lên đỉnh hơi lạnh.', date: '2026-10-14', status: 'approved' }
+        { id: 'rv-1', tourId: 'tour-halong', guestName: 'Nguyễn Văn An', tourName: 'Hạ Long 3N2Đ – Du Thuyền 5 Sao', rating: 5, comment: 'Chuyến đi tuyệt vời! Du thuyền sang trọng, ngắm hoàng hôn vịnh Hạ Long siêu đẹp.', date: '2026-10-16', status: 'approved' },
+        { id: 'rv-2', tourId: 'tour-danang', guestName: 'Hoàng Thùy Linh', tourName: 'Đà Nẵng – Bà Nà Hills – Phố Cổ Hội An', rating: 5, comment: 'Khách sạn sạch sẽ gần biển, HDV chụp ảnh có tâm. Rất đáng tiền!', date: '2026-10-15', status: 'approved' },
+        { id: 'rv-3', tourId: 'tour-sapa', guestName: 'Đặng Quốc Huy', tourName: 'Sapa – Chinh Phục Đỉnh Fansipan – Bản Cát Cát', rating: 4, comment: 'Lịch trình hợp lý, săn được biển mây Fansipan tuyệt đẹp, chỉ có đường lên đỉnh hơi lạnh.', date: '2026-10-14', status: 'approved' },
+        { id: 'rv-4', tourId: 'tour-phuquoc', guestName: 'Vũ Minh Trang', tourName: 'Phú Quốc – Thiên Đường Nghỉ Dưỡng Grand World', rating: 5, comment: 'Resort hồ bơi vô cực ngắm hoàng hôn tuyệt đỉnh. Đồ ăn hải sản tươi ngon phong phú.', date: '2026-10-12', status: 'approved' }
       ]
     };
 
@@ -2562,6 +2564,7 @@
       const tours = getTours();
       const bookings = getBookings();
       const contacts = getContacts();
+      const reviews = getReviews();
 
       // Badges
       const pendingBookings = bookings.filter(b => b.status === 'pending').length;
@@ -2570,6 +2573,8 @@
       document.getElementById('badgeTourCount').textContent = tours.length;
       document.getElementById('badgePendingBookings').textContent = pendingBookings;
       document.getElementById('badgeUnreadContacts').textContent = unreadContacts;
+      const badgeReviewCount = document.getElementById('badgeReviewCount');
+      if (badgeReviewCount) badgeReviewCount.textContent = reviews.length;
 
       // KPIs
       const totalRevenue = bookings
@@ -3694,6 +3699,9 @@
        ======================================================== */
     function renderReviewsTable() {
       const reviews = getReviews();
+      const badge = document.getElementById('badgeReviewCount');
+      if (badge) badge.textContent = reviews.length;
+
       const searchKey = document.getElementById('reviewSearchInput').value.trim().toLowerCase();
       const starFilter = document.getElementById('reviewStarFilter').value;
 
@@ -3706,26 +3714,34 @@
 
       const tbody = document.getElementById('reviewsTableBody');
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Chưa có đánh giá nào.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Chưa có đánh giá nào phù hợp.</td></tr>';
         return;
       }
 
       tbody.innerHTML = filtered.map(r => `
         <tr>
-          <td><strong>${r.guestName}</strong></td>
-          <td><strong style="color:var(--primary);">${r.tourName}</strong></td>
+          <td>
+            <strong>${r.guestName}</strong>
+          </td>
+          <td>
+            <a href="tourdetail.html?id=${encodeURIComponent(r.tourId || '')}" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:none;" title="Xem tour trên trang chi tiết">
+              ${r.tourName} ↗
+            </a>
+          </td>
           <td style="color:#f59e0b; font-size:1.05rem;">${'⭐'.repeat(r.rating || 5)}</td>
-          <td><div style="max-width: 300px; color:#475569;">"${r.comment}"</div></td>
+          <td><div style="max-width: 320px; color:#475569; line-height:1.5;">"${r.comment}"</div></td>
           <td>${formatDate(r.date)}</td>
           <td>
             <span class="status-badge ${r.status === 'approved' ? 'status-open' : 'status-pending'}">
-              ${r.status === 'approved' ? 'Đã duyệt hiển thị' : 'Chờ duyệt'}
+              ${r.status === 'approved' ? 'Đã duyệt hiển thị' : 'Đã ẩn (Chờ duyệt)'}
             </span>
           </td>
           <td style="text-align: right;">
             <div class="action-btns" style="justify-content: flex-end;">
-              <button class="btn-action edit" onclick="toggleReviewStatus('${r.id}')">${r.status === 'approved' ? 'Ẩn' : 'Duyệt'}</button>
-              <button class="btn-action delete" onclick="deleteReview('${r.id}')">Xóa</button>
+              <button class="btn-action edit" onclick="toggleReviewStatus('${r.id}')" title="${r.status === 'approved' ? 'Ẩn đánh giá khỏi trang web' : 'Duyệt hiển thị đánh giá lên trang web'}">
+                ${r.status === 'approved' ? 'Ẩn' : 'Duyệt'}
+              </button>
+              <button class="btn-action delete" onclick="deleteReview('${r.id}')" title="Xóa đánh giá vĩnh viễn">Xóa</button>
             </div>
           </td>
         </tr>
@@ -3737,17 +3753,20 @@
 
     window.toggleReviewStatus = (id) => {
       const all = getReviews();
-      const r = all.find(x => x.id === id);
+      const r = all.find(x => String(x.id) === String(id));
       if (r) {
-        r.status = r.status === 'approved' ? 'pending' : 'approved';
+        const wasApproved = r.status === 'approved';
+        r.status = wasApproved ? 'pending' : 'approved';
         setReviews(all);
-        showToast(`Đã thay đổi trạng thái review của ${r.guestName}!`);
+        showToast(r.status === 'approved' 
+          ? `Đã duyệt hiển thị đánh giá của khách ${r.guestName}!` 
+          : `Đã ẩn đánh giá của khách ${r.guestName} khỏi trang chi tiết!`);
         renderReviewsTable();
       }
     };
 
     window.deleteReview = (id) => {
-      document.getElementById('deleteConfirmMessage').innerHTML = 'Bạn có chắc muốn xóa nhận xét đánh giá này?';
+      document.getElementById('deleteConfirmMessage').innerHTML = 'Bạn có chắc chắn muốn xóa nhận xét đánh giá này vĩnh viễn không? Thao tác này không thể hoàn tác.';
       pendingDeleteAction = () => {
         const next = getReviews().filter(x => String(x.id) !== String(id));
         setReviews(next);
@@ -3853,6 +3872,20 @@
     renderDashboard();
     renderToursTable();
     renderBookingsTable();
+
+    // Check if deep linked from tourdetail or other pages
+    const hashPanel = window.location.hash ? window.location.hash.replace('#', '') : null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryPanel = urlParams.get('tab');
+    const storedPanel = localStorage.getItem('admin_target_tab');
+    const targetPanel = (hashPanel && panelTitles[hashPanel]) 
+      ? hashPanel 
+      : ((queryPanel && panelTitles[queryPanel]) ? queryPanel : storedPanel);
+
+    if (targetPanel && panelTitles[targetPanel]) {
+      switchPanel(targetPanel);
+      localStorage.removeItem('admin_target_tab');
+    }
   </script>
 </body>
 </html>
