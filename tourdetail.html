@@ -751,6 +751,7 @@
                   <div class="form-row">
                     <label>Ngày bạn muốn khởi hành (*)</label>
                     <input type="date" id="custDate" required />
+                    <span id="custDateErr" style="color: #ea580c; font-size: 12px; display: none; margin-top: 4px; font-weight: 600;"></span>
                   </div>
                   <div class="form-row">
                     <label>Số lượng người lớn (*)</label>
@@ -830,6 +831,181 @@
         document.getElementById('custVehicle').addEventListener('change', updateTotal);
         updateTotal();
 
+        const checkDetailConflict = () => {
+          const dateVal = document.getElementById('custDate')?.value;
+          const phoneVal = document.getElementById('custPhone')?.value.trim();
+          const emailVal = document.getElementById('custEmail')?.value.trim();
+          const activeUser = JSON.parse(localStorage.getItem('tourdulich_active_user') || 'null');
+          const bks = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
+          const errEl = document.getElementById('custDateErr');
+          if (!errEl) return;
+          if (!dateVal || (!phoneVal && !emailVal && !activeUser)) {
+            errEl.style.display = 'none';
+            return;
+          }
+          const chk = validateBookingRules({
+            bookings: bks,
+            email: emailVal,
+            phone: phoneVal,
+            activeUser,
+            tourName: tour.name,
+            tourObj: tour,
+            departureDate: dateVal
+          });
+          if (!chk.ok) {
+            errEl.innerHTML = chk.type === 'DUPLICATE_TOUR'
+              ? '⚠️ Bạn đã có đơn đặt tour này. Mỗi tài khoản chỉ được đặt 1 lần.'
+              : '⚠️ Trùng lịch với tour bạn đã đặt trước đó trong khoảng thời gian này!';
+            errEl.style.display = 'block';
+          } else {
+            errEl.style.display = 'none';
+          }
+        };
+
+        document.getElementById('custDate')?.addEventListener('change', checkDetailConflict);
+        document.getElementById('custPhone')?.addEventListener('blur', checkDetailConflict);
+        document.getElementById('custEmail')?.addEventListener('blur', checkDetailConflict);
+
+        
+// ==========================================
+// HỆ THỐNG KIỂM TRA QUY TẮC ĐẶT TOUR & TRÙNG LỊCH TRÌNH
+// ==========================================
+function parseLocalDate(dateStr) {
+  if (!dateStr) return null;
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length < 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) {
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  return new Date(parts[0], parts[1] - 1, parts[2]);
+}
+
+function formatDateISO(d) {
+  if (!d || isNaN(d.getTime())) return '';
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return year + '-' + month + '-' + day;
+}
+
+function addDays(d, days) {
+  const result = new Date(d.getTime());
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
+function formatDateVi(dateStr) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+  return dateStr;
+}
+
+function getStatusVi(status) {
+  switch (status) {
+    case 'confirmed': return 'Đã xác nhận';
+    case 'paid': return 'Đã thanh toán';
+    case 'completed': return 'Đã hoàn thành';
+    case 'pending': return 'Chờ xác nhận';
+    case 'cancelled': return 'Đã hủy';
+    default: return status || 'Chờ xác nhận';
+  }
+}
+
+function parseTourDays(durationStr, nameStr) {
+  const combined = (durationStr || '') + ' ' + (nameStr || '');
+  const match = combined.match(/(\d+)\s*(?:N|ng[aà]y|day)/i);
+  if (match) {
+    const num = parseInt(match[1], 10);
+    if (num > 0) return num;
+  }
+  return 3;
+}
+
+function isSameCustomer(b, email, phone, activeUser) {
+  const normEmail = (s) => (s || '').trim().toLowerCase();
+  const normPhone = (s) => (s || '').replace(/\D/g, '');
+
+  const bEmail = normEmail(b.email);
+  const bPhone = normPhone(b.phone);
+  const curEmail = normEmail(email);
+  const curPhone = normPhone(phone);
+  const userEmail = activeUser ? normEmail(activeUser.email) : '';
+  const userPhone = activeUser ? normPhone(activeUser.phone) : '';
+
+  if (curEmail && bEmail && curEmail === bEmail) return true;
+  if (curPhone && bPhone && curPhone === bPhone) return true;
+  if (userEmail && bEmail && userEmail === bEmail) return true;
+  if (userPhone && bPhone && userPhone === bPhone) return true;
+
+  return false;
+}
+
+function isSameTour(b, targetName, targetTourObj) {
+  if (targetTourObj) {
+    if (b.tourId && targetTourObj.id && String(b.tourId) === String(targetTourObj.id)) return true;
+    if (b.tourCode && targetTourObj.code && b.tourCode === targetTourObj.code) return true;
+  }
+  const cleanStr = (s) => (s || '').toLowerCase().replace(/[^a-z0-9àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/g, '');
+  const bClean = cleanStr(b.tourName);
+  const targetClean = cleanStr(targetName || (targetTourObj && targetTourObj.name));
+  if (bClean && targetClean) {
+    if (bClean === targetClean) return true;
+    if ((bClean.includes(targetClean) || targetClean.includes(bClean)) && Math.min(bClean.length, targetClean.length) >= 8) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function validateBookingRules({ bookings, email, phone, activeUser, tourName, tourObj, departureDate }) {
+  const newDays = parseTourDays(tourObj?.duration, tourName);
+  const newStartDate = parseLocalDate(departureDate);
+  if (!newStartDate) return { ok: true };
+  const newEndDate = addDays(newStartDate, newDays - 1);
+
+  for (const b of bookings) {
+    if (b.status === 'cancelled') continue;
+    if (!isSameCustomer(b, email, phone, activeUser)) continue;
+
+    // QUY TẮC 1: 1 TÀI KHOẢN KHÔNG THỂ ĐẶT 1 TOUR NHIỀU LẦN
+    if (isSameTour(b, tourName, tourObj)) {
+      return {
+        ok: false,
+        type: 'DUPLICATE_TOUR',
+        message: '⚠️ BẠN ĐÃ CÓ ĐƠN ĐẶT TOUR NÀY!\n\n' +
+          'Tài khoản / Số điện thoại (' + (phone || email) + ') của bạn đã có đơn đặt tour "' + b.tourName + '":\n' +
+          '• Mã đơn: #' + b.id + '\n' +
+          '• Ngày khởi hành: ' + formatDateVi(b.travelDate) + '\n' +
+          '• Trạng thái: ' + getStatusVi(b.status) + '\n\n' +
+          'Theo quy định, mỗi tài khoản chỉ được đặt tour này 1 lần. Quý khách vui lòng kiểm tra tại mục "Đơn hàng" hoặc chọn trải nghiệm các tour khác!'
+      };
+    }
+
+    // QUY TẮC 2: TRÙNG LỊCH TRÌNH TOUR (TOUR 3N2Đ THÌ KHÔNG THỂ ĐI TOUR TIẾP THEO KHI CHƯA KẾT THÚC)
+    const bDays = parseTourDays(b.duration, b.tourName);
+    const bStartDate = parseLocalDate(b.travelDate);
+    if (!bStartDate) continue;
+    const bEndDate = addDays(bStartDate, bDays - 1);
+
+    const hasOverlap = (bStartDate <= newEndDate) && (newStartDate <= bEndDate);
+    if (hasOverlap) {
+      const nextAvailable = addDays(bEndDate, 1);
+      return {
+        ok: false,
+        type: 'SCHEDULE_OVERLAP',
+        message: '⚠️ TRÙNG LỊCH TRÌNH TOUR!\n\n' +
+          'Bạn đang có lịch trình tham gia tour "' + b.tourName + '" (Mã đơn: #' + b.id + '):\n' +
+          '• Thời gian chuyến đi: Từ ' + formatDateVi(formatDateISO(bStartDate)) + ' đến hết ngày ' + formatDateVi(formatDateISO(bEndDate)) + ' (' + bDays + ' ngày).\n\n' +
+          'Tour mới bạn chọn dự kiến đi từ ngày ' + formatDateVi(formatDateISO(newStartDate)) + ' đến ' + formatDateVi(formatDateISO(newEndDate)) + ' (' + newDays + ' ngày), bị trùng với thời gian chuyến đi trên nên bạn không thể tham gia cả 2 tour cùng lúc.\n\n' +
+          '👉 Vui lòng chọn ngày khởi hành sau chuyến đi cũ (từ ngày ' + formatDateVi(formatDateISO(nextAvailable)) + ' trở đi), hoặc hủy đơn cũ tại trang "Đơn hàng" nếu muốn thay đổi hành trình!'
+      };
+    }
+  }
+
+  return { ok: true, newDays, newStartDate, newEndDate };
+}
+
         // Submit form
         document.getElementById('bookTourForm').addEventListener('submit', (e) => {
           e.preventDefault();
@@ -841,6 +1017,26 @@
           const children = parseInt(document.getElementById('custChildQty').value) || 0;
           const promo = document.getElementById('custPromo').value.trim().toUpperCase();
 
+          const BOOKING_KEY = 'tourdulich_bookings';
+          const bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
+          const activeUser = JSON.parse(localStorage.getItem('tourdulich_active_user') || 'null');
+
+          // Kiểm tra 2 quy tắc: Không đặt trùng tour và Không đặt trùng lịch trình đang đi
+          const ruleCheck = validateBookingRules({
+            bookings,
+            email,
+            phone,
+            activeUser,
+            tourName: tour.name,
+            tourObj: tour,
+            departureDate: date
+          });
+
+          if (!ruleCheck.ok) {
+            alert(ruleCheck.message);
+            return;
+          }
+
           const vehicle = document.getElementById('custVehicle') ? document.getElementById('custVehicle').value : 'Ô tô du lịch Limousine VIP';
           const tourGuide = document.getElementById('custTourGuide') ? document.getElementById('custTourGuide').value : 'Đoàn tự động sắp xếp (HDV 5 sao)';
           const isPlane = vehicle.includes('Máy bay');
@@ -849,15 +1045,18 @@
           if (promo === 'HE2026') finalTotal = Math.max(0, finalTotal - 500000);
           else if (promo === 'VIPTOUR') finalTotal = Math.max(0, finalTotal - 1000000);
           else if (promo === 'SUMMER300') finalTotal = Math.max(0, finalTotal - 300000);
-
-          // Save to localStorage
-          const BOOKING_KEY = 'tourdulich_bookings';
-          const bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
           const newBookingId = 'BK-' + Math.floor(1000 + Math.random() * 9000);
           const bookingStages = (Array.isArray(tour.stages) && tour.stages.length === 3) ? tour.stages : getDefaultStages(tour.name);
 
+          const tourDays = parseTourDays(tour?.duration, tour?.name);
+          const travelEndDate = formatDateISO(addDays(parseLocalDate(date), tourDays - 1));
+
           bookings.unshift({
             id: newBookingId,
+            tourId: tour?.id || '',
+            tourCode: tour?.code || '',
+            duration: tour?.duration || `${tourDays}N${tourDays - 1}Đ`,
+            tourDays: tourDays,
             guestName: name,
             phone: phone,
             email: email,
@@ -868,6 +1067,7 @@
             tourGuide: tourGuide,
             tourName: tour.name,
             travelDate: date,
+            travelEndDate: travelEndDate,
             totalPrice: finalTotal,
             promoInfo: promo,
             paymentMethod: 'Chuyển khoản / VietQR',

@@ -350,7 +350,7 @@
                 ${b.note || b.notes ? `<br><small style="color:#64748b;">${b.note || b.notes}</small>` : ''}
               </td>
               <td>
-                📅 ${b.travelDate || '---'}<br>
+                📅 ${b.travelDate || '---'}${b.travelEndDate && b.travelEndDate !== b.travelDate ? ` ➔ ${b.travelEndDate}` : ''}<br>
                 <small style="color:#0d7a5f; font-weight:bold;">${b.vehicle && b.vehicle.includes('Máy bay') ? '✈️ Máy bay khứ hồi' : '🚌 Ô tô Limousine VIP'}</small><br>
                 <small style="color:#475569;">HDV: <b>${b.tourGuide ? b.tourGuide.split('(')[0].trim() : 'Sắp xếp tự động'}</b></small>
               </td>
@@ -419,7 +419,7 @@
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; font-size:14px;">
                   <div><span style="color:#64748b; font-size:12px; display:block;">HÀNH KHÁCH ĐẠI DIỆN</span><strong>${b.guestName}</strong></div>
                   <div><span style="color:#64748b; font-size:12px; display:block;">SỐ ĐIỆN THOẠI</span><strong>${b.phone}</strong></div>
-                  <div><span style="color:#64748b; font-size:12px; display:block;">NGÀY KHỞI HÀNH</span><strong style="color:#0d7a5f;">📅 ${b.travelDate}</strong></div>
+                  <div><span style="color:#64748b; font-size:12px; display:block;">NGÀY KHỞI HÀNH</span><strong style="color:#0d7a5f;">📅 ${b.travelDate}${b.travelEndDate && b.travelEndDate !== b.travelDate ? ` ➔ ${b.travelEndDate}` : ''}</strong></div>
                   <div><span style="color:#64748b; font-size:12px; display:block;">PHƯƠNG TIỆN DI CHUYỂN</span><strong style="color:#0284c7;">${b.vehicle || 'Ô tô du lịch Limousine VIP'}</strong></div>
                   <div style="grid-column: span 2;"><span style="color:#64748b; font-size:12px; display:block;">HƯỚNG DẪN VIÊN PHỤ TRÁCH</span><strong style="color:#ea580c;">👨‍🏫 ${b.tourGuide || 'Công ty sắp xếp HDV 5 sao'}</strong></div>
                 </div>
