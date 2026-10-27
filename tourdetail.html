@@ -1006,6 +1006,150 @@ function validateBookingRules({ bookings, email, phone, activeUser, tourName, to
   return { ok: true, newDays, newStartDate, newEndDate };
 }
 
+        
+// ==========================================
+// TÍCH HỢP HỘP THOẠI THÔNG BÁO HOẠT HỌA HIỆN ĐẠI (THAY THẾ ALERT)
+// ==========================================
+function createNoticeModalDOM() {
+  if (document.getElementById('appNoticeModal')) return;
+  const modalDiv = document.createElement('div');
+  modalDiv.id = 'appNoticeModal';
+  modalDiv.className = 'notice-modal-backdrop';
+  modalDiv.setAttribute('aria-hidden', 'true');
+  modalDiv.innerHTML = `
+    <div class="notice-modal-card">
+      <button type="button" class="notice-modal-close" id="btnNoticeClose" aria-label="Đóng">✕</button>
+      <div class="notice-modal-icon-wrapper" id="noticeIconWrapper">
+        <div class="notice-modal-icon" id="noticeIcon">⚠️</div>
+        <div class="notice-icon-ripple"></div>
+      </div>
+      <h3 class="notice-modal-title" id="noticeTitle">Thông Báo</h3>
+      <div class="notice-modal-body" id="noticeBody"></div>
+      <div class="notice-modal-actions" id="noticeActions">
+        <button type="button" class="btn-notice-primary" id="noticePrimaryBtn">Tôi đã hiểu</button>
+        <button type="button" class="btn-notice-secondary" id="noticeSecondaryBtn" style="display:none;">Xem Đơn Hàng ➔</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modalDiv);
+
+  modalDiv.addEventListener('click', (e) => {
+    if (e.target === modalDiv) closeNoticeModal();
+  });
+  document.getElementById('btnNoticeClose')?.addEventListener('click', closeNoticeModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalDiv.classList.contains('active')) closeNoticeModal();
+  });
+}
+
+function showNoticeModal(options) {
+  createNoticeModalDOM();
+  let { title = 'Thông Báo', message = '', type = 'warning', primaryBtnText = 'Tôi đã hiểu', secondaryBtnText = '', onSecondary = null, onPrimary = null } = (typeof options === 'string' ? { message: options } : options) || {};
+
+  // Auto-detect type & icon
+  let iconEmoji = '⚠️';
+  if (message && (message.includes('🎉') || message.includes('thành công') || message.includes('CẢM ƠN') || message.includes('ĐẶT TOUR THÀNH CÔNG'))) {
+    type = 'success';
+    iconEmoji = '🎉';
+  } else if (message && (message.includes('TRÙNG LỊCH') || message.includes('ĐÃ CÓ ĐƠN') || message.includes('CẢNH BÁO') || message.includes('⚠️'))) {
+    type = 'warning';
+    iconEmoji = '⚠️';
+  } else if (message && (message.includes('hết chỗ') || message.includes('Không thể') || message.includes('không hợp lệ') || message.includes('❌') || message.includes('vượt quá'))) {
+    type = 'error';
+    iconEmoji = '⛔';
+  } else if (message && (message.includes('ĐĂNG KÝ') || message.includes('ĐĂNG NHẬP') || message.includes('CHÀO MỪNG') || message.includes('ℹ️'))) {
+    type = 'info';
+    iconEmoji = '✈️';
+  }
+
+  // Parse title from first line if it looks like a header
+  const lines = (message || '').split('\n').map(l => l.trim()).filter(Boolean);
+  if (!options.title) {
+    if (lines.length > 0 && (lines[0].startsWith('⚠️') || lines[0].startsWith('🎉') || lines[0].startsWith('❌') || lines[0].startsWith('⛔') || lines[0].startsWith('ℹ️'))) {
+      title = lines[0].replace(/^[⚠️🎉❌⛔ℹ️\s]+/, '').trim();
+      message = lines.slice(1).join('\n');
+    }
+  }
+
+  // Format message body into HTML paragraphs and bullet points
+  let formattedHtml = '';
+  const bodyLines = (message || '').split('\n');
+  let inBulletList = false;
+
+  bodyLines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
+      if (!inBulletList) {
+        formattedHtml += '<ul style="margin: 8px 0 10px 18px; padding:0; color:#334155;">';
+        inBulletList = true;
+      }
+      formattedHtml += `<li style="margin-bottom: 4px;">${trimmed.replace(/^[•\-]\s*/, '')}</li>`;
+    } else {
+      if (inBulletList) {
+        formattedHtml += '</ul>';
+        inBulletList = false;
+      }
+      if (trimmed.startsWith('👉')) {
+        formattedHtml += `<p style="margin: 10px 0 4px; padding: 10px 12px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; color: #065f46; font-weight: 600;">${trimmed}</p>`;
+      } else {
+        formattedHtml += `<p style="margin-bottom: 6px;">${trimmed}</p>`;
+      }
+    }
+  });
+  if (inBulletList) formattedHtml += '</ul>';
+
+  // Check if we should suggest viewing orders
+  if (!secondaryBtnText && (message.includes('Đơn hàng') || message.includes('Đơn Đặt Chỗ') || message.includes('đơn đặt tour'))) {
+    secondaryBtnText = 'Xem Đơn Đặt Chỗ ➔';
+    onSecondary = () => { window.location.href = 'trangdonhang.html'; };
+  }
+
+  const modalEl = document.getElementById('appNoticeModal');
+  const card = modalEl.querySelector('.notice-modal-card');
+  card.className = `notice-modal-card notice-type-${type}`;
+  document.getElementById('noticeIcon').textContent = iconEmoji;
+  document.getElementById('noticeTitle').textContent = title || 'Thông Báo Hệ Thống';
+  document.getElementById('noticeBody').innerHTML = formattedHtml || message;
+
+  const priBtn = document.getElementById('noticePrimaryBtn');
+  priBtn.textContent = primaryBtnText;
+  priBtn.onclick = () => {
+    closeNoticeModal();
+    if (typeof onPrimary === 'function') onPrimary();
+  };
+
+  const secBtn = document.getElementById('noticeSecondaryBtn');
+  if (secondaryBtnText) {
+    secBtn.textContent = secondaryBtnText;
+    secBtn.style.display = 'inline-block';
+    secBtn.onclick = () => {
+      closeNoticeModal();
+      if (typeof onSecondary === 'function') onSecondary();
+    };
+  } else {
+    secBtn.style.display = 'none';
+  }
+
+  modalEl.classList.add('active');
+  modalEl.setAttribute('aria-hidden', 'false');
+}
+
+function closeNoticeModal() {
+  const modalEl = document.getElementById('appNoticeModal');
+  if (modalEl) {
+    modalEl.classList.remove('active');
+    modalEl.setAttribute('aria-hidden', 'true');
+  }
+}
+
+// Ghi đè toàn bộ window.alert để không bao giờ hiện popup phèn của trình duyệt
+window.alert = function(msg) {
+  showNoticeModal(msg);
+};
+window.showNoticeModal = showNoticeModal;
+window.closeNoticeModal = closeNoticeModal;
+
         // Submit form
         document.getElementById('bookTourForm').addEventListener('submit', (e) => {
           e.preventDefault();
@@ -1033,7 +1177,14 @@ function validateBookingRules({ bookings, email, phone, activeUser, tourName, to
           });
 
           if (!ruleCheck.ok) {
-            alert(ruleCheck.message);
+            showNoticeModal({
+              type: 'warning',
+              title: ruleCheck.type === 'DUPLICATE_TOUR' ? 'Đã Có Đơn Đặt Tour Này' : 'Trùng Lịch Trình Tour',
+              message: ruleCheck.message,
+              primaryBtnText: 'Tôi đã hiểu',
+              secondaryBtnText: 'Xem Đơn Đặt Chỗ ➔',
+              onSecondary: () => { window.location.href = 'trangdonhang.html'; }
+            });
             return;
           }
 
@@ -1080,8 +1231,15 @@ function validateBookingRules({ bookings, email, phone, activeUser, tourName, to
 
           localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings));
 
-          alert(`🎉 ĐẶT TOUR THÀNH CÔNG!\n\nCảm ơn Quý khách ${name}!\nMã đơn của bạn: #${newBookingId}\nTour: ${tour.name}\nSố khách: ${adults + children} người (${adults} lớn, ${children} trẻ em)\nPhương tiện: ${vehicle}\nHướng dẫn viên: ${tourGuide}\nTổng thanh toán: ${formatCurrency(finalTotal)}\n\nĐơn hàng đã được lưu. Chuyển sang trang "Đơn hàng" để kiểm tra và xem Vé điện tử E-Ticket!`);
-          window.location.href = 'trangdonhang.html';
+          showNoticeModal({
+            type: 'success',
+            title: 'Đặt Tour Thành Công!',
+            message: `Cảm ơn Quý khách ${name}!\n\nĐơn đặt tour #${newBookingId} đã được lưu thành công vào hệ thống:\n• Tour: ${tour.name}\n• Số khách: ${adults + children} người (${adults} lớn, ${children} trẻ em)\n• Phương tiện: ${vehicle}\n• Hướng dẫn viên: ${tourGuide}\n• Tổng thanh toán: ${formatCurrency(finalTotal)}\n\n👉 Bạn có thể vào mục "Đơn hàng" để kiểm tra mã vé điện tử E-Ticket QR Code & quản lý lộ trình 3 chặng!`,
+            primaryBtnText: 'Xem Vé & Đơn Hàng ➔',
+            onPrimary: () => { window.location.href = 'trangdonhang.html'; },
+            secondaryBtnText: 'Ở lại trang này',
+            onSecondary: () => {}
+          });
         });
 
         // Initialize Reviews for this Tour

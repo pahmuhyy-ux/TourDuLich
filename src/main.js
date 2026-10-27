@@ -1,3 +1,147 @@
+
+// ==========================================
+// TÍCH HỢP HỘP THOẠI THÔNG BÁO HOẠT HỌA HIỆN ĐẠI (THAY THẾ ALERT)
+// ==========================================
+function createNoticeModalDOM() {
+  if (document.getElementById('appNoticeModal')) return;
+  const modalDiv = document.createElement('div');
+  modalDiv.id = 'appNoticeModal';
+  modalDiv.className = 'notice-modal-backdrop';
+  modalDiv.setAttribute('aria-hidden', 'true');
+  modalDiv.innerHTML = `
+    <div class="notice-modal-card">
+      <button type="button" class="notice-modal-close" id="btnNoticeClose" aria-label="Đóng">✕</button>
+      <div class="notice-modal-icon-wrapper" id="noticeIconWrapper">
+        <div class="notice-modal-icon" id="noticeIcon">⚠️</div>
+        <div class="notice-icon-ripple"></div>
+      </div>
+      <h3 class="notice-modal-title" id="noticeTitle">Thông Báo</h3>
+      <div class="notice-modal-body" id="noticeBody"></div>
+      <div class="notice-modal-actions" id="noticeActions">
+        <button type="button" class="btn-notice-primary" id="noticePrimaryBtn">Tôi đã hiểu</button>
+        <button type="button" class="btn-notice-secondary" id="noticeSecondaryBtn" style="display:none;">Xem Đơn Hàng ➔</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modalDiv);
+
+  modalDiv.addEventListener('click', (e) => {
+    if (e.target === modalDiv) closeNoticeModal();
+  });
+  document.getElementById('btnNoticeClose')?.addEventListener('click', closeNoticeModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalDiv.classList.contains('active')) closeNoticeModal();
+  });
+}
+
+function showNoticeModal(options) {
+  createNoticeModalDOM();
+  let { title = 'Thông Báo', message = '', type = 'warning', primaryBtnText = 'Tôi đã hiểu', secondaryBtnText = '', onSecondary = null, onPrimary = null } = (typeof options === 'string' ? { message: options } : options) || {};
+
+  // Auto-detect type & icon
+  let iconEmoji = '⚠️';
+  if (message && (message.includes('🎉') || message.includes('thành công') || message.includes('CẢM ƠN') || message.includes('ĐẶT TOUR THÀNH CÔNG'))) {
+    type = 'success';
+    iconEmoji = '🎉';
+  } else if (message && (message.includes('TRÙNG LỊCH') || message.includes('ĐÃ CÓ ĐƠN') || message.includes('CẢNH BÁO') || message.includes('⚠️'))) {
+    type = 'warning';
+    iconEmoji = '⚠️';
+  } else if (message && (message.includes('hết chỗ') || message.includes('Không thể') || message.includes('không hợp lệ') || message.includes('❌') || message.includes('vượt quá'))) {
+    type = 'error';
+    iconEmoji = '⛔';
+  } else if (message && (message.includes('ĐĂNG KÝ') || message.includes('ĐĂNG NHẬP') || message.includes('CHÀO MỪNG') || message.includes('ℹ️'))) {
+    type = 'info';
+    iconEmoji = '✈️';
+  }
+
+  // Parse title from first line if it looks like a header
+  const lines = (message || '').split('\n').map(l => l.trim()).filter(Boolean);
+  if (!options.title) {
+    if (lines.length > 0 && (lines[0].startsWith('⚠️') || lines[0].startsWith('🎉') || lines[0].startsWith('❌') || lines[0].startsWith('⛔') || lines[0].startsWith('ℹ️'))) {
+      title = lines[0].replace(/^[⚠️🎉❌⛔ℹ️\s]+/, '').trim();
+      message = lines.slice(1).join('\n');
+    }
+  }
+
+  // Format message body into HTML paragraphs and bullet points
+  let formattedHtml = '';
+  const bodyLines = (message || '').split('\n');
+  let inBulletList = false;
+
+  bodyLines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
+      if (!inBulletList) {
+        formattedHtml += '<ul style="margin: 8px 0 10px 18px; padding:0; color:#334155;">';
+        inBulletList = true;
+      }
+      formattedHtml += `<li style="margin-bottom: 4px;">${trimmed.replace(/^[•\-]\s*/, '')}</li>`;
+    } else {
+      if (inBulletList) {
+        formattedHtml += '</ul>';
+        inBulletList = false;
+      }
+      if (trimmed.startsWith('👉')) {
+        formattedHtml += `<p style="margin: 10px 0 4px; padding: 10px 12px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; color: #065f46; font-weight: 600;">${trimmed}</p>`;
+      } else {
+        formattedHtml += `<p style="margin-bottom: 6px;">${trimmed}</p>`;
+      }
+    }
+  });
+  if (inBulletList) formattedHtml += '</ul>';
+
+  // Check if we should suggest viewing orders
+  if (!secondaryBtnText && (message.includes('Đơn hàng') || message.includes('Đơn Đặt Chỗ') || message.includes('đơn đặt tour'))) {
+    secondaryBtnText = 'Xem Đơn Đặt Chỗ ➔';
+    onSecondary = () => { window.location.href = 'trangdonhang.html'; };
+  }
+
+  const modalEl = document.getElementById('appNoticeModal');
+  const card = modalEl.querySelector('.notice-modal-card');
+  card.className = `notice-modal-card notice-type-${type}`;
+  document.getElementById('noticeIcon').textContent = iconEmoji;
+  document.getElementById('noticeTitle').textContent = title || 'Thông Báo Hệ Thống';
+  document.getElementById('noticeBody').innerHTML = formattedHtml || message;
+
+  const priBtn = document.getElementById('noticePrimaryBtn');
+  priBtn.textContent = primaryBtnText;
+  priBtn.onclick = () => {
+    closeNoticeModal();
+    if (typeof onPrimary === 'function') onPrimary();
+  };
+
+  const secBtn = document.getElementById('noticeSecondaryBtn');
+  if (secondaryBtnText) {
+    secBtn.textContent = secondaryBtnText;
+    secBtn.style.display = 'inline-block';
+    secBtn.onclick = () => {
+      closeNoticeModal();
+      if (typeof onSecondary === 'function') onSecondary();
+    };
+  } else {
+    secBtn.style.display = 'none';
+  }
+
+  modalEl.classList.add('active');
+  modalEl.setAttribute('aria-hidden', 'false');
+}
+
+function closeNoticeModal() {
+  const modalEl = document.getElementById('appNoticeModal');
+  if (modalEl) {
+    modalEl.classList.remove('active');
+    modalEl.setAttribute('aria-hidden', 'true');
+  }
+}
+
+// Ghi đè toàn bộ window.alert để không bao giờ hiện popup phèn của trình duyệt
+window.alert = function(msg) {
+  showNoticeModal(msg);
+};
+window.showNoticeModal = showNoticeModal;
+window.closeNoticeModal = closeNoticeModal;
+
 import './style.css'
 
 // ==========================================
@@ -122,11 +266,13 @@ const renderTourCards = (dataToRender = toursList) => {
         <div class="tour-foot">
           <div>
             <span class="price-old">${formatCurrency(oldPrice)}</span>
-            <span class="price" style="color:#ea580c;">${formatCurrency(tour.price)}</span>
+            <span class="price" style="color:#ea580c; font-weight:800;">${formatCurrency(tour.price)}</span>
           </div>
-          <div style="display: flex; gap: 6px;">
-            <a href="tourdetail.html?id=${tour.id}" onclick="event.stopPropagation();" class="btn btn-sm" style="background:#f1f5f9; color:#0f172a; padding: 8px 12px;">Chi tiết</a>
-            <button class="btn btn-primary btn-sm" type="button" ${isSoldOut ? 'disabled style="background:#94a3b8; cursor:not-allowed;"' : ''}>${isSoldOut ? 'Hết chỗ' : 'Đặt ngay'}</button>
+          <div style="display: flex; align-items:center; gap: 6px;">
+            <span style="${isSoldOut ? 'background:#fef2f2; color:#ef4444; border:1px solid #fecaca;' : 'background:#ecfdf5; color:#059669; border:1px solid #a7f3d0;'} font-size:12px; font-weight:700; padding:6px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+              ${isSoldOut ? '❌ Hết chỗ' : '✅ Còn chỗ'}
+            </span>
+            <a href="tourdetail.html?id=${tour.id}" onclick="event.stopPropagation();" class="btn btn-sm" style="background:#0d7a5f; color:white; font-weight:700; padding: 7px 13px; border-radius:6px; text-decoration:none;">Chi tiết ➔</a>
           </div>
         </div>
       </div>
@@ -195,8 +341,29 @@ const openTourDetail = (tour) => {
   if (detailPrice) detailPrice.textContent = formatCurrency(tour.price);
   const detailOldPrice = document.querySelector('#tourDetailOldPrice');
   if (detailOldPrice) detailOldPrice.textContent = formatCurrency(tour.oldPrice || Math.round(tour.price * 1.18));
+  const slotsLeft = typeof tour.slots === 'number' ? tour.slots : 10;
+  const isSoldOut = slotsLeft <= 0 || tour.status === 'closed';
+
   const detailStatus = document.querySelector('#tourDetailStatus');
-  if (detailStatus) detailStatus.textContent = (tour.slots <= 0 || tour.status === 'closed') ? 'Đã hết chỗ' : 'Đang nhận khách';
+  if (detailStatus) {
+    detailStatus.textContent = isSoldOut ? 'Đã hết chỗ' : `Còn ${slotsLeft} chỗ nhận khách`;
+    detailStatus.style.color = isSoldOut ? '#ef4444' : '#0d7a5f';
+  }
+
+  const slotBadge = document.querySelector('#tourDetailSlotBadge');
+  if (slotBadge) {
+    if (isSoldOut) {
+      slotBadge.innerHTML = '❌ Hết chỗ';
+      slotBadge.style.background = '#fef2f2';
+      slotBadge.style.color = '#ef4444';
+      slotBadge.style.border = '1px solid #fecaca';
+    } else {
+      slotBadge.innerHTML = `🔥 Còn chỗ (${slotsLeft} khách)`;
+      slotBadge.style.background = '#ecfdf5';
+      slotBadge.style.color = '#059669';
+      slotBadge.style.border = '1px solid #a7f3d0';
+    }
+  }
   const detailImage = document.querySelector('#tourDetailImage');
   if (detailImage) {
     detailImage.src = tour.image || img(tour.code || tour.name);
@@ -430,11 +597,11 @@ document.querySelector('#app').innerHTML = `
         <h4 style="font-size: 14px; color: #0f766e; margin-top: 12px; margin-bottom: 8px;">🎒 Gợi ý chuẩn bị hành lý</h4>
         <div id="tourPackingGuide" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
       </div>
-      <div style="margin-top: 20px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; padding-top:15px;">
-        <div><span class="price-old" id="tourDetailOldPrice">0đ</span><span class="price" id="tourDetailPrice" style="color:#ea580c;">0đ</span></div>
-        <div style="display:flex; gap:10px;">
-          <a id="btnFullDetailPage" href="tourdetail.html" class="btn btn-sm" style="text-decoration: none; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700; color: #0284c7; background: #f0f9ff;">Xem lịch trình chi tiết →</a>
-          <button class="btn btn-primary btn-sm" id="btnBookTour" type="button">Chọn ghế & Đặt ngay</button>
+      <div style="margin-top: 20px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; padding-top:15px; flex-wrap:wrap; gap:10px;">
+        <div><span class="price-old" id="tourDetailOldPrice">0đ</span><span class="price" id="tourDetailPrice" style="color:#ea580c; font-size:20px; font-weight:800;">0đ</span></div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span id="tourDetailSlotBadge" style="padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 13.5px; display: inline-flex; align-items: center; gap: 5px;"></span>
+          <a id="btnFullDetailPage" href="tourdetail.html" class="btn btn-primary btn-sm" style="text-decoration: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 14px; background: #0d7a5f; color: white; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(13,122,95,0.25);">Xem chi tiết & Đặt tour ➔</a>
         </div>
       </div>
     </div>
@@ -1499,7 +1666,7 @@ const renderFavoritesModal = () => {
         <h4 style="margin: 0 0 5px 0; font-size: 14px; color: #1e293b;">${tour.name}</h4>
         <p style="color: #ea580c; font-weight: bold; margin: 0 0 10px 0;">${formatCurrency(tour.price)}</p>
         <div style="display: flex; gap: 8px;">
-          <button class="btn-view-fav" data-id="${tour.id}" style="background: #e0f2fe; color: #0284c7; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Đặt ngay</button>
+          <button class="btn-view-fav" data-id="${tour.id}" style="background: #e0f2fe; color: #0284c7; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Xem chi tiết ➔</button>
           <button class="btn-remove-fav" data-id="${tour.id}" style="background: #fee2e2; color: #ef4444; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Xóa</button>
         </div>
       </div>
