@@ -1006,7 +1006,12 @@ function validateBookingRules({ bookings, email, phone, activeUser, tourName, to
         ok: false,
         type: 'DUPLICATE_TOUR',
         message: '⚠️ BẠN ĐÃ CÓ ĐƠN ĐẶT TOUR NÀY!\n\n' +
-          'Tài khoản / Số điện thoại (' + (phone || email) + ') của bạn đã có đơn đặt tour "' + b.tourName + '":\n' +
+          (() => {
+            const allTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
+            const matchedT = allTours.find(t => (b.tourId && String(t.id) === String(b.tourId)) || (b.tourCode && t.code === b.tourCode));
+            const realTourName = matchedT ? matchedT.name : b.tourName;
+            return 'Tài khoản / Số điện thoại (' + (phone || email) + ') của bạn đã có đơn đặt tour "' + realTourName + '":\n';
+          })() +
           '• Mã đơn: #' + b.id + '\n' +
           '• Ngày khởi hành: ' + formatDateVi(b.travelDate) + '\n' +
           '• Trạng thái: ' + getStatusVi(b.status) + '\n\n' +
@@ -1027,7 +1032,12 @@ function validateBookingRules({ bookings, email, phone, activeUser, tourName, to
         ok: false,
         type: 'SCHEDULE_OVERLAP',
         message: '⚠️ TRÙNG LỊCH TRÌNH TOUR!\n\n' +
-          'Bạn đang có lịch trình tham gia tour "' + b.tourName + '" (Mã đơn: #' + b.id + '):\n' +
+          (() => {
+            const allTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
+            const matchedT = allTours.find(t => (b.tourId && String(t.id) === String(b.tourId)) || (b.tourCode && t.code === b.tourCode));
+            const realTourName = matchedT ? matchedT.name : b.tourName;
+            return 'Bạn đang có lịch trình tham gia tour "' + realTourName + '" (Mã đơn: #' + b.id + '):\n';
+          })() +
           '• Thời gian chuyến đi: Từ ' + formatDateVi(formatDateISO(bStartDate)) + ' đến hết ngày ' + formatDateVi(formatDateISO(bEndDate)) + ' (' + bDays + ' ngày).\n\n' +
           'Tour mới bạn chọn dự kiến đi từ ngày ' + formatDateVi(formatDateISO(newStartDate)) + ' đến ' + formatDateVi(formatDateISO(newEndDate)) + ' (' + newDays + ' ngày), bị trùng với thời gian chuyến đi trên nên bạn không thể tham gia cả 2 tour cùng lúc.\n\n' +
           '👉 Vui lòng chọn ngày khởi hành sau chuyến đi cũ (từ ngày ' + formatDateVi(formatDateISO(nextAvailable)) + ' trở đi), hoặc hủy đơn cũ tại trang "Đơn hàng" nếu muốn thay đổi hành trình!'

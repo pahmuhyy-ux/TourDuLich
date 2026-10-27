@@ -94,7 +94,114 @@
           #eticketModal { position: fixed; inset: 0; background: white; z-index: 99999; }
           .no-print { display: none !important; }
         }
-    </style>
+    
+/* ===================================================
+   MODERN ANIMATED NOTICE MODAL (Thay thế alert truyền thống)
+   =================================================== */
+.notice-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+  padding: 16px;
+}
+.notice-modal-backdrop.active { opacity: 1; visibility: visible; }
+.notice-modal-card {
+  background: #ffffff;
+  border-radius: 24px;
+  max-width: 520px;
+  width: 100%;
+  padding: 32px 26px 24px;
+  box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  position: relative;
+  text-align: center;
+  transform: scale(0.85) translateY(24px);
+  opacity: 0;
+  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  font-family: inherit;
+}
+.notice-modal-backdrop.active .notice-modal-card { transform: scale(1) translateY(0); opacity: 1; }
+.notice-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: #f1f5f9;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #64748b;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+.notice-modal-close:hover { background: #e2e8f0; color: #0f172a; transform: rotate(90deg); }
+.notice-modal-icon-wrapper {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.notice-modal-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.18);
+  animation: iconBounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.notice-icon-ripple {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  opacity: 0.45;
+  animation: ripplePulse 2s infinite ease-out;
+  z-index: 1;
+}
+.notice-type-warning .notice-modal-icon { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #d97706; border: 2.5px solid #f59e0b; }
+.notice-type-warning .notice-icon-ripple { border: 3px solid #f59e0b; }
+.notice-type-error .notice-modal-icon { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626; border: 2.5px solid #ef4444; }
+.notice-type-error .notice-icon-ripple { border: 3px solid #ef4444; }
+.notice-type-success .notice-modal-icon { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); color: #15803d; border: 2.5px solid #10b981; }
+.notice-type-success .notice-icon-ripple { border: 3px solid #10b981; }
+.notice-type-info .notice-modal-icon { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0369a1; border: 2.5px solid #0ea5e9; }
+.notice-type-info .notice-icon-ripple { border: 3px solid #0ea5e9; }
+@keyframes iconBounceIn { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.18); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes ripplePulse { 0% { transform: scale(0.85); opacity: 0.7; } 70% { transform: scale(1.4); opacity: 0; } 100% { transform: scale(1.4); opacity: 0; } }
+.notice-modal-title { font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 12px; letter-spacing: -0.02em; line-height: 1.35; }
+.notice-modal-body { font-size: 14px; line-height: 1.65; color: #334155; text-align: left; margin-bottom: 22px; background: #f8fafc; padding: 16px; border-radius: 14px; border: 1px solid #e2e8f0; max-height: 52vh; overflow-y: auto; }
+.notice-modal-body p { margin: 0 0 8px; }
+.notice-modal-body p:last-child { margin-bottom: 0; }
+.notice-modal-body ul { margin: 8px 0 10px 18px; padding: 0; }
+.notice-modal-body li { margin-bottom: 5px; }
+.notice-modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-notice-primary { flex: 1; min-width: 160px; background: linear-gradient(135deg, #0d7a5f 0%, #059669 100%); color: white; border: none; padding: 12px 22px; border-radius: 12px; font-weight: 700; font-size: 14.5px; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 4px 14px rgba(13, 122, 95, 0.32); }
+.btn-notice-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(13, 122, 95, 0.42); }
+.btn-notice-secondary { flex: 1; min-width: 160px; background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 14.5px; cursor: pointer; transition: all 0.25s ease; }
+.btn-notice-secondary:hover { background: #e2e8f0; transform: translateY(-2px); }
+
+</style>
 </head>
 <body>
 
@@ -224,6 +331,143 @@
     </footer>
 
     <script>
+
+// ==========================================
+// TÍCH HỢP HỘP THOẠI THÔNG BÁO HOẠT HỌA HIỆN ĐẠI (THAY THẾ ALERT)
+// ==========================================
+function createNoticeModalDOM() {
+  if (document.getElementById('appNoticeModal')) return;
+  const modalDiv = document.createElement('div');
+  modalDiv.id = 'appNoticeModal';
+  modalDiv.className = 'notice-modal-backdrop';
+  modalDiv.setAttribute('aria-hidden', 'true');
+  modalDiv.innerHTML = `
+    <div class="notice-modal-card">
+      <button type="button" class="notice-modal-close" id="btnNoticeClose" aria-label="Đóng">✕</button>
+      <div class="notice-modal-icon-wrapper" id="noticeIconWrapper">
+        <div class="notice-modal-icon" id="noticeIcon">⚠️</div>
+        <div class="notice-icon-ripple"></div>
+      </div>
+      <h3 class="notice-modal-title" id="noticeTitle">Thông Báo</h3>
+      <div class="notice-modal-body" id="noticeBody"></div>
+      <div class="notice-modal-actions" id="noticeActions">
+        <button type="button" class="btn-notice-primary" id="noticePrimaryBtn">Tôi đã hiểu</button>
+        <button type="button" class="btn-notice-secondary" id="noticeSecondaryBtn" style="display:none;">Xem Đơn Hàng ➔</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modalDiv);
+
+  modalDiv.addEventListener('click', (e) => {
+    if (e.target === modalDiv) closeNoticeModal();
+  });
+  document.getElementById('btnNoticeClose')?.addEventListener('click', closeNoticeModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalDiv.classList.contains('active')) closeNoticeModal();
+  });
+}
+
+function showNoticeModal(options) {
+  createNoticeModalDOM();
+  let { title = 'Thông Báo', message = '', type = 'warning', primaryBtnText = 'Tôi đã hiểu', secondaryBtnText = '', onSecondary = null, onPrimary = null } = (typeof options === 'string' ? { message: options } : options) || {};
+
+  // Auto-detect type & icon
+  let iconEmoji = '⚠️';
+  if (message && (message.includes('🎉') || message.includes('thành công') || message.includes('CẢM ƠN'))) {
+    type = 'success';
+    iconEmoji = '🎉';
+  } else if (message && (message.includes('TRÙNG LỊCH') || message.includes('ĐÃ CÓ ĐƠN') || message.includes('CẢNH BÁO') || message.includes('⚠️'))) {
+    type = 'warning';
+    iconEmoji = '⚠️';
+  } else if (message && (message.includes('hết chỗ') || message.includes('Không thể') || message.includes('Nghiêm cấm') || message.includes('NGHIÊM CẤM') || message.includes('KHÔNG THỂ') || message.includes('không hợp lệ') || message.includes('❌') || message.includes('⛔'))) {
+    type = 'error';
+    iconEmoji = '⛔';
+  } else if (message && (message.includes('ĐĂNG KÝ') || message.includes('ĐĂNG NHẬP') || message.includes('CHÀO MỪNG') || message.includes('ℹ️'))) {
+    type = 'info';
+    iconEmoji = '✈️';
+  }
+
+  // Parse title from first line if it looks like a header
+  const lines = (message || '').split('\n').map(l => l.trim()).filter(Boolean);
+  if (!options.title) {
+    if (lines.length > 0 && (lines[0].startsWith('⚠️') || lines[0].startsWith('🎉') || lines[0].startsWith('❌') || lines[0].startsWith('⛔') || lines[0].startsWith('ℹ️'))) {
+      title = lines[0].replace(/^[⚠️🎉❌⛔ℹ️\s]+/, '').trim();
+      message = lines.slice(1).join('\n');
+    }
+  }
+
+  // Format message body into HTML paragraphs and bullet points
+  let formattedHtml = '';
+  const bodyLines = (message || '').split('\n');
+  let inBulletList = false;
+
+  bodyLines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
+      if (!inBulletList) {
+        formattedHtml += '<ul style="margin: 8px 0 10px 18px; padding:0; color:#334155;">';
+        inBulletList = true;
+      }
+      formattedHtml += `<li style="margin-bottom: 4px;">${trimmed.replace(/^[•\-]\s*/, '')}</li>`;
+    } else {
+      if (inBulletList) {
+        formattedHtml += '</ul>';
+        inBulletList = false;
+      }
+      if (trimmed.startsWith('👉')) {
+        formattedHtml += `<p style="margin: 10px 0 4px; padding: 10px 12px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; color: #065f46; font-weight: 600;">${trimmed}</p>`;
+      } else {
+        formattedHtml += `<p style="margin-bottom: 6px;">${trimmed}</p>`;
+      }
+    }
+  });
+  if (inBulletList) formattedHtml += '</ul>';
+
+  const modalEl = document.getElementById('appNoticeModal');
+  const card = modalEl.querySelector('.notice-modal-card');
+  card.className = `notice-modal-card notice-type-${type}`;
+  document.getElementById('noticeIcon').textContent = iconEmoji;
+  document.getElementById('noticeTitle').textContent = title || 'Thông Báo Hệ Thống';
+  document.getElementById('noticeBody').innerHTML = formattedHtml || message;
+
+  const priBtn = document.getElementById('noticePrimaryBtn');
+  priBtn.textContent = primaryBtnText;
+  priBtn.onclick = () => {
+    closeNoticeModal();
+    if (typeof onPrimary === 'function') onPrimary();
+  };
+
+  const secBtn = document.getElementById('noticeSecondaryBtn');
+  if (secondaryBtnText) {
+    secBtn.textContent = secondaryBtnText;
+    secBtn.style.display = 'inline-block';
+    secBtn.onclick = () => {
+      closeNoticeModal();
+      if (typeof onSecondary === 'function') onSecondary();
+    };
+  } else {
+    secBtn.style.display = 'none';
+  }
+
+  modalEl.classList.add('active');
+  modalEl.setAttribute('aria-hidden', 'false');
+}
+
+function closeNoticeModal() {
+  const modalEl = document.getElementById('appNoticeModal');
+  if (modalEl) {
+    modalEl.classList.remove('active');
+    modalEl.setAttribute('aria-hidden', 'true');
+  }
+}
+
+window.alert = function(msg) {
+  showNoticeModal(msg);
+};
+window.showNoticeModal = showNoticeModal;
+window.closeNoticeModal = closeNoticeModal;
+
       const BOOKING_KEY = 'tourdulich_bookings';
       const TOUR_KEY = 'tourdulich_tours';
       const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(val) || 0);
@@ -297,6 +541,28 @@
 
       let currentStatusFilter = 'all';
 
+      // TỰ ĐỘNG ĐỒNG BỘ TÊN TOUR CHO TẤT CẢ ĐƠN ĐẶT TOUR
+      function syncTourNamesToBookings() {
+        try {
+          const tours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
+          const bookings = getBookings();
+          let changed = false;
+          bookings.forEach(b => {
+            const match = tours.find(t => (b.tourId && String(t.id) === String(b.tourId)) || (b.tourCode && t.code === b.tourCode));
+            if (match && match.name && b.tourName !== match.name) {
+              b.tourName = match.name;
+              changed = true;
+            }
+          });
+          if (changed) {
+            saveBookings(bookings);
+            console.log('Đơn hàng: Đã tự động đồng bộ tên tour mới nhất từ hệ thống.');
+          }
+        } catch(e) {}
+      }
+      syncTourNamesToBookings();
+
+
       window.renderOrders = () => {
         let bookings = getBookings();
         const searchKey = (document.getElementById('orderSearchInput')?.value || '').toLowerCase().trim();
@@ -346,7 +612,12 @@
                 <small style="color: #64748b;">📞 ${b.phone || ''}</small>
               </td>
               <td>
-                <strong style="color: #0f172a;">${b.tourName}</strong>
+                ${(() => {
+                  const allTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
+                  const matched = allTours.find(t => (b.tourId && String(t.id) === String(b.tourId)) || (b.tourCode && t.code === b.tourCode) || (t.name && t.name.toLowerCase() === (b.tourName || '').toLowerCase()));
+                  const realName = matched ? matched.name : b.tourName;
+                  return `<strong style="color: #0f172a;">${realName}</strong>`;
+                })()}
                 ${b.note || b.notes ? `<br><small style="color:#64748b;">${b.note || b.notes}</small>` : ''}
               </td>
               <td>
@@ -377,7 +648,10 @@
         const b = getBookings().find(item => String(item.id) === String(id));
         if (!b) return;
         const stages = (Array.isArray(b.stages) && b.stages.length === 3) ? b.stages : getDefaultStages(b.tourName);
-        document.getElementById('stageModalSub').textContent = `Mã đặt chỗ: ${b.id} • Tour: ${b.tourName} • Ngày đi: ${b.travelDate}`;
+        const allTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
+        const matched = allTours.find(t => (b.tourId && String(t.id) === String(b.tourId)) || (b.tourCode && t.code === b.tourCode) || (t.name && t.name.toLowerCase() === (b.tourName || '').toLowerCase()));
+        const realTourName = matched ? matched.name : b.tourName;
+        document.getElementById('stageModalSub').textContent = `Mã đặt chỗ: ${b.id} • Tour: ${realTourName} • Ngày đi: ${b.travelDate}`;
         
         document.getElementById('stageTimelineContent').innerHTML = stages.map(s => `
           <div class="stage-item">
@@ -407,7 +681,12 @@
             <div class="eticket-head">
               <div>
                 <div style="font-size:12px; text-transform:uppercase; letter-spacing:1px; opacity:0.9;">Traveloka / TourDuLich Boarding Pass</div>
-                <h3 style="margin:4px 0 0; color:white; font-size:20px;">${b.tourName}</h3>
+                ${(() => {
+                  const allTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
+                  const matched = allTours.find(t => (b.tourId && String(t.id) === String(b.tourId)) || (b.tourCode && t.code === b.tourCode) || (t.name && t.name.toLowerCase() === (b.tourName || '').toLowerCase()));
+                  const realName = matched ? matched.name : b.tourName;
+                  return `<h3 style="margin:4px 0 0; color:white; font-size:20px;">${realName}</h3>`;
+                })()}
               </div>
               <div style="text-align:right;">
                 <div style="font-size:12px; opacity:0.9;">MÃ ĐẶT CHỖ (PNR)</div>
@@ -446,7 +725,10 @@
       window.openSplitBill = (id) => {
         const b = getBookings().find(item => String(item.id) === String(id));
         if (!b) return;
-        document.getElementById('splitBillSub').textContent = `Đơn: ${b.id} • ${b.tourName} • Số lượng: ${b.guestCount || 1} thành viên`;
+        const allTours = JSON.parse(localStorage.getItem('tourdulich_tours') || '[]');
+        const matched = allTours.find(t => (b.tourId && String(t.id) === String(b.tourId)) || (b.tourCode && t.code === b.tourCode) || (t.name && t.name.toLowerCase() === (b.tourName || '').toLowerCase()));
+        const realTourName = matched ? matched.name : b.tourName;
+        document.getElementById('splitBillSub').textContent = `Đơn: ${b.id} • ${realTourName} • Số lượng: ${b.guestCount || 1} thành viên`;
         document.getElementById('splitBaseAmount').value = b.totalPrice || 0;
         document.getElementById('splitExtraAmount').value = 600000;
 
@@ -514,11 +796,27 @@
       window.closeModal = (modalId) => document.getElementById(modalId).classList.remove('show');
 
       window.cancelOrder = (id) => {
+        const target = getBookings().find(b => String(b.id) === String(id));
+        if (target && (target.status === 'confirmed' || target.status === 'paid' || target.status === 'completed')) {
+          showNoticeModal({
+            type: 'error',
+            title: 'Không Thể Tự Hủy Đơn Đã Xác Nhận!',
+            message: `Đơn đặt tour #${id} đang ở trạng thái "${target.status === 'confirmed' ? 'Đã xác nhận' : target.status === 'paid' ? 'Đã thanh toán' : 'Đã hoàn thành'}".\n\n` +
+              `• Để bảo đảm quyền lợi hoàn tiền và giữ chỗ hợp lệ, quý khách không thể tự hủy đơn đã xác nhận / xuất vé điện tử E-Ticket.\n` +
+              `• Quý khách vui lòng liên hệ Hotline CSKH 1900 6868 hoặc Quản trị viên để được hỗ trợ theo quy định hoàn tiền du lịch!`
+          });
+          return;
+        }
+
         if (confirm(`Bạn có chắc chắn muốn hủy đơn đặt tour #${id} này không?`)) {
           let bookings = getBookings().map(b => String(b.id) === String(id) ? { ...b, status: 'cancelled' } : b);
           saveBookings(bookings);
           renderOrders();
-          alert(`✅ Đã hủy đơn đặt tour #${id} thành công!`);
+          showNoticeModal({
+            type: 'success',
+            title: 'Hủy Đơn Thành Công',
+            message: `Đã hủy đơn đặt tour #${id} thành công! Quý khách có thể lựa chọn và đặt tour khác bất cứ lúc nào.`
+          });
         }
       };
 
