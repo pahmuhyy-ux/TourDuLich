@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VietTour - Khám phá Việt Nam</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo">VietTour</div>
+
+        <nav>
+            <a href="#" class="active">Trang chủ</a>
+            <a href="#tour">Tour du lịch</a>
+            <a href="#destination">Điểm đến</a>
+            <a href="#about">Giới thiệu</a>
+            <a href="#contact">Liên hệ</a>
+        </nav>
+
+        <button class="btn-login">Đăng nhập</button>
+    </header>
+
+
+    <!-- BANNER -->
+    <section class="banner">
+        <div class="banner-content">
+            <p class="small-title">KHÁM PHÁ VIỆT NAM</p>
+
+            <h1>
+                Hành trình đẹp<br>
+                Bắt đầu từ hôm nay
+            </h1>
+
+            <p>
+                Khám phá những địa điểm tuyệt đẹp,
+                trải nghiệm văn hóa và tạo nên những
+                kỷ niệm đáng nhớ.
+            </p>
+
+            <button class="btn-main" onclick="goToTour()">
+                Xem tour ngay
+            </button>
+        </div>
+    </section>
+
+
+    <!-- DANH SÁCH TOUR -->
+    <section class="section" id="tour">
+
+        <div class="section-title">
+            <p>KHÁM PHÁ CÙNG VIETTOUR</p>
+            <h2>Danh sách tour</h2>
+            <span>
+                Các tour đang có sẵn để bạn lựa chọn và đặt ngay hôm nay
+            </span>
+        </div>
+
+
+        <div class="tour-list">
+
+            <!-- TOUR 1 -->
+            <div class="tour-card">
+                <img src="assets/tour-da-nang.svg" alt="Phong cảnh biển Đà Nẵng và Hội An">
+
+                <div class="tour-content">
+                    <h3>Khám phá Đà Nẵng</h3>
+
+                    <p class="location">📍 Đà Nẵng - Hội An</p>
+                    <p class="duration">🕒 3 ngày 2 đêm</p>
+
+                    <p>
+                        Trải nghiệm biển Mỹ Khê, phố cổ Hội An
+                        và những món ăn đặc sản miền Trung.
+                    </p>
+
+                    <a class="tour-detail-link" href="chi-tiet-tour.html">
+                        Xem chi tiết tour
+                    </a>
+
+                    <div class="tour-bottom">
+                        <strong>3.500.000đ</strong>
+                        <button onclick="bookTour('Đà Nẵng')">
+                            Đặt tour
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- TOUR 2 -->
+            <div class="tour-card">
+                <img src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80" alt="Vịnh Hạ Long">
+
+                <div class="tour-content">
+                    <h3>Khám phá Hạ Long</h3>
+
+                    <p class="location">📍 Quảng Ninh</p>
+                    <p class="duration">🕒 2 ngày 1 đêm</p>
+
+                    <p>
+                        Du ngoạn vịnh Hạ Long, ngắm cảnh thiên nhiên
+                        và tận hưởng không khí trong lành.
+                    </p>
+
+                    <a class="tour-detail-link" href="chi-tiet-tour.html">
+                        Xem chi tiết tour
+                    </a>
+
+                    <div class="tour-bottom">
+                        <strong>2.900.000đ</strong>
+                        <button onclick="bookTour('Hạ Long')">
+                            Đặt tour
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- TOUR 3 -->
+            <div class="tour-card">
+                <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80" alt="Đà Lạt thành phố ngàn hoa">
+
+                <div class="tour-content">
+                    <h3>Khám phá Đà Lạt</h3>
+
+                    <p class="location">📍 Đà Lạt</p>
+                    <p class="duration">🕒 3 ngày 2 đêm</p>
+
+                    <p>
+                        Thành phố ngàn hoa với khí hậu mát mẻ,
+                        cảnh đẹp và nhiều địa điểm check-in.
+                    </p>
+
+                    <a class="tour-detail-link" href="chi-tiet-tour.html">
+                        Xem chi tiết tour
+                    </a>
+
+                    <div class="tour-bottom">
+                        <strong>3.200.000đ</strong>
+                        <button onclick="bookTour('Đà Lạt')">
+                            Đặt tour
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- GIỚI THIỆU -->
+    <section class="about" id="about">
+
+        <div class="about-image">
+            <img src="https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1000&q=80">
+        </div>
+
+        <div class="about-content">
+
+            <p class="small-title">VỀ VIETTOUR</p>
+
+            <h2>
+                Đồng hành cùng bạn
+                trên mọi hành trình
+            </h2>
+
+            <p>
+                VietTour là website cung cấp các tour du lịch
+                trong nước với nhiều lựa chọn phù hợp cho cá nhân,
+                gia đình và nhóm bạn.
+            </p>
+
+            <p>
+                Chúng tôi mong muốn mang đến những chuyến đi
+                an toàn, tiện lợi và nhiều trải nghiệm đáng nhớ.
+            </p>
+
+            <button class="btn-main">
+                Tìm hiểu thêm
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- ĐIỂM ĐẾN -->
+    <section class="section" id="destination">
+
+        <div class="section-title">
+            <p>ĐIỂM ĐẾN</p>
+            <h2>Khám phá Việt Nam</h2>
+        </div>
+
+        <div class="destination-list">
+
+            <div class="destination">
+                <img src="https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?auto=format&fit=crop&w=800&q=80">
+                <h3>Hà Nội</h3>
+            </div>
+
+            <div class="destination">
+                <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80">
+                <h3>Đà Lạt</h3>
+            </div>
+
+            <div class="destination">
+                <img src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80">
+                <h3>Hạ Long</h3>
+            </div>
+
+            <div class="destination">
+                <img src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80">
+                <h3>Đà Nẵng</h3>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ƯU ĐIỂM -->
+    <section class="features">
+
+        <div class="section-title">
+            <p>TẠI SAO CHỌN VIETTOUR?</p>
+            <h2>Những điều chúng tôi mang đến</h2>
+        </div>
+
+        <div class="feature-list">
+
+            <div class="feature">
+                <div class="icon">💰</div>
+                <h3>Giá hợp lý</h3>
+                <p>
+                    Nhiều lựa chọn tour với mức giá phù hợp.
+                </p>
+            </div>
+
+            <div class="feature">
+                <div class="icon">🚌</div>
+                <h3>Lịch trình rõ ràng</h3>
+                <p>
+                    Lịch trình được xây dựng chi tiết và thuận tiện.
+                </p>
+            </div>
+
+            <div class="feature">
+                <div class="icon">👨‍💼</div>
+                <h3>Hỗ trợ tận tình</h3>
+                <p>
+                    Đội ngũ hỗ trợ khách hàng trong suốt chuyến đi.
+                </p>
+            </div>
+
+            <div class="feature">
+                <div class="icon">⭐</div>
+                <h3>Trải nghiệm tốt</h3>
+                <p>
+                    Mang đến những trải nghiệm đáng nhớ cho du khách.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CTA -->
+    <section class="cta">
+
+        <h2>Sẵn sàng cho chuyến đi tiếp theo?</h2>
+
+        <p>
+            Hãy chọn một hành trình và bắt đầu khám phá ngay hôm nay.
+        </p>
+
+        <button class="btn-main" onclick="goToTour()">
+            Khám phá tour
+        </button>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer id="contact">
+
+        <div class="footer-content">
+
+            <div>
+                <h2>VietTour</h2>
+                <p>
+                    Đồng hành cùng bạn trên mọi hành trình.
+                </p>
+            </div>
+
+            <div>
+                <h3>Liên hệ</h3>
+                <p>📍 Hà Nội, Việt Nam</p>
+                <p>📞 0123 456 789</p>
+                <p>✉️ contact@viettour.vn</p>
+            </div>
+
+            <div>
+                <h3>Liên kết</h3>
+                <p>Trang chủ</p>
+                <p>Tour du lịch</p>
+                <p>Điểm đến</p>
+            </div>
+
+        </div>
+
+        <div class="copyright">
+            © 2026 VietTour. All rights reserved.
+        </div>
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>

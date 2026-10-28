@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Phong cảnh biển Đà Nẵng</title>
+  <desc id="desc">Minh họa bãi biển Đà Nẵng với núi, biển xanh và cầu vàng lúc bình minh.</desc>
+  <rect width="1200" height="760" fill="#dff4f2"/>
+  <circle cx="930" cy="160" r="92" fill="#ffd27a"/>
+  <path d="M0 350 190 185 330 315 485 120 670 330 830 210 1010 345 1200 190V470H0Z" fill="#75aaa5"/>
+  <path d="M0 390 180 255 330 355 490 205 680 365 850 275 1010 390 1200 250V480H0Z" fill="#3d7f7d" opacity=".8"/>
+  <path d="M0 450c180-35 310 35 470 0s290-35 430 0 210 20 300-5v315H0Z" fill="#36aeb1"/>
+  <path d="M0 535c180-34 300 28 465-3s285-28 430 4 220 15 305-4v228H0Z" fill="#118b9c"/>
+  <path d="M0 650c180-30 320 28 475-3s280-24 425 3 205 17 300-2v112H0Z" fill="#f8dfac"/>
+  <path d="M650 535c80-30 175-30 255 0v24H650Z" fill="#f7f1dc"/>
+  <path d="M725 450h115v95H725z" fill="#e8b46c"/>
+  <path d="M685 450h195l-18-28H703Z" fill="#c87552"/>
+  <path d="M750 390h64v60h-64z" fill="#f5d28b"/>
+  <path d="M770 318h25v72h-25z" fill="#5e928b"/>
+  <path d="M782 310c-55-35-72-76-48-105 44 21 65 54 48 105Zm8-10c7-54 36-86 75-87 0 47-24 76-75 87Z" fill="#3d8b73"/>
+  <path d="M600 575h270" stroke="#fff3d2" stroke-width="8" opacity=".75"/>
+  <path d="M90 590c95-18 180 17 260 0M375 635c85-16 160 14 235 0M930 600c72-14 135 12 205 0" fill="none" stroke="#bcebee" stroke-width="8" stroke-linecap="round"/>
+</svg>
