@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết tour Đà Nẵng - Hội An | VietTour</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <a class="logo" href="index.html">VietTour</a>
+
+        <nav>
+            <a href="index.html">Trang chủ</a>
+            <a href="index.html#tour" class="active">Tour du lịch</a>
+            <a href="index.html#destination">Điểm đến</a>
+            <a href="index.html#about">Giới thiệu</a>
+            <a href="index.html#contact">Liên hệ</a>
+        </nav>
+
+        <button class="btn-login">Đăng nhập</button>
+    </header>
+
+    <main class="tour-detail-page">
+        <div class="tour-detail-breadcrumb">
+            <a href="index.html">Trang chủ</a>
+            <span>/</span>
+            <span>Chi tiết tour</span>
+        </div>
+
+        <section class="tour-detail-hero">
+            <div class="tour-detail-image">
+                <img src="assets/tour-da-nang.svg" alt="Phong cảnh biển Đà Nẵng và Hội An">
+            </div>
+
+            <div class="tour-detail-summary">
+                <p class="small-title">TOUR NỔI BẬT</p>
+                <h1>Khám phá Đà Nẵng - Hội An</h1>
+                <p class="tour-detail-location">📍 Đà Nẵng - Hội An</p>
+
+                <div class="tour-facts">
+                    <div>
+                        <span>Thời lượng</span>
+                        <strong>3 ngày 2 đêm</strong>
+                    </div>
+                    <div>
+                        <span>Khởi hành</span>
+                        <strong>Mỗi thứ 6 hàng tuần</strong>
+                    </div>
+                    <div>
+                        <span>Phương tiện</span>
+                        <strong>Máy bay & xe du lịch</strong>
+                    </div>
+                    <div>
+                        <span>Số khách</span>
+                        <strong>Tối đa 25 người</strong>
+                    </div>
+                </div>
+
+                <div class="tour-detail-price">
+                    <span>Giá tour từ</span>
+                    <strong>3.500.000đ <small>/ người</small></strong>
+                </div>
+
+                <button class="btn-main" onclick="bookTour('Đà Nẵng - Hội An')">
+                    Đặt tour ngay
+                </button>
+            </div>
+        </section>
+
+        <section class="tour-detail-content">
+            <div class="tour-itinerary">
+                <p class="small-title">LỊCH TRÌNH GỢI Ý</p>
+                <h2>Hành trình 3 ngày 2 đêm</h2>
+
+                <article class="itinerary-day">
+                    <div class="day-number">01</div>
+                    <div>
+                        <h3>Đón khách - Bán đảo Sơn Trà</h3>
+                        <p>Đón khách tại sân bay Đà Nẵng, nhận phòng khách sạn và tham quan chùa Linh Ứng, bãi biển Mỹ Khê. Nghỉ đêm tại Đà Nẵng.</p>
+                    </div>
+                </article>
+
+                <article class="itinerary-day">
+                    <div class="day-number">02</div>
+                    <div>
+                        <h3>Ngũ Hành Sơn - Phố cổ Hội An</h3>
+                        <p>Khám phá danh thắng Ngũ Hành Sơn, làng đá mỹ nghệ Non Nước và phố cổ Hội An. Thưởng thức ẩm thực địa phương, ngắm phố cổ lên đèn.</p>
+                    </div>
+                </article>
+
+                <article class="itinerary-day">
+                    <div class="day-number">03</div>
+                    <div>
+                        <h3>Tự do mua sắm - Tiễn khách</h3>
+                        <p>Dùng bữa sáng, tự do mua đặc sản miền Trung và trả phòng. Xe đưa khách ra sân bay, kết thúc hành trình.</p>
+                    </div>
+                </article>
+            </div>
+
+            <aside class="tour-detail-sidebar">
+                <div class="detail-info-box">
+                    <h3>Giá tour bao gồm</h3>
+                    <ul>
+                        <li>Khách sạn tiêu chuẩn 3 sao</li>
+                        <li>Các bữa ăn theo lịch trình</li>
+                        <li>Xe du lịch máy lạnh</li>
+                        <li>Vé tham quan các điểm đến</li>
+                        <li>Hướng dẫn viên địa phương</li>
+                        <li>Bảo hiểm du lịch</li>
+                    </ul>
+                </div>
+
+                <div class="detail-info-box detail-note">
+                    <h3>Lưu ý</h3>
+                    <p>Giá tour có thể thay đổi theo thời điểm đặt và số lượng khách. Vui lòng liên hệ VietTour để được tư vấn lịch khởi hành phù hợp.</p>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <footer id="contact">
+        <div class="footer-content">
+            <div>
+                <h2>VietTour</h2>
+                <p>Đồng hành cùng bạn trên mọi hành trình.</p>
+            </div>
+            <div>
+                <h3>Liên hệ</h3>
+                <p>📍 Hà Nội, Việt Nam</p>
+                <p>📞 0123 456 789</p>
+                <p>✉️ contact@viettour.vn</p>
+            </div>
+            <div>
+                <h3>Liên kết</h3>
+                <p><a href="index.html">Trang chủ</a></p>
+                <p><a href="index.html#tour">Tour du lịch</a></p>
+                <p><a href="index.html#destination">Điểm đến</a></p>
+            </div>
+        </div>
+
+        <div class="copyright">© 2026 VietTour. All rights reserved.</div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
